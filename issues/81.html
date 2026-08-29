@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #81 Persona 외형 설명 UI/UX Visual Spec</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; padding: 32px 20px 72px; background: Canvas; color: CanvasText; }
+    main { max-width: 1100px; margin: 0 auto; }
+    .meta, .helper { opacity: .68; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 16px; }
+    button { border: 1px solid color-mix(in srgb, CanvasText 22%, Canvas); background: Canvas; color: CanvasText; border-radius: 10px; padding: 9px 14px; font: inherit; }
+    button[aria-selected="true"] { font-weight: 700; border-color: CanvasText; }
+    .stage { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 18px; padding: 24px; }
+    .phone { width: min(390px, 100%); min-height: 720px; margin: 0 auto; padding: 18px; border: 1px solid color-mix(in srgb, CanvasText 28%, Canvas); border-radius: 28px; box-sizing: border-box; background: color-mix(in srgb, Canvas 94%, CanvasText); }
+    .top { display: flex; align-items: center; gap: 12px; padding-bottom: 16px; border-bottom: 1px solid color-mix(in srgb, CanvasText 14%, Canvas); }
+    .back { font-size: 21px; } h2 { margin: 0; font-size: 18px; } h3 { margin: 22px 0 10px; font-size: 16px; }
+    .card { display: grid; grid-template-columns: 72px 1fr; gap: 12px; padding: 14px; border-radius: 14px; background: color-mix(in srgb, CanvasText 8%, Canvas); }
+    .thumb { display: grid; place-items: center; height: 72px; border-radius: 10px; background: color-mix(in srgb, CanvasText 18%, Canvas); font-size: 12px; }
+    .actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+    .action { padding: 7px 10px; border-radius: 8px; font-size: 13px; } .primary { background: CanvasText; color: Canvas; }
+    .field { margin-top: 14px; padding: 11px; min-height: 78px; border: 1px solid color-mix(in srgb, CanvasText 28%, Canvas); border-radius: 10px; }
+    .label { display: block; margin-bottom: 7px; font-size: 13px; font-weight: 700; }
+    .empty { color: color-mix(in srgb, CanvasText 55%, Canvas); } .status { margin-top: 10px; padding: 10px; border-radius: 9px; font-size: 13px; }
+    .loading { background: color-mix(in srgb, #6d75ff 18%, Canvas); } .error { background: color-mix(in srgb, #d95050 18%, Canvas); }
+    .save { width: 100%; margin-top: 22px; padding: 12px; border: 0; border-radius: 10px; background: CanvasText; color: Canvas; font-weight: 700; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="meta">seok-jun/my-honey-chat · Issue #81</div>
+    <h1>참고 이미지 외형 추출 결과를 Persona 외형 설명으로 노출</h1>
+    <p class="helper">대상 화면: Persona 편집. 외형 추출은 사용자가 누를 때만 시작하며, 결과는 저장 전까지 편집 화면의 초안이다.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Visual spec state">
+    <button type="button" role="tab" aria-selected="true" data-target="current">Current</button>
+    <button type="button" role="tab" aria-selected="false" data-target="ready">Proposed: 준비</button>
+    <button type="button" role="tab" aria-selected="false" data-target="loading">Proposed: 추출 중</button>
+    <button type="button" role="tab" aria-selected="false" data-target="success">Proposed: 결과</button>
+    <button type="button" role="tab" aria-selected="false" data-target="error">Proposed: 오류</button>
+  </div>
+
+  <section class="stage" id="current">
+    <div class="phone">
+      <div class="top"><span class="back">‹</span><h2>Persona 편집</h2></div>
+      <h3>핵심 정체성</h3><div class="field">이름, 나이대, 직업, 관계, 기본 화법, 추가 배경</div>
+      <h3>외형 참고 이미지</h3>
+      <div class="card"><div class="thumb">선택 이미지</div><div><strong>이미지·영상 생성에 사용하는 선택 항목</strong><div class="actions"><button class="action">이미지 변경</button><button class="action">삭제</button></div></div></div>
+      <p class="helper">이미지에서 얻은 외형 텍스트는 화면에 표시되지 않는다.</p><button class="save">저장</button>
+    </div>
+  </section>
+
+  <section class="stage" id="ready" hidden>
+    <div class="phone">
+      <div class="top"><span class="back">‹</span><h2>Persona 편집</h2></div>
+      <h3>외형 참고 이미지</h3>
+      <div class="card"><div class="thumb">선택 이미지</div><div><strong>등록된 외형 참고 이미지</strong><div class="actions"><button class="action primary">외형 추출</button><button class="action">이미지 변경</button><button class="action">삭제</button></div></div></div>
+      <p class="helper">외형 추출을 누르면 이 이미지를 xAI에 분석 요청한다.</p>
+      <h3>외형 설명</h3><div class="field empty">추출 결과가 여기 표시됩니다. 직접 입력하거나 추출 후 수정할 수 있습니다.</div>
+      <button class="save">저장</button>
+    </div>
+  </section>
+
+  <section class="stage" id="loading" hidden>
+    <div class="phone">
+      <div class="top"><span class="back">‹</span><h2>Persona 편집</h2></div>
+      <h3>외형 참고 이미지</h3><div class="card"><div class="thumb">선택 이미지</div><div><strong>등록된 외형 참고 이미지</strong><div class="actions"><button class="action" disabled>외형 추출</button></div></div></div>
+      <div class="status loading">외형을 분석하는 중… 완료될 때까지 새 추출 요청은 할 수 없습니다.</div>
+      <h3>외형 설명</h3><div class="field">저장 전 결과가 표시될 영역</div><button class="save">저장</button>
+    </div>
+  </section>
+
+  <section class="stage" id="success" hidden>
+    <div class="phone">
+      <div class="top"><span class="back">‹</span><h2>Persona 편집</h2></div>
+      <h3>외형 참고 이미지</h3><div class="card"><div class="thumb">선택 이미지</div><div><strong>등록된 외형 참고 이미지</strong><div class="actions"><button class="action primary">외형 다시 추출</button></div></div></div>
+      <h3>외형 설명</h3><div class="field">추출된 외형 설명이 이 편집 가능한 입력란에 표시됩니다.</div>
+      <p class="helper">이 결과는 아직 저장되지 않았습니다. 수정 후 저장을 누르면 이후 대화 Persona에 반영됩니다.</p><button class="save">저장</button>
+    </div>
+  </section>
+
+  <section class="stage" id="error" hidden>
+    <div class="phone">
+      <div class="top"><span class="back">‹</span><h2>Persona 편집</h2></div>
+      <h3>외형 참고 이미지</h3><div class="card"><div class="thumb">선택 이미지</div><div><strong>등록된 외형 참고 이미지</strong><div class="actions"><button class="action primary">외형 추출</button></div></div></div>
+      <div class="status error">외형을 추출하지 못했습니다. 기존 외형 설명과 저장된 Persona는 바뀌지 않았습니다.</div>
+      <h3>외형 설명</h3><div class="field">기존에 입력한 외형 설명은 그대로 유지됩니다.</div><button class="save">저장</button>
+    </div>
+  </section>
+</main>
+<script>
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const stages = document.querySelectorAll('.stage');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(item => item.setAttribute('aria-selected', String(item === tab)));
+    stages.forEach(stage => { stage.hidden = stage.id !== tab.dataset.target; });
+  }));
+</script>
+</body>
+</html>
