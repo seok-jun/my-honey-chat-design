@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>My Honey Chat — UI/UX Visual Specs</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { max-width: 860px; margin: 0 auto; padding: 48px 24px 80px; line-height: 1.6; }
+    h1 { margin-bottom: 8px; }
+    h2 { margin-top: 36px; }
+    code { padding: 2px 6px; border-radius: 6px; background: color-mix(in srgb, CanvasText 8%, Canvas); }
+    .card { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 14px; padding: 20px; margin: 18px 0; }
+    .muted { opacity: .72; }
+  </style>
+</head>
+<body>
+  <h1>My Honey Chat UI/UX Visual Specs</h1>
+  <p class="muted">이 저장소는 <strong>seok-jun/my-honey-chat</strong>의 UI/UX Visual Spec 전용 저장소다.</p>
+
+  <div class="card">
+    <strong>원칙</strong>
+    <ul>
+      <li>UI/UX 변경을 시각적으로 검토해야 할 때만 HTML을 만든다.</li>
+      <li>비즈니스 프로세스, 데이터 흐름, provider 라우팅, 모듈 구조는 여기서 관리하지 않는다.</li>
+      <li>Visual Spec은 실제 앱 구현이 아니라 화면 배치·정보 계층·상태·인터랙션의 계약이다.</li>
+      <li>앱 이슈의 기능 요구사항과 충돌하면 기능 동작은 앱 이슈가 우선한다.</li>
+    </ul>
+  </div>
+
+  <h2>파일 규칙</h2>
+  <ul>
+    <li>앱 이슈 번호를 파일명으로 사용: <code>issues/57.html</code></li>
+    <li>한 이슈는 가능한 한 self-contained HTML 하나로 관리한다.</li>
+    <li>CSS와 최소 JavaScript는 HTML 안에 포함한다.</li>
+    <li>npm, bundler, framework, 외부 CSS/JS 의존성을 추가하지 않는다.</li>
+    <li>Current / Proposed, default / loading / empty / error 등 필요한 상태를 한 파일에서 비교 가능하게 만든다.</li>
+  </ul>
+
+  <h2>생성 기준</h2>
+  <p>신규 화면, 주요 레이아웃 변경, navigation/modal/sheet/gallery/picker 변경, 다중 UI 상태처럼 텍스트만으로 화면 구조가 하나로 결정되지 않는 경우 Visual Spec을 만든다.</p>
+  <p>문구·색상·간격·아이콘의 단순 수정이나 기존 UI를 그대로 유지하는 버그 수정에는 만들지 않는다.</p>
+</body>
+</html>
