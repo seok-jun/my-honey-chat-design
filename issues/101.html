@@ -1,0 +1,104 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #101 — Persona Import Export Share Visual Spec</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 32px 20px 72px; background: Canvas; color: CanvasText; }
+    main { max-width: 1100px; margin: 0 auto; }
+    .meta,.muted { opacity:.65; }
+    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0; }
+    button { border:1px solid color-mix(in srgb, CanvasText 18%, Canvas); background:Canvas; color:CanvasText; border-radius:10px; padding:9px 13px; cursor:pointer; }
+    button[aria-selected="true"],.primary { border-color:CanvasText; font-weight:700; }
+    .stage { border:1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius:18px; padding:24px; min-height:680px; }
+    .phone { width:min(410px,100%); min-height:720px; margin:auto; border:1px solid color-mix(in srgb, CanvasText 25%, Canvas); border-radius:28px; overflow:hidden; }
+    .appbar { height:64px; padding:0 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid color-mix(in srgb, CanvasText 12%, Canvas); }
+    .grow { flex:1; }.title { font-weight:750; }.sub { font-size:12px; opacity:.62; }
+    .content { padding:16px; }.card,.panel { border:1px solid color-mix(in srgb, CanvasText 15%, Canvas); border-radius:16px; padding:14px; margin-bottom:12px; }
+    .row { display:flex; gap:10px; align-items:center; }.avatar { width:42px;height:42px;border-radius:50%;display:grid;place-items:center;border:1px solid color-mix(in srgb, CanvasText 20%, Canvas);font-weight:700; }
+    .actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }.actions .primary { margin-left:auto; }
+    .check { display:flex; align-items:flex-start; gap:10px; padding:12px 0; border-bottom:1px solid color-mix(in srgb, CanvasText 10%, Canvas); }
+    .box { width:18px;height:18px;border:1px solid CanvasText;border-radius:4px;flex:0 0 auto;margin-top:2px; }.box.on::after { content:'✓';display:grid;place-items:center;font-size:13px; }
+    .warning { border-style:dashed; }.file { padding:10px;border-radius:10px;border:1px solid color-mix(in srgb, CanvasText 14%, Canvas);font-family:ui-monospace,monospace;font-size:12px; }
+    .center { min-height:560px;display:grid;place-items:center;text-align:center;padding:26px; }
+    [hidden]{display:none!important;}
+  </style>
+</head>
+<body>
+<main>
+  <div class="meta">seok-jun/my-honey-chat · Issue #101</div>
+  <h1>.mhpersona 가져오기 · 내보내기 · 공유</h1>
+  <p>공유 대상은 Persona Definition이다. 개인 Runtime 데이터는 공유 패키지에 포함하지 않는다.</p>
+
+  <div class="tabs" role="tablist">
+    <button role="tab" aria-selected="true" data-target="library">Library Actions</button>
+    <button role="tab" aria-selected="false" data-target="export">Export / Share</button>
+    <button role="tab" aria-selected="false" data-target="import">Import Preview</button>
+    <button role="tab" aria-selected="false" data-target="error">Invalid Package</button>
+  </div>
+
+  <section id="library" class="stage">
+    <div class="phone">
+      <div class="appbar"><button>←</button><div class="grow"><div class="title">Persona Library</div><div class="sub">보유 Persona</div></div><button class="primary">가져오기</button></div>
+      <div class="content">
+        <div class="card">
+          <div class="row"><div class="avatar">유</div><div class="grow"><div class="title">유란</div><div class="sub">현재 사용 중</div></div><button>⋮</button></div>
+          <div class="actions"><button>편집</button><button>내보내기</button><button>공유</button></div>
+        </div>
+        <div class="panel muted">가져오기 → 시스템 파일 Picker. 내보내기 → 포함 데이터 확인 후 Save Picker. 공유 → 포함 데이터 확인 후 Android Sharesheet.</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="export" class="stage" hidden>
+    <div class="phone">
+      <div class="appbar"><button>←</button><div class="grow"><div class="title">유란 내보내기</div><div class="sub">포함할 데이터를 확인하세요</div></div></div>
+      <div class="content">
+        <div class="panel">
+          <div class="title">항상 포함</div>
+          <p class="muted">이름, 나이대, 역할, 관계 설정, 기본 화법, 추가 배경, 외형 설명, Tunable Persona</p>
+        </div>
+        <div class="check"><div class="box on"></div><div><div class="title">프로필 이미지 포함</div><div class="sub">선택 해제 가능</div></div></div>
+        <div class="check"><div class="box"></div><div><div class="title">외형 참고 이미지 포함</div><div class="sub">기본값 OFF · 명시적으로 선택한 경우에만 포함</div></div></div>
+        <div class="panel warning">
+          <div class="title">포함되지 않는 데이터</div>
+          <p class="muted">대화, Memory, Relationship, 현재 Mood, 생성 미디어 기록, API key/token, 로컬 파일 경로</p>
+        </div>
+        <div class="file">yuran.mhpersona</div>
+        <div class="actions"><button>취소</button><button>파일로 저장</button><button class="primary">공유</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="import" class="stage" hidden>
+    <div class="phone">
+      <div class="appbar"><button>←</button><div class="grow"><div class="title">Persona 가져오기</div><div class="sub">검증 완료 · schema v1</div></div></div>
+      <div class="content">
+        <div class="file">shared-character.mhpersona</div>
+        <div class="card">
+          <div class="row"><div class="avatar">서</div><div class="grow"><div class="title">서연</div><div class="sub">20대 후반 · 직장 동료</div></div></div>
+          <p class="muted" style="margin-top:12px">프로필 이미지 포함 · 외형 참고 이미지 미포함</p>
+        </div>
+        <div class="panel"><div class="title">새 Persona로 추가됩니다</div><p class="muted">같은 이름이 있어도 덮어쓰지 않는다. 새 local ID를 만들고 Relationship/Mood는 초기값, 대화/Memory는 빈 상태로 시작한다.</p></div>
+        <div class="actions"><button>취소</button><button class="primary">가져오기</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="error" class="stage" hidden>
+    <div class="phone">
+      <div class="appbar"><button>←</button><div class="grow"><div class="title">Persona 가져오기</div></div></div>
+      <div class="center"><div><h2>이 Persona 파일을 열 수 없습니다</h2><p class="muted">지원하지 않는 버전이거나 파일 구조가 올바르지 않습니다. 기존 Persona와 현재 선택 상태는 변경되지 않습니다.</p><button class="primary">다른 파일 선택</button></div></div>
+    </div>
+  </section>
+</main>
+<script>
+  const tabs=document.querySelectorAll('[role="tab"]');
+  const stages=document.querySelectorAll('.stage');
+  tabs.forEach(tab=>tab.addEventListener('click',()=>{tabs.forEach(x=>x.setAttribute('aria-selected',String(x===tab)));stages.forEach(s=>s.hidden=s.id!==tab.dataset.target);}));
+</script>
+</body>
+</html>
