@@ -1,0 +1,186 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #100 — Persona Library UI/UX Visual Spec</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 32px 20px 72px; background: Canvas; color: CanvasText; }
+    main { max-width: 1180px; margin: 0 auto; }
+    header { margin-bottom: 24px; }
+    h1, h2, h3, p { margin-top: 0; }
+    .meta, .muted { opacity: .66; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+    button { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); background: Canvas; color: CanvasText; border-radius: 10px; padding: 9px 13px; cursor: pointer; }
+    button[aria-selected="true"], .primary { font-weight: 700; border-color: CanvasText; }
+    .danger { border-style: dashed; }
+    .stage { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 18px; padding: 24px; min-height: 690px; }
+    .phone { width: min(410px, 100%); min-height: 720px; margin: 0 auto; border: 1px solid color-mix(in srgb, CanvasText 25%, Canvas); border-radius: 28px; overflow: hidden; background: Canvas; }
+    .appbar { height: 64px; display: flex; align-items: center; gap: 12px; padding: 0 16px; border-bottom: 1px solid color-mix(in srgb, CanvasText 12%, Canvas); }
+    .avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; border: 1px solid color-mix(in srgb, CanvasText 22%, Canvas); font-weight: 700; flex: 0 0 auto; }
+    .grow { flex: 1; min-width: 0; }
+    .title { font-weight: 750; }
+    .sub { font-size: 12px; opacity: .62; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+    .content { padding: 16px; }
+    .toolbar { display: flex; gap: 8px; margin-bottom: 16px; }
+    .toolbar button:last-child { margin-left: auto; }
+    .card { border: 1px solid color-mix(in srgb, CanvasText 15%, Canvas); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
+    .card.active { border-width: 2px; }
+    .row { display: flex; gap: 12px; align-items: center; }
+    .card-actions { display: flex; gap: 8px; margin-top: 12px; }
+    .badge { display: inline-block; margin-top: 6px; padding: 3px 7px; border: 1px solid color-mix(in srgb, CanvasText 16%, Canvas); border-radius: 999px; font-size: 11px; }
+    .field { margin: 0 0 14px; }
+    .field label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; }
+    .input { min-height: 42px; border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 10px; padding: 10px; opacity: .84; }
+    .textarea { min-height: 72px; }
+    details { border-top: 1px solid color-mix(in srgb, CanvasText 12%, Canvas); padding-top: 14px; margin-top: 16px; }
+    .slider { display: grid; grid-template-columns: 1fr 72px; gap: 10px; align-items: center; margin: 10px 0; }
+    .track { height: 8px; border-radius: 999px; border: 1px solid color-mix(in srgb, CanvasText 20%, Canvas); position: relative; }
+    .track::after { content: ""; display: block; width: 62%; height: 100%; border-right: 2px solid CanvasText; }
+    .footer { display: flex; gap: 8px; padding-top: 16px; }
+    .footer .primary { margin-left: auto; }
+    .center { min-height: 560px; display: grid; place-items: center; text-align: center; padding: 28px; }
+    .chat { padding: 18px; }
+    .bubble { max-width: 78%; border: 1px solid color-mix(in srgb, CanvasText 16%, Canvas); border-radius: 16px; padding: 10px 12px; margin-bottom: 12px; }
+    .bubble.me { margin-left: auto; }
+    .note { max-width: 760px; margin: 20px auto 0; font-size: 13px; line-height: 1.6; opacity: .72; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="meta">seok-jun/my-honey-chat · Issue #100</div>
+    <h1>Persona Library · 생성 · 편집 · 전환</h1>
+    <p>Persona를 하나의 설정 페이지가 아니라 사용자가 보유하고 전환하는 Library로 다룬다. 파일 import/export/share는 이 Issue 범위가 아니다.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Visual spec state">
+    <button type="button" role="tab" aria-selected="true" data-target="current">Current</button>
+    <button type="button" role="tab" aria-selected="false" data-target="library">Library</button>
+    <button type="button" role="tab" aria-selected="false" data-target="editor">Editor</button>
+    <button type="button" role="tab" aria-selected="false" data-target="empty">Empty / Error</button>
+    <button type="button" role="tab" aria-selected="false" data-target="switched">After Switch</button>
+  </div>
+
+  <section class="stage" id="current">
+    <div class="phone">
+      <div class="appbar">
+        <div class="avatar">유</div>
+        <div class="grow"><div class="title">유란</div><div class="sub">현재 단일 Persona</div></div>
+        <button type="button">설정</button>
+      </div>
+      <div class="chat">
+        <div class="bubble">현재는 한 Persona를 전제로 한 채팅 화면이다.</div>
+        <div class="bubble me">다른 Persona를 보유하거나 전환하는 Library 진입점이 없다.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stage" id="library" hidden>
+    <div class="phone">
+      <div class="appbar">
+        <button type="button">←</button>
+        <div class="grow"><div class="title">Persona Library</div><div class="sub">내가 보유한 Persona 3개</div></div>
+        <button type="button" class="primary">＋ 새 Persona</button>
+      </div>
+      <div class="content">
+        <div class="card active">
+          <div class="row">
+            <div class="avatar">유</div>
+            <div class="grow"><div class="title">유란</div><div class="sub">29세 · 친근하고 장난스러운 관계</div><span class="badge">현재 사용 중</span></div>
+            <button type="button">⋮</button>
+          </div>
+          <div class="card-actions"><button type="button">편집</button><button type="button">복제</button></div>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="avatar">서</div>
+            <div class="grow"><div class="title">서연</div><div class="sub">직장 동료 · 차분한 말투</div><span class="badge">사용자 생성</span></div>
+            <button type="button">⋮</button>
+          </div>
+          <div class="card-actions"><button type="button" class="primary">이 Persona로 대화</button><button type="button">편집</button></div>
+        </div>
+        <div class="card">
+          <div class="row">
+            <div class="avatar">나</div>
+            <div class="grow"><div class="title">나리</div><div class="sub">오래된 친구 · 적극적인 화제 제안</div><span class="badge">복제본</span></div>
+            <button type="button">⋮</button>
+          </div>
+          <div class="card-actions"><button type="button" class="primary">이 Persona로 대화</button><button type="button">편집</button></div>
+        </div>
+        <p class="muted">⋮ 메뉴: 복제 / 삭제. 마지막 Persona는 삭제할 수 없고 삭제 전 확인 dialog를 표시한다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="stage" id="editor" hidden>
+    <div class="phone">
+      <div class="appbar">
+        <button type="button">←</button>
+        <div class="grow"><div class="title">새 Persona</div><div class="sub">* 필수 입력</div></div>
+      </div>
+      <div class="content">
+        <div class="row" style="margin-bottom:16px"><div class="avatar">＋</div><div><div class="title">프로필 이미지</div><div class="sub">선택 · 기존 이미지 저장 정책 사용</div></div></div>
+        <div class="field"><label>이름 *</label><div class="input">서연</div></div>
+        <div class="field"><label>나이대 *</label><div class="input">20대 후반</div></div>
+        <div class="field"><label>직업 또는 역할 *</label><div class="input">직장 동료</div></div>
+        <div class="field"><label>관계 설정 *</label><div class="input textarea">같은 프로젝트를 오래 함께한 가까운 동료</div></div>
+        <div class="field"><label>기본 화법 *</label><div class="input textarea">차분하고 자연스러운 반말, 과한 질문은 피함</div></div>
+        <div class="field"><label>추가 배경</label><div class="input textarea muted">선택 입력</div></div>
+        <div class="field"><label>외형 설명</label><div class="input textarea muted">선택 입력</div></div>
+        <details>
+          <summary><strong>고급 설정</strong> · Tunable Persona</summary>
+          <div class="slider"><span>주도성</span><div class="track"></div></div>
+          <div class="slider"><span>장난기</span><div class="track"></div></div>
+          <div class="slider"><span>애정 표현</span><div class="track"></div></div>
+          <div class="slider"><span>질문 빈도</span><div class="track"></div></div>
+          <p class="muted">실제 구현은 현재 지원 중인 Tunable 필드 전체를 사용한다.</p>
+        </details>
+        <div class="footer"><button type="button">취소</button><button type="button" class="primary">저장</button></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stage" id="empty" hidden>
+    <div class="phone">
+      <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona Library</div></div><button type="button">＋</button></div>
+      <div class="center">
+        <div>
+          <h2>Persona가 없습니다</h2>
+          <p class="muted">정상 신규 설치에서는 최초 Persona 설정으로 연결한다. 저장소 오류로 목록을 읽지 못한 경우 빈 목록으로 위장하지 않는다.</p>
+          <button type="button" class="primary">첫 Persona 만들기</button>
+          <button type="button">다시 시도</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="stage" id="switched" hidden>
+    <div class="phone">
+      <div class="appbar">
+        <div class="avatar">서</div>
+        <div class="grow"><div class="title">서연</div><div class="sub">Persona Library 열기 ›</div></div>
+        <button type="button">⋮</button>
+      </div>
+      <div class="chat">
+        <div class="bubble">전환 직후에는 서연 Persona에 속한 기존 대화만 표시한다.</div>
+        <div class="bubble me">유란의 대화나 Memory는 이 화면과 다음 모델 요청에 섞이지 않는다.</div>
+      </div>
+    </div>
+  </section>
+
+  <p class="note"><strong>정보 계층:</strong> Chat 상단의 현재 Persona 이름/프로필이 Library 진입점이다. Library에서는 “현재 사용 중” 상태와 전환 action이 가장 높은 우선순위이며, 편집/복제/삭제는 보조 action이다. Editor는 Core Identity를 우선 노출하고 Tunable 값은 고급 설정으로 접는다. Relationship, Mood, 대화, Memory는 Persona Definition 편집 항목으로 노출하지 않는다.</p>
+</main>
+<script>
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const stages = document.querySelectorAll('.stage');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
+    stages.forEach(stage => stage.hidden = stage.id !== tab.dataset.target;
+  }));
+</script>
+</body>
+</html>
