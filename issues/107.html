@@ -1,0 +1,307 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #107 — Scene Context UI/UX Visual Spec</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --bg: #0f0c0f;
+      --surface: #171317;
+      --surface-2: #241d21;
+      --bubble: #2a2227;
+      --mine: #6f3948;
+      --accent: #f0a8b7;
+      --text: #f7edf1;
+      --muted: #aa9ca2;
+      --line: #44383e;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 32px 20px 72px; background: var(--bg); color: var(--text); }
+    main { max-width: 1180px; margin: 0 auto; }
+    header { margin-bottom: 24px; }
+    h1, h2, h3, p { margin-top: 0; }
+    .meta, .muted { color: var(--muted); }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+    button {
+      border: 1px solid var(--line);
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 10px;
+      padding: 9px 13px;
+      cursor: pointer;
+    }
+    button[aria-selected="true"], .primary { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+    .stage { border: 1px solid var(--line); border-radius: 18px; padding: 24px; min-height: 760px; }
+    .phone {
+      width: min(390px, 100%);
+      min-height: 720px;
+      margin: 0 auto;
+      border: 1px solid #5b4d54;
+      border-radius: 30px;
+      overflow: hidden;
+      background: var(--surface);
+      position: relative;
+    }
+    .appbar {
+      height: 68px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 10px 12px;
+      border-bottom: 1px solid var(--line);
+    }
+    .avatar {
+      width: 42px;
+      height: 42px;
+      border-radius: 50%;
+      display: grid;
+      place-items: center;
+      background: #33272d;
+      color: var(--accent);
+      font-weight: 750;
+    }
+    .grow { flex: 1; min-width: 0; }
+    .title { font-weight: 750; }
+    .sub { font-size: 12px; color: var(--muted); margin-top: 2px; }
+    .icon { min-width: 36px; padding: 8px; font-size: 17px; }
+    .chat { padding: 18px 14px 96px; }
+    .bubble {
+      width: fit-content;
+      max-width: 82%;
+      padding: 11px 13px;
+      margin-bottom: 12px;
+      border-radius: 17px 17px 17px 5px;
+      background: var(--bubble);
+      line-height: 1.48;
+      font-size: 15px;
+    }
+    .bubble.mine {
+      margin-left: auto;
+      border-radius: 17px 17px 5px 17px;
+      background: var(--mine);
+    }
+    .action {
+      color: #d7c7cd;
+      font-size: 13px;
+      font-style: italic;
+      line-height: 1.45;
+      border-left: 2px solid #9b7885;
+      padding-left: 9px;
+      margin-bottom: 9px;
+    }
+    .dialogue { color: var(--text); }
+    .time { color: #8f8388; font-size: 10px; margin-top: 5px; }
+    .composer {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      display: flex;
+      gap: 8px;
+      align-items: center;
+      padding: 12px;
+      background: var(--surface);
+      border-top: 1px solid var(--line);
+    }
+    .input {
+      flex: 1;
+      min-height: 42px;
+      border: 1px solid var(--line);
+      border-radius: 22px;
+      padding: 11px 14px;
+      color: var(--muted);
+      background: #1d181b;
+    }
+    .menu {
+      position: absolute;
+      z-index: 3;
+      top: 58px;
+      right: 10px;
+      width: 215px;
+      background: #282126;
+      border: 1px solid #5c4d54;
+      border-radius: 12px;
+      padding: 6px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.45);
+    }
+    .menu-item { padding: 12px; border-radius: 8px; }
+    .menu-item strong { display: block; font-size: 14px; }
+    .menu-item span { display: block; margin-top: 3px; color: var(--muted); font-size: 11px; }
+    .scrim {
+      position: absolute;
+      inset: 0;
+      z-index: 4;
+      background: rgba(0,0,0,.58);
+      display: grid;
+      place-items: center;
+      padding: 24px;
+    }
+    .dialog {
+      width: 100%;
+      border: 1px solid #5d4e55;
+      border-radius: 20px;
+      background: #2a2227;
+      padding: 20px;
+    }
+    .choice {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+      padding: 11px 0;
+      border-bottom: 1px solid var(--line);
+    }
+    .choice:last-of-type { border-bottom: 0; }
+    .radio {
+      width: 18px;
+      height: 18px;
+      margin-top: 2px;
+      border: 2px solid var(--muted);
+      border-radius: 50%;
+    }
+    .radio.selected { border-color: var(--accent); box-shadow: inset 0 0 0 4px #2a2227; background: var(--accent); }
+    .choice-text strong { display: block; font-size: 14px; }
+    .choice-text span { display: block; color: var(--muted); font-size: 12px; margin-top: 3px; }
+    .actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 18px; }
+    .reset { color: #e3b9c4; }
+    .notes {
+      max-width: 860px;
+      margin: 24px auto 0;
+      padding: 18px;
+      border: 1px solid var(--line);
+      border-radius: 14px;
+      line-height: 1.65;
+    }
+    .notes li { margin-bottom: 7px; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="meta">seok-jun/my-honey-chat · Issue #107</div>
+    <h1>Scene Context · 짧은 행동 묘사 · 상황 교정</h1>
+    <p class="muted">Presence는 내부 상태다. 기본 채팅에는 모드 토글이나 상태 badge를 노출하지 않고, 행동이 의미 있을 때만 말풍선 안에 짧게 표현한다.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Visual spec state">
+    <button type="button" role="tab" aria-selected="true" data-target="remote">REMOTE 기본</button>
+    <button type="button" role="tab" aria-selected="false" data-target="present-action">PRESENT · Action</button>
+    <button type="button" role="tab" aria-selected="false" data-target="present-dialogue">PRESENT · Dialogue</button>
+    <button type="button" role="tab" aria-selected="false" data-target="correction-menu">교정 메뉴</button>
+    <button type="button" role="tab" aria-selected="false" data-target="correction-confirm">교정 확인</button>
+  </div>
+
+  <section class="stage" id="remote">
+    <div class="phone">
+      <div class="appbar">
+        <div class="avatar">유</div>
+        <div class="grow"><div class="title">유란</div><div class="sub">노말</div></div>
+        <button class="icon" type="button" aria-label="미디어">▦</button>
+        <button class="icon" type="button" aria-label="설정">⚙</button>
+        <button class="icon" type="button" aria-label="더보기">⋮</button>
+      </div>
+      <div class="chat">
+        <div class="bubble mine"><div class="dialogue">일반 사용자 메시지 영역</div><div class="time">18:20</div></div>
+        <div class="bubble"><div class="dialogue">일반 assistant 답변 영역</div><div class="time">18:20</div></div>
+      </div>
+      <div class="composer"><button class="icon" type="button">＋</button><div class="input">메시지</div><button class="icon primary" type="button">➤</button></div>
+    </div>
+  </section>
+
+  <section class="stage" id="present-action" hidden>
+    <div class="phone">
+      <div class="appbar">
+        <div class="avatar">유</div>
+        <div class="grow"><div class="title">유란</div><div class="sub">노말</div></div>
+        <button class="icon" type="button">▦</button><button class="icon" type="button">⚙</button><button class="icon" type="button">⋮</button>
+      </div>
+      <div class="chat">
+        <div class="bubble mine"><div class="dialogue">같은 공간의 대화 맥락</div><div class="time">18:22</div></div>
+        <div class="bubble">
+          <div class="action">캐릭터의 짧은 행동 또는 환경 반응</div>
+          <div class="dialogue">assistant 대화 본문</div>
+          <div class="time">18:22</div>
+        </div>
+      </div>
+      <div class="composer"><button class="icon" type="button">＋</button><div class="input">메시지</div><button class="icon primary" type="button">➤</button></div>
+    </div>
+  </section>
+
+  <section class="stage" id="present-dialogue" hidden>
+    <div class="phone">
+      <div class="appbar">
+        <div class="avatar">유</div>
+        <div class="grow"><div class="title">유란</div><div class="sub">노말</div></div>
+        <button class="icon" type="button">▦</button><button class="icon" type="button">⚙</button><button class="icon" type="button">⋮</button>
+      </div>
+      <div class="chat">
+        <div class="bubble mine"><div class="dialogue">같은 공간의 대화 맥락</div><div class="time">18:24</div></div>
+        <div class="bubble"><div class="dialogue">행동 묘사가 필요하지 않은 assistant 답변</div><div class="time">18:24</div></div>
+      </div>
+      <div class="composer"><button class="icon" type="button">＋</button><div class="input">메시지</div><button class="icon primary" type="button">➤</button></div>
+    </div>
+  </section>
+
+  <section class="stage" id="correction-menu" hidden>
+    <div class="phone">
+      <div class="appbar">
+        <div class="avatar">유</div>
+        <div class="grow"><div class="title">유란</div><div class="sub">노말</div></div>
+        <button class="icon" type="button">▦</button><button class="icon" type="button">⚙</button><button class="icon primary" type="button">⋮</button>
+      </div>
+      <div class="menu">
+        <div class="menu-item"><strong>현재 상황 다시 설정</strong><span>자동 인지가 어긋났을 때만 사용</span></div>
+      </div>
+      <div class="chat">
+        <div class="bubble"><div class="dialogue">기존 채팅 화면은 그대로 유지</div><div class="time">18:25</div></div>
+      </div>
+      <div class="composer"><button class="icon" type="button">＋</button><div class="input">메시지</div><button class="icon primary" type="button">➤</button></div>
+    </div>
+  </section>
+
+  <section class="stage" id="correction-confirm" hidden>
+    <div class="phone">
+      <div class="appbar">
+        <div class="avatar">유</div>
+        <div class="grow"><div class="title">유란</div><div class="sub">노말</div></div>
+        <button class="icon" type="button">▦</button><button class="icon" type="button">⚙</button><button class="icon" type="button">⋮</button>
+      </div>
+      <div class="chat"><div class="bubble"><div class="dialogue">상황 교정 전 채팅 내용</div></div></div>
+      <div class="scrim">
+        <div class="dialog" role="dialog" aria-modal="true">
+          <h3>현재 상황 다시 설정</h3>
+          <p class="muted">자동으로 이해한 상황이 다를 때만 골라줘. 대화 내용은 지워지지 않아.</p>
+          <div class="choice"><div class="radio selected"></div><div class="choice-text"><strong>떨어져 있는 중</strong><span>메신저처럼 각자 다른 곳에서 대화</span></div></div>
+          <div class="choice"><div class="radio"></div><div class="choice-text"><strong>같이 있는 중</strong><span>같은 장소에서 직접 대화</span></div></div>
+          <div class="choice reset"><div class="radio"></div><div class="choice-text"><strong>상황 초기화</strong><span>자동 인지가 다시 판단하도록 현재 상태만 지움</span></div></div>
+          <div class="actions"><button type="button">취소</button><button type="button" class="primary">적용</button></div>
+        </div>
+      </div>
+      <div class="composer"><button class="icon" type="button">＋</button><div class="input">메시지</div><button class="icon primary" type="button">➤</button></div>
+    </div>
+  </section>
+
+  <div class="notes">
+    <strong>구현 계약</strong>
+    <ul>
+      <li>REMOTE/PRESENT/APPROACHING/LEAVING 같은 내부 상태명을 기본 채팅 UI에 표시하지 않는다.</li>
+      <li>Action/Narration은 assistant 말풍선 안에서 대화 본문보다 작은 보조 계층으로 표시한다. 없으면 기존 말풍선과 동일하다.</li>
+      <li>Action/Narration은 캐릭터 행동과 환경 반응만 담고, 사용자의 행동·감정·동의는 확정하지 않는다.</li>
+      <li>상황 교정은 상시 토글이 아니라 더보기 메뉴의 복구 action이다.</li>
+      <li>교정 적용은 현재 Scene만 바꾸며 Conversation과 Memory를 새로 만들거나 삭제하지 않는다.</li>
+    </ul>
+  </div>
+</main>
+<script>
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const stages = document.querySelectorAll('.stage');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(item => item.setAttribute('aria-selected', String(item === tab)));
+    stages.forEach(stage => { stage.hidden = stage.id !== tab.dataset.target; });
+  }));
+</script>
+</body>
+</html>
