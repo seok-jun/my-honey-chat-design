@@ -51,15 +51,15 @@
     .time { margin-top: 5px; font-size: 10px; opacity: .56; text-align: right; }
     .composer-wrap { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 12px 14px; border-top: 1px solid color-mix(in srgb, CanvasText 14%, Canvas); background: Canvas; }
     .mode-row { display: flex; align-items: center; justify-content: space-between; min-height: 25px; margin: 0 3px 7px; }
-    .mode { display: inline-flex; align-items: center; gap: 6px; font-size: 12px; font-weight: 750; }
-    .mode.action-mode { color: color-mix(in srgb, var(--action) 86%, CanvasText); }
+    .mode-options { display: inline-flex; gap: 5px; }
+    .mode-chip { padding: 4px 9px; border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 999px; font-size: 12px; font-weight: 750; }
+    .mode-chip.dialogue-active { border-color: var(--accent); background: color-mix(in srgb, var(--accent) 16%, Canvas); }
+    .mode-chip.action-active { border-color: var(--action); background: color-mix(in srgb, var(--action) 18%, Canvas); color: color-mix(in srgb, var(--action) 86%, CanvasText); }
     .counter { font-size: 12px; opacity: .68; }
     .counter.warning { color: var(--warning); opacity: 1; font-weight: 750; }
     .counter.error { color: var(--error); opacity: 1; font-weight: 800; }
     .composer { display: flex; align-items: flex-end; gap: 8px; }
     .icon { display: grid; place-items: center; flex: 0 0 40px; width: 40px; height: 40px; padding: 0; border-radius: 50%; }
-    .mode-toggle { color: var(--action); border-color: color-mix(in srgb, var(--action) 58%, Canvas); }
-    .mode-toggle.active { background: var(--action); color: white; }
     .input { flex: 1; min-height: 20px; max-height: 88px; padding: 10px 12px; border: 1px solid color-mix(in srgb, CanvasText 20%, Canvas); border-radius: 18px; color: color-mix(in srgb, CanvasText 62%, Canvas); }
     .input.action-input { border-color: color-mix(in srgb, var(--action) 68%, Canvas); }
     .input.error { border-color: var(--error); }
@@ -101,7 +101,7 @@
     <div class="phone">
       <div class="top"><div class="avatar"></div><div class="grow"><div class="title">유란</div><div class="sub">노말</div></div><button class="icon" type="button">⋮</button></div>
       <div class="chat"><div class="bubble">assistant 메시지 영역<div class="time">18:20</div></div></div>
-      <div class="composer-wrap"><div class="mode-row"><span class="mode">Dialogue 입력</span></div><div class="composer"><button class="icon mode-toggle" type="button" aria-label="Action 입력으로 전환">동작</button><div class="input">메시지</div><button class="icon send" type="button">➤</button></div></div>
+      <div class="composer-wrap"><div class="mode-row"><div class="mode-options"><span class="mode-chip dialogue-active">Dialogue</span><span class="mode-chip">Action</span></div></div><div class="composer"><button class="icon" type="button" aria-label="사진 첨부">＋</button><div class="input">메시지</div><button class="icon send" type="button">➤</button></div></div>
     </div>
   </section>
 
@@ -109,7 +109,7 @@
     <div class="phone">
       <div class="top"><div class="avatar"></div><div class="grow"><div class="title">유란</div><div class="sub">노말</div></div><button class="icon" type="button">⋮</button></div>
       <div class="chat"><div class="bubble">assistant 메시지 영역<div class="time">18:20</div></div></div>
-      <div class="composer-wrap"><div class="mode-row"><span class="mode action-mode">◆ Action 입력</span><span class="counter">0/300</span></div><div class="composer"><button class="icon mode-toggle active" type="button" aria-label="Dialogue 입력으로 복귀">동작</button><div class="input action-input">내 행동이나 현재 상황을 입력</div><button class="icon send" type="button" disabled>➤</button></div></div>
+      <div class="composer-wrap"><div class="mode-row"><div class="mode-options"><span class="mode-chip">Dialogue</span><span class="mode-chip action-active">Action</span></div><span class="counter">0/300</span></div><div class="composer"><button class="icon" type="button" aria-label="사진 첨부">＋</button><div class="input action-input">내 행동이나 현재 상황을 입력</div><button class="icon send" type="button" disabled>➤</button></div></div>
     </div>
   </section>
 
@@ -117,7 +117,7 @@
     <div class="phone">
       <div class="top"><div class="avatar"></div><div class="grow"><div class="title">유란</div><div class="sub">노말</div></div><button class="icon" type="button">⋮</button></div>
       <div class="chat"><div class="bubble">assistant 메시지 영역<div class="time">18:20</div></div></div>
-      <div class="composer-wrap"><div class="mode-row"><span class="mode action-mode">◆ Action 입력</span><span class="counter warning">250/300</span></div><div class="composer"><button class="icon mode-toggle active" type="button">동작</button><div class="input action-input">사용자가 작성 중인 Action 텍스트</div><button class="icon send" type="button">➤</button></div></div>
+      <div class="composer-wrap"><div class="mode-row"><div class="mode-options"><span class="mode-chip">Dialogue</span><span class="mode-chip action-active">Action</span></div><span class="counter warning">250/300</span></div><div class="composer"><button class="icon" type="button" aria-label="사진 첨부">＋</button><div class="input action-input">사용자가 작성 중인 Action 텍스트</div><button class="icon send" type="button">➤</button></div></div>
     </div>
   </section>
 
@@ -125,7 +125,7 @@
     <div class="phone">
       <div class="top"><div class="avatar"></div><div class="grow"><div class="title">유란</div><div class="sub">노말</div></div><button class="icon" type="button">⋮</button></div>
       <div class="chat"><div class="bubble">assistant 메시지 영역<div class="time">18:20</div></div></div>
-      <div class="composer-wrap"><div class="mode-row"><span class="mode action-mode">◆ Action 입력</span><span class="counter warning">300/300</span></div><div class="composer"><button class="icon mode-toggle active" type="button">동작</button><div class="input action-input">최대 길이 Action 텍스트</div><button class="icon send" type="button">➤</button></div></div>
+      <div class="composer-wrap"><div class="mode-row"><div class="mode-options"><span class="mode-chip">Dialogue</span><span class="mode-chip action-active">Action</span></div><span class="counter warning">300/300</span></div><div class="composer"><button class="icon" type="button" aria-label="사진 첨부">＋</button><div class="input action-input">최대 길이 Action 텍스트</div><button class="icon send" type="button">➤</button></div></div>
     </div>
   </section>
 
@@ -133,7 +133,7 @@
     <div class="phone">
       <div class="top"><div class="avatar"></div><div class="grow"><div class="title">유란</div><div class="sub">노말</div></div><button class="icon" type="button">⋮</button></div>
       <div class="chat"><div class="bubble">assistant 메시지 영역<div class="time">18:20</div></div></div>
-      <div class="composer-wrap"><div class="mode-row"><span class="mode action-mode">◆ Action 입력</span><span class="counter error">301/300</span></div><div class="composer"><button class="icon mode-toggle active" type="button">동작</button><div class="input action-input error">제한을 초과한 Action 텍스트</div><button class="icon send" type="button" disabled>➤</button></div><div class="validation">300자 이하로 수정해야 전송할 수 있습니다. 입력은 자동으로 잘리지 않습니다.</div></div>
+      <div class="composer-wrap"><div class="mode-row"><div class="mode-options"><span class="mode-chip">Dialogue</span><span class="mode-chip action-active">Action</span></div><span class="counter error">301/300</span></div><div class="composer"><button class="icon" type="button" aria-label="사진 첨부">＋</button><div class="input action-input error">제한을 초과한 Action 텍스트</div><button class="icon send" type="button" disabled>➤</button></div><div class="validation">300자 이하로 수정해야 전송할 수 있습니다. 입력은 자동으로 잘리지 않습니다.</div></div>
     </div>
   </section>
 
@@ -141,7 +141,7 @@
     <div class="phone">
       <div class="top"><div class="avatar"></div><div class="grow"><div class="title">유란</div><div class="sub">노말</div></div><button class="icon" type="button">⋮</button></div>
       <div class="chat"><div class="bubble">assistant 메시지 영역<div class="time">18:20</div></div><div class="bubble mine action"><div class="kind">ACTION</div>사용자가 전송한 행동·상황 묘사<div class="time">18:21</div></div></div>
-      <div class="composer-wrap"><div class="mode-row"><span class="mode">Dialogue 입력</span></div><div class="composer"><button class="icon mode-toggle" type="button">동작</button><div class="input">메시지</div><button class="icon send" type="button">➤</button></div></div>
+      <div class="composer-wrap"><div class="mode-row"><div class="mode-options"><span class="mode-chip dialogue-active">Dialogue</span><span class="mode-chip">Action</span></div></div><div class="composer"><button class="icon" type="button" aria-label="사진 첨부">＋</button><div class="input">메시지</div><button class="icon send" type="button">➤</button></div></div>
     </div>
   </section>
 
@@ -153,6 +153,7 @@
       <li>Action은 250자부터 counter를 강조하고 300자까지 전송 가능하다. 301자 이상과 whitespace-only 입력은 전송을 막고 자동 truncate하지 않는다.</li>
       <li>전송된 Action은 일반 사용자 말풍선과 다른 보조 색·ACTION label로 식별한다.</li>
       <li>Action 전송이 성공하면 입력 모드는 Dialogue로 복귀한다.</li>
+      <li>Dialogue/Action control은 기존 사진 첨부 button과 함께 표시하며 첨부 기능을 숨기거나 제거하지 않는다.</li>
     </ul>
   </div>
 </main>
