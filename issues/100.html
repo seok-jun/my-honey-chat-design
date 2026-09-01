@@ -147,7 +147,7 @@
   const stages = document.querySelectorAll('.stage');
   tabs.forEach(tab => tab.addEventListener('click', () => {
     tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
-    stages.forEach(stage => stage.hidden = stage.id !== tab.dataset.target;
+    stages.forEach(stage => stage.hidden = stage.id !== tab.dataset.target);
   }));
 </script>
 </body>
