@@ -1,6 +1,11 @@
-name: Deploy Visual Specs to Pages
+name: Visual Spec Pages
 
 on:
+  pull_request:
+    paths:
+      - "issues/**"
+      - "scripts/build_site.py"
+      - ".github/workflows/pages.yml"
   push:
     branches:
       - main
@@ -12,11 +17,9 @@ on:
 
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 concurrency:
-  group: pages
+  group: pages-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
@@ -25,9 +28,6 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
-
-      - name: Configure Pages
-        uses: actions/configure-pages@v5
 
       - name: Build preview site
         run: python3 scripts/build_site.py
@@ -38,8 +38,12 @@ jobs:
           path: dist
 
   deploy:
+    if: github.event_name != 'pull_request'
     needs: build
     runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
     environment:
       name: github-pages
       url: ${{ steps.deployment.outputs.page_url }}
