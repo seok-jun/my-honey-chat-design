@@ -152,7 +152,7 @@
       <li>V1의 한 번 전송은 Dialogue 또는 Action 한 종류만 담고, 혼합 segment 작성 UI는 제공하지 않는다.</li>
       <li>Action은 250자부터 counter를 강조하고 300자까지 전송 가능하다. 301자 이상과 whitespace-only 입력은 전송을 막고 자동 truncate하지 않는다.</li>
       <li>전송된 Action은 일반 사용자 말풍선과 다른 보조 색·ACTION label로 식별한다.</li>
-      <li>Action 전송이 성공하면 입력 모드는 Dialogue로 복귀한다.</li>
+      <li>유효한 Action 전송 요청이 enqueue되면 입력 모드는 Dialogue로 복귀한다. validation 또는 enqueue가 거부되면 입력과 Action mode를 유지한다.</li>
       <li>Dialogue/Action control은 기존 사진 첨부 button과 함께 표시하며 첨부 기능을 숨기거나 제거하지 않는다.</li>
     </ul>
   </div>
