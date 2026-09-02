@@ -69,6 +69,7 @@
     .action-only-bubble { border: 1px solid color-mix(in srgb, var(--action) 38%, Canvas); background: var(--action-soft); }
     .action-line { color: color-mix(in srgb, var(--action) 86%, CanvasText); font-size: .88rem; font-style: italic; line-height: 1.45; }
     .dialogue-line { margin-top: 7px; padding-top: 7px; border-top: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+    .bubble:not(.mine) .dialogue-line { border-top-color: var(--line); }
     .time { margin-top: 6px; color: var(--muted); font-size: .67rem; text-align: right; }
     .kind { margin-bottom: 5px; color: var(--action); font-size: .68rem; font-weight: 850; letter-spacing: .06em; }
 
@@ -140,6 +141,7 @@
     <button type="button" role="tab" aria-selected="false" data-target="editing">Action 작성</button>
     <button type="button" role="tab" aria-selected="false" data-target="pending">Pending + Dialogue</button>
     <button type="button" role="tab" aria-selected="false" data-target="combined">통합 전송 후</button>
+    <button type="button" role="tab" aria-selected="false" data-target="character-combined">캐릭터 통합 응답</button>
     <button type="button" role="tab" aria-selected="false" data-target="action-only">Action-only</button>
     <button type="button" role="tab" aria-selected="false" data-target="limit">300자 초과</button>
   </div>
@@ -250,6 +252,25 @@
     </div>
   </section>
 
+  <section class="stage" id="character-combined" hidden>
+    <div class="stage-layout">
+      <div class="phone">
+        <div class="top"><button class="back" type="button" aria-label="뒤로">‹</button><div class="avatar"></div><div class="grow"><div class="title">유란</div><div class="sub">노말</div></div><button class="more" type="button" aria-label="더보기">⋮</button></div>
+        <div class="chat">
+          <div class="bubble"><div class="action-line">테이블 위에 잔을 내려놓는다.</div><div class="dialogue-line">늦었네. 기다리고 있었어.</div><div class="time">18:20</div></div>
+          <div class="bubble mine"><div class="action-line">창가 쪽으로 자리를 옮긴다.</div><div class="dialogue-line">여기 앉아도 돼?</div><div class="time">18:21</div></div>
+        </div>
+        <div class="composer-wrap"><div class="composer"><button class="icon" type="button" aria-label="첨부">＋</button><button class="icon action-trigger" type="button" aria-label="행동 묘사 추가">✦</button><div class="input empty">메시지</div><button class="icon send" type="button" disabled>➤</button></div></div>
+      </div>
+      <div class="state-notes">
+        <div class="eyebrow">Proposed · Character parity</div>
+        <h2>캐릭터도 같은 내부 정보 계층 사용</h2>
+        <p>캐릭터의 구조화된 Action + Dialogue 응답도 한 말풍선 안에서 Action, 구분선, Dialogue 순서로 표시한다.</p>
+        <ul><li>사용자와 캐릭터는 정렬과 말풍선 색상만 role에 맞게 다르다.</li><li>Action-only 또는 Dialogue-only 응답에는 구분선을 표시하지 않는다.</li><li>굵은 글씨나 특수문자를 분석하지 않고 구조화된 segment 타입을 사용한다.</li></ul>
+      </div>
+    </div>
+  </section>
+
   <section class="stage" id="action-only" hidden>
     <div class="stage-layout">
       <div class="phone">
@@ -298,9 +319,12 @@
     <ul>
       <li>Action editor의 `완료`는 pending 상태 전환이며 provider 전송·Conversation 저장을 발생시키지 않는다.</li>
       <li>pending Action과 Dialogue는 한 user turn의 ordered segments로 함께 전송·저장한다.</li>
+      <li>pending Action이 있는 상태에서 Action 버튼 또는 연필 버튼을 누르면 기존 내용이 채워진 editor를 연다. 두 번째 Action을 추가하지 않으며, `취소`는 기존 pending Action을 유지하고 `완료`는 이를 교체한다. Dialogue draft는 두 경우 모두 보존한다.</li>
       <li>Action-only는 pending Action이 있고 Dialogue가 비어 있을 때 사용자가 전송 버튼을 직접 누른 경우에만 허용한다.</li>
       <li>enqueue가 거부되거나 실패하면 pending Action과 Dialogue draft를 모두 보존한다.</li>
       <li>화면 표시만 합치고 persistence에서 독립 turn 두 개로 저장하는 구현은 이 Visual Spec을 충족하지 않는다.</li>
+      <li>캐릭터의 구조화된 Action + Dialogue도 같은 말풍선 안에서 Action, 구분선, Dialogue 순서로 표시한다. role별 정렬과 말풍선 색상만 다르게 유지한다.</li>
+      <li>사용자와 캐릭터 모두 두 segment가 함께 있을 때만 구분선을 표시하며, Markdown 강조나 임의 delimiter 문자열로 segment 타입을 추론하지 않는다.</li>
       <li>Dialogue-only, 첨부 버튼, Action 300자 제한은 기존 동작을 유지한다.</li>
     </ul>
     <div class="synthetic">화면의 메시지 예시는 실제 대화가 아닌 UI 검토용 합성 텍스트다.</div>
