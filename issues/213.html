@@ -1,0 +1,318 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #213 Action + Dialogue 동일 턴 UI/UX Visual Spec</title>
+  <style>
+    :root {
+      color-scheme: light dark;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --accent: #7557d9;
+      --accent-strong: #6544cc;
+      --accent-soft: color-mix(in srgb, var(--accent) 14%, Canvas);
+      --action: #8a5bb5;
+      --action-soft: color-mix(in srgb, var(--action) 12%, Canvas);
+      --line: color-mix(in srgb, CanvasText 16%, Canvas);
+      --muted: color-mix(in srgb, CanvasText 64%, Canvas);
+      --error: #c74444;
+      --warning: #b76a12;
+      --phone: color-mix(in srgb, Canvas 96%, CanvasText);
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 32px 20px 72px; background: Canvas; color: CanvasText; }
+    main { max-width: 1160px; margin: 0 auto; }
+    header { max-width: 820px; }
+    h1 { margin: 8px 0 10px; font-size: clamp(1.65rem, 4vw, 2.35rem); line-height: 1.18; }
+    h2 { margin: 0 0 4px; font-size: 1rem; }
+    p { line-height: 1.65; }
+    .meta, .helper { color: var(--muted); }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 16px; }
+    button {
+      min-height: 42px;
+      border: 1px solid var(--line);
+      background: Canvas;
+      color: CanvasText;
+      border-radius: 12px;
+      padding: 9px 13px;
+      font: inherit;
+      cursor: pointer;
+    }
+    button[aria-selected="true"] { font-weight: 750; border-color: var(--accent); background: var(--accent-soft); }
+    button:focus-visible { outline: 3px solid color-mix(in srgb, var(--accent) 45%, transparent); outline-offset: 2px; }
+    button:disabled { cursor: default; opacity: .46; }
+
+    .stage { border: 1px solid var(--line); border-radius: 22px; padding: 24px; background: color-mix(in srgb, CanvasText 2%, Canvas); }
+    .stage-layout { display: grid; grid-template-columns: minmax(0, 420px) minmax(240px, 1fr); gap: 30px; align-items: start; max-width: 900px; margin: 0 auto; }
+    .phone {
+      position: relative;
+      width: min(393px, 100%);
+      min-height: 760px;
+      border: 1px solid color-mix(in srgb, CanvasText 28%, Canvas);
+      border-radius: 30px;
+      overflow: hidden;
+      background: var(--phone);
+      box-shadow: 0 18px 55px color-mix(in srgb, CanvasText 12%, transparent);
+    }
+    .top { display: flex; align-items: center; gap: 10px; min-height: 68px; padding: 12px 14px; border-bottom: 1px solid var(--line); background: Canvas; }
+    .back { display: grid; place-items: center; width: 38px; height: 38px; min-height: 38px; padding: 0; border: 0; font-size: 1.35rem; }
+    .avatar { width: 38px; height: 38px; border-radius: 50%; background: linear-gradient(135deg, color-mix(in srgb, var(--accent) 32%, Canvas), color-mix(in srgb, var(--action) 48%, Canvas)); }
+    .grow { flex: 1; min-width: 0; }
+    .title { font-weight: 800; }
+    .sub { margin-top: 2px; color: var(--muted); font-size: .75rem; }
+    .more { display: grid; place-items: center; width: 38px; height: 38px; min-height: 38px; padding: 0; border: 0; font-size: 1.2rem; }
+
+    .chat { display: flex; flex-direction: column; gap: 12px; min-height: 520px; padding: 20px 16px 190px; }
+    .bubble { align-self: flex-start; max-width: 80%; padding: 11px 13px; border-radius: 16px 16px 16px 5px; background: color-mix(in srgb, CanvasText 8%, Canvas); line-height: 1.45; }
+    .mine { align-self: flex-end; border-radius: 16px 16px 5px 16px; background: color-mix(in srgb, var(--accent) 19%, Canvas); }
+    .action-only-bubble { border: 1px solid color-mix(in srgb, var(--action) 38%, Canvas); background: var(--action-soft); }
+    .action-line { color: color-mix(in srgb, var(--action) 86%, CanvasText); font-size: .88rem; font-style: italic; line-height: 1.45; }
+    .dialogue-line { margin-top: 7px; padding-top: 7px; border-top: 1px solid color-mix(in srgb, var(--accent) 20%, transparent); }
+    .time { margin-top: 6px; color: var(--muted); font-size: .67rem; text-align: right; }
+    .kind { margin-bottom: 5px; color: var(--action); font-size: .68rem; font-weight: 850; letter-spacing: .06em; }
+
+    .composer-wrap { position: absolute; left: 0; right: 0; bottom: 0; padding: 10px 12px 14px; border-top: 1px solid var(--line); background: Canvas; }
+    .pending-card, .action-editor { margin-bottom: 9px; border: 1px solid color-mix(in srgb, var(--action) 38%, Canvas); border-radius: 14px; background: var(--action-soft); }
+    .pending-card { display: flex; align-items: center; gap: 9px; min-height: 48px; padding: 8px 8px 8px 12px; }
+    .pending-icon { color: var(--action); font-size: 1rem; }
+    .pending-copy { flex: 1; min-width: 0; }
+    .pending-label { color: var(--action); font-size: .68rem; font-weight: 850; letter-spacing: .04em; }
+    .pending-text { overflow: hidden; margin-top: 2px; color: color-mix(in srgb, CanvasText 76%, Canvas); font-size: .82rem; font-style: italic; text-overflow: ellipsis; white-space: nowrap; }
+    .mini-actions { display: flex; gap: 2px; }
+    .mini { display: grid; place-items: center; width: 34px; height: 34px; min-height: 34px; padding: 0; border: 0; border-radius: 10px; color: var(--muted); }
+
+    .action-editor { padding: 10px; }
+    .editor-head { display: flex; align-items: center; gap: 8px; margin-bottom: 8px; }
+    .editor-title { flex: 1; color: var(--action); font-size: .8rem; font-weight: 800; }
+    .counter { color: var(--muted); font-size: .74rem; }
+    .counter.error { color: var(--error); font-weight: 800; }
+    .action-field { min-height: 58px; padding: 9px 10px; border: 1px solid color-mix(in srgb, var(--action) 52%, Canvas); border-radius: 11px; background: Canvas; color: color-mix(in srgb, CanvasText 78%, Canvas); font-size: .86rem; line-height: 1.45; }
+    .action-field.error { border-color: var(--error); }
+    .validation { margin-top: 7px; color: var(--error); font-size: .74rem; line-height: 1.45; }
+    .editor-actions { display: flex; justify-content: flex-end; gap: 7px; margin-top: 8px; }
+    .editor-actions button { min-height: 36px; padding: 6px 11px; border-radius: 10px; font-size: .8rem; }
+    .editor-actions .save { border-color: var(--action); background: var(--action); color: white; }
+
+    .composer { display: flex; align-items: flex-end; gap: 7px; }
+    .icon { display: grid; place-items: center; flex: 0 0 42px; width: 42px; height: 42px; min-height: 42px; padding: 0; border-radius: 50%; }
+    .action-trigger { color: var(--action); border-color: color-mix(in srgb, var(--action) 38%, Canvas); }
+    .input { flex: 1; min-height: 42px; max-height: 88px; padding: 10px 13px; border: 1px solid color-mix(in srgb, CanvasText 20%, Canvas); border-radius: 19px; color: color-mix(in srgb, CanvasText 70%, Canvas); line-height: 1.35; }
+    .input.empty { color: var(--muted); }
+    .send { border: 0; background: var(--accent); color: white; font-weight: 900; }
+    .send:disabled { background: color-mix(in srgb, CanvasText 18%, Canvas); color: color-mix(in srgb, CanvasText 45%, Canvas); }
+    .mode-row { display: flex; gap: 5px; margin: 0 2px 8px; }
+    .mode-chip { padding: 4px 9px; border: 1px solid var(--line); border-radius: 999px; font-size: .72rem; font-weight: 750; }
+    .mode-chip.active { border-color: var(--action); background: var(--action-soft); color: var(--action); }
+
+    .state-notes { padding-top: 4px; }
+    .eyebrow { color: var(--accent); font-size: .76rem; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
+    .state-notes h2 { margin-top: 7px; font-size: 1.25rem; }
+    .state-notes p { color: var(--muted); }
+    .state-notes ul { padding-left: 21px; line-height: 1.65; }
+    .state-notes li + li { margin-top: 7px; }
+    .contract { max-width: 900px; margin: 20px auto 0; padding: 18px 20px; border-radius: 16px; background: color-mix(in srgb, CanvasText 7%, Canvas); }
+    .contract h2 { margin-bottom: 10px; }
+    .contract ul { margin: 0; padding-left: 21px; line-height: 1.65; }
+    .contract li + li { margin-top: 7px; }
+    .synthetic { margin-top: 14px; color: var(--muted); font-size: .78rem; }
+    [hidden] { display: none !important; }
+
+    @media (max-width: 780px) {
+      body { padding: 24px 12px 56px; }
+      .stage { padding: 14px; }
+      .stage-layout { grid-template-columns: 1fr; }
+      .state-notes { padding: 2px 4px 0; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="meta">seok-jun/my-honey-chat · Issue #213</div>
+    <h1>Action + Dialogue를 한 번에 작성하는 채팅 Composer</h1>
+    <p class="helper">대상 화면: 채팅. Action 완료를 전송으로 취급하지 않고 pending segment로 보존한 뒤, Dialogue와 하나의 user turn으로 전송·표시한다.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Visual spec state">
+    <button type="button" role="tab" aria-selected="true" data-target="current">Current</button>
+    <button type="button" role="tab" aria-selected="false" data-target="default">기본 Composer</button>
+    <button type="button" role="tab" aria-selected="false" data-target="editing">Action 작성</button>
+    <button type="button" role="tab" aria-selected="false" data-target="pending">Pending + Dialogue</button>
+    <button type="button" role="tab" aria-selected="false" data-target="combined">통합 전송 후</button>
+    <button type="button" role="tab" aria-selected="false" data-target="action-only">Action-only</button>
+    <button type="button" role="tab" aria-selected="false" data-target="limit">300자 초과</button>
+  </div>
+
+  <section class="stage" id="current">
+    <div class="stage-layout">
+      <div class="phone">
+        <div class="top"><button class="back" type="button" aria-label="뒤로">‹</button><div class="avatar"></div><div class="grow"><div class="title">유란</div><div class="sub">노말</div></div><button class="more" type="button" aria-label="더보기">⋮</button></div>
+        <div class="chat">
+          <div class="bubble">응답 메시지 영역<div class="time">18:20</div></div>
+          <div class="bubble mine action-only-bubble"><div class="kind">ACTION</div>전송된 행동·상황 묘사<div class="time">18:21</div></div>
+          <div class="bubble mine">뒤이어 별도 전송된 대사<div class="time">18:21</div></div>
+        </div>
+        <div class="composer-wrap">
+          <div class="mode-row"><span class="mode-chip">Dialogue</span><span class="mode-chip active">Action</span></div>
+          <div class="composer"><button class="icon" type="button" aria-label="첨부">＋</button><div class="input empty">내 행동이나 현재 상황을 입력</div><button class="icon send" type="button">➤</button></div>
+        </div>
+      </div>
+      <div class="state-notes">
+        <div class="eyebrow">Current</div>
+        <h2>두 입력이 별도 메시지로 보임</h2>
+        <p>Action 모드에서 전송하면 말풍선이 즉시 생기고, 이어지는 Dialogue가 다음 말풍선으로 분리된다.</p>
+        <ul><li>Action과 Dialogue의 결합 의도가 약하게 보인다.</li><li>모드 칩과 ACTION 라벨이 대화보다 데이터 타입을 앞세운다.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="stage" id="default" hidden>
+    <div class="stage-layout">
+      <div class="phone">
+        <div class="top"><button class="back" type="button" aria-label="뒤로">‹</button><div class="avatar"></div><div class="grow"><div class="title">유란</div><div class="sub">노말</div></div><button class="more" type="button" aria-label="더보기">⋮</button></div>
+        <div class="chat"><div class="bubble">응답 메시지 영역<div class="time">18:20</div></div></div>
+        <div class="composer-wrap">
+          <div class="composer"><button class="icon" type="button" aria-label="첨부">＋</button><button class="icon action-trigger" type="button" aria-label="행동 묘사 추가">✦</button><div class="input empty">메시지</div><button class="icon send" type="button" disabled>➤</button></div>
+        </div>
+      </div>
+      <div class="state-notes">
+        <div class="eyebrow">Proposed · Default</div>
+        <h2>대사 입력이 항상 기본</h2>
+        <p>Dialogue/Action 모드 칩을 제거한다. 행동 묘사는 composer의 보조 버튼으로 추가하고, 평소 채팅 입력 흐름은 바꾸지 않는다.</p>
+        <ul><li>`＋`는 기존 첨부 기능을 유지한다.</li><li>`✦`는 Action editor를 연다.</li><li>Dialogue-only 전송은 기존과 동일하다.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="stage" id="editing" hidden>
+    <div class="stage-layout">
+      <div class="phone">
+        <div class="top"><button class="back" type="button" aria-label="뒤로">‹</button><div class="avatar"></div><div class="grow"><div class="title">유란</div><div class="sub">노말</div></div><button class="more" type="button" aria-label="더보기">⋮</button></div>
+        <div class="chat"><div class="bubble">응답 메시지 영역<div class="time">18:20</div></div></div>
+        <div class="composer-wrap">
+          <div class="action-editor">
+            <div class="editor-head"><span class="pending-icon">✦</span><span class="editor-title">행동·상황 묘사</span><span class="counter">18/300</span></div>
+            <div class="action-field">창가 쪽으로 자리를 옮긴다.</div>
+            <div class="editor-actions"><button type="button">취소</button><button class="save" type="button">완료</button></div>
+          </div>
+          <div class="composer"><button class="icon" type="button" aria-label="첨부">＋</button><button class="icon action-trigger" type="button" aria-label="행동 묘사 추가">✦</button><div class="input empty">메시지</div><button class="icon send" type="button" disabled>➤</button></div>
+        </div>
+      </div>
+      <div class="state-notes">
+        <div class="eyebrow">Proposed · Editing</div>
+        <h2>전송과 Action 완료를 분리</h2>
+        <p>`완료`는 작성한 Action을 pending 상태로 접을 뿐 provider 전송이나 Conversation 저장을 발생시키지 않는다.</p>
+        <ul><li>Action 최대 길이와 counter는 #198의 300자 정책을 유지한다.</li><li>`취소`는 editor만 닫고 기존 Dialogue draft를 보존한다.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="stage" id="pending" hidden>
+    <div class="stage-layout">
+      <div class="phone">
+        <div class="top"><button class="back" type="button" aria-label="뒤로">‹</button><div class="avatar"></div><div class="grow"><div class="title">유란</div><div class="sub">노말</div></div><button class="more" type="button" aria-label="더보기">⋮</button></div>
+        <div class="chat"><div class="bubble">응답 메시지 영역<div class="time">18:20</div></div></div>
+        <div class="composer-wrap">
+          <div class="pending-card">
+            <span class="pending-icon">✦</span>
+            <div class="pending-copy"><div class="pending-label">PENDING ACTION</div><div class="pending-text">창가 쪽으로 자리를 옮긴다.</div></div>
+            <div class="mini-actions"><button class="mini" type="button" aria-label="행동 묘사 수정">✎</button><button class="mini" type="button" aria-label="행동 묘사 제거">×</button></div>
+          </div>
+          <div class="composer"><button class="icon" type="button" aria-label="첨부">＋</button><button class="icon action-trigger" type="button" aria-label="행동 묘사 수정">✦</button><div class="input">여기 앉아도 돼?</div><button class="icon send" type="button">➤</button></div>
+        </div>
+      </div>
+      <div class="state-notes">
+        <div class="eyebrow">Proposed · Pending</div>
+        <h2>Action은 대사 위에 붙어 대기</h2>
+        <p>사용자는 전송 전에 Action과 Dialogue가 한 턴이라는 것을 확인할 수 있다.</p>
+        <ul><li>연필은 Action 수정, ×는 Action 제거다.</li><li>전송 버튼은 ordered segments를 한 user turn으로 enqueue한다.</li><li>Action이 pending인 동안에도 Dialogue draft를 자유롭게 편집한다.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="stage" id="combined" hidden>
+    <div class="stage-layout">
+      <div class="phone">
+        <div class="top"><button class="back" type="button" aria-label="뒤로">‹</button><div class="avatar"></div><div class="grow"><div class="title">유란</div><div class="sub">노말</div></div><button class="more" type="button" aria-label="더보기">⋮</button></div>
+        <div class="chat">
+          <div class="bubble">응답 메시지 영역<div class="time">18:20</div></div>
+          <div class="bubble mine"><div class="action-line">창가 쪽으로 자리를 옮긴다.</div><div class="dialogue-line">여기 앉아도 돼?</div><div class="time">18:21</div></div>
+        </div>
+        <div class="composer-wrap"><div class="composer"><button class="icon" type="button" aria-label="첨부">＋</button><button class="icon action-trigger" type="button" aria-label="행동 묘사 추가">✦</button><div class="input empty">메시지</div><button class="icon send" type="button" disabled>➤</button></div></div>
+      </div>
+      <div class="state-notes">
+        <div class="eyebrow">Proposed · Sent</div>
+        <h2>한 말풍선 안에서 의미 계층을 유지</h2>
+        <p>Action은 작은 이탤릭 보조 문장, Dialogue는 기본 본문으로 표시한다. 개발자용 ACTION 라벨은 채팅 기록에서 노출하지 않는다.</p>
+        <ul><li>말풍선과 timestamp는 user turn당 하나다.</li><li>Action이 먼저, Dialogue가 다음인 순서를 시각적으로 보존한다.</li><li>성공 enqueue 뒤 pending Action과 Dialogue draft를 함께 비운다.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="stage" id="action-only" hidden>
+    <div class="stage-layout">
+      <div class="phone">
+        <div class="top"><button class="back" type="button" aria-label="뒤로">‹</button><div class="avatar"></div><div class="grow"><div class="title">유란</div><div class="sub">노말</div></div><button class="more" type="button" aria-label="더보기">⋮</button></div>
+        <div class="chat"><div class="bubble">응답 메시지 영역<div class="time">18:20</div></div><div class="bubble mine action-only-bubble"><div class="action-line">창가 쪽으로 자리를 옮긴다.</div><div class="time">18:21</div></div></div>
+        <div class="composer-wrap">
+          <div class="pending-card"><span class="pending-icon">✦</span><div class="pending-copy"><div class="pending-label">PENDING ACTION</div><div class="pending-text">창가 쪽으로 자리를 옮긴다.</div></div><div class="mini-actions"><button class="mini" type="button" aria-label="행동 묘사 수정">✎</button><button class="mini" type="button" aria-label="행동 묘사 제거">×</button></div></div>
+          <div class="composer"><button class="icon" type="button" aria-label="첨부">＋</button><button class="icon action-trigger" type="button" aria-label="행동 묘사 수정">✦</button><div class="input empty">메시지</div><button class="icon send" type="button">➤</button></div>
+        </div>
+      </div>
+      <div class="state-notes">
+        <div class="eyebrow">Proposed · Action-only</div>
+        <h2>빈 Dialogue에서 직접 전송하면 Action-only</h2>
+        <p>Action `완료`만으로는 전송되지 않는다. Dialogue가 비어 있어도 사용자가 전송 버튼을 직접 누른 경우에만 Action-only user turn을 만든다.</p>
+        <ul><li>전송 전 pending 카드가 계속 보인다.</li><li>전송 결과는 보조 Action 스타일만 가진 단일 말풍선이다.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="stage" id="limit" hidden>
+    <div class="stage-layout">
+      <div class="phone">
+        <div class="top"><button class="back" type="button" aria-label="뒤로">‹</button><div class="avatar"></div><div class="grow"><div class="title">유란</div><div class="sub">노말</div></div><button class="more" type="button" aria-label="더보기">⋮</button></div>
+        <div class="chat"><div class="bubble">응답 메시지 영역<div class="time">18:20</div></div></div>
+        <div class="composer-wrap">
+          <div class="action-editor">
+            <div class="editor-head"><span class="pending-icon">✦</span><span class="editor-title">행동·상황 묘사</span><span class="counter error">301/300</span></div>
+            <div class="action-field error">제한을 초과한 합성 Action 텍스트</div>
+            <div class="validation">300자 이하로 수정해야 완료할 수 있습니다. 입력은 자동으로 잘리지 않습니다.</div>
+            <div class="editor-actions"><button type="button">취소</button><button class="save" type="button" disabled>완료</button></div>
+          </div>
+          <div class="composer"><button class="icon" type="button" aria-label="첨부">＋</button><button class="icon action-trigger" type="button" aria-label="행동 묘사 추가">✦</button><div class="input">기존 Dialogue draft</div><button class="icon send" type="button" disabled>➤</button></div>
+        </div>
+      </div>
+      <div class="state-notes">
+        <div class="eyebrow">Proposed · Validation</div>
+        <h2>잘못된 Action은 pending으로 확정하지 않음</h2>
+        <p>300자를 초과하면 counter와 field를 error로 표시하고 `완료`를 비활성화한다. Dialogue draft는 그대로 유지한다.</p>
+        <ul><li>Action을 자동 truncate하지 않는다.</li><li>검증 오류 중에는 전체 turn 전송도 막는다.</li></ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="contract" aria-labelledby="contract-title">
+    <h2 id="contract-title">구현 계약</h2>
+    <ul>
+      <li>Action editor의 `완료`는 pending 상태 전환이며 provider 전송·Conversation 저장을 발생시키지 않는다.</li>
+      <li>pending Action과 Dialogue는 한 user turn의 ordered segments로 함께 전송·저장한다.</li>
+      <li>Action-only는 pending Action이 있고 Dialogue가 비어 있을 때 사용자가 전송 버튼을 직접 누른 경우에만 허용한다.</li>
+      <li>enqueue가 거부되거나 실패하면 pending Action과 Dialogue draft를 모두 보존한다.</li>
+      <li>화면 표시만 합치고 persistence에서 독립 turn 두 개로 저장하는 구현은 이 Visual Spec을 충족하지 않는다.</li>
+      <li>Dialogue-only, 첨부 버튼, Action 300자 제한은 기존 동작을 유지한다.</li>
+    </ul>
+    <div class="synthetic">화면의 메시지 예시는 실제 대화가 아닌 UI 검토용 합성 텍스트다.</div>
+  </section>
+</main>
+<script>
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const stages = document.querySelectorAll('.stage');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(item => item.setAttribute('aria-selected', String(item === tab)));
+    stages.forEach(stage => { stage.hidden = stage.id !== tab.dataset.target; });
+  }));
+</script>
+</body>
+</html>
