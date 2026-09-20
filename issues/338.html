@@ -1,0 +1,585 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #338 — Conversation Snapshot Restore UI/UX Visual Spec</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, Pretendard, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --page: #0b090b;
+      --surface: #171317;
+      --surface-2: #1d191d;
+      --surface-3: #2a2429;
+      --text: #f7f1f3;
+      --muted: #b9adb1;
+      --faint: #8f8388;
+      --accent: #f0a8b7;
+      --accent-ink: #2a1720;
+      --danger: #ffb4ab;
+      --danger-surface: #452523;
+      --success: #b9dfc2;
+      --success-surface: #21392a;
+      --line: #3b3338;
+      --shadow: 0 28px 80px rgb(0 0 0 / 45%);
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: radial-gradient(circle at 50% -20%, #34262f 0, var(--page) 40%); color: var(--text); }
+    button { font: inherit; }
+    main { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 40px 0 72px; }
+    header { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; margin-bottom: 24px; }
+    h1 { margin: 8px 0 10px; font-size: clamp(28px, 5vw, 46px); line-height: 1.06; letter-spacing: -.035em; }
+    h2, h3, p { margin-top: 0; }
+    .eyebrow { color: var(--accent); font-weight: 750; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; }
+    .lede { max-width: 760px; color: var(--muted); line-height: 1.65; margin-bottom: 0; }
+    .contract { max-width: 320px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 16px; background: rgb(29 25 29 / 72%); color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .contract strong { color: var(--text); }
+
+    .tabs { display: flex; gap: 8px; overflow-x: auto; padding: 8px 0 18px; scrollbar-width: thin; }
+    .tabs button { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 999px; padding: 9px 14px; background: var(--surface-2); color: var(--muted); cursor: pointer; }
+    .tabs button[aria-selected="true"] { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); font-weight: 750; }
+
+    .stage { min-height: 780px; padding: 28px; border: 1px solid var(--line); border-radius: 24px; background: rgb(23 19 23 / 88%); box-shadow: var(--shadow); }
+    .stage-grid { display: grid; grid-template-columns: minmax(320px, 410px) minmax(260px, 1fr); gap: 34px; align-items: start; }
+    .stage-copy { padding: 16px 0; }
+    .stage-copy h2 { margin-bottom: 12px; font-size: 26px; letter-spacing: -.02em; }
+    .stage-copy p, .stage-copy li { color: var(--muted); line-height: 1.65; }
+    .stage-copy ul { padding-left: 20px; margin: 0 0 14px; }
+    .rule { margin-top: 20px; padding: 16px; border-left: 3px solid var(--accent); border-radius: 0 12px 12px 0; background: var(--surface-2); }
+    .rule strong { display: block; margin-bottom: 5px; color: var(--text); }
+    .rule.stop { border-left-color: var(--danger); }
+
+    .phone { position: relative; width: min(390px, 100%); height: 740px; margin: 0 auto; overflow: hidden; border: 1px solid #52464d; border-radius: 32px; background: #120f12; box-shadow: 0 18px 52px rgb(0 0 0 / 55%); }
+    .statusbar { height: 26px; display: flex; justify-content: space-between; align-items: end; padding: 0 18px 5px; background: var(--surface); font-size: 10px; color: var(--muted); }
+    .topbar { height: 60px; display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: var(--surface); border-bottom: 1px solid #211c20; }
+    .topbar .back { width: 28px; color: var(--muted); }
+    .topbar strong { font-size: 16px; }
+    .screen { position: absolute; inset: 86px 0 0; overflow: hidden; padding: 16px 14px; }
+
+    .section-title { margin: 4px 0 10px; font-size: 13px; font-weight: 800; letter-spacing: .02em; }
+    .card { padding: 14px; margin-bottom: 12px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface-2); }
+    .card h4 { margin: 0 0 6px; font-size: 14px; }
+    .card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .card .hint { display: block; margin-top: 8px; color: var(--faint); font-size: 11px; line-height: 1.5; }
+    .row { display: flex; gap: 8px; margin-top: 12px; }
+    .btn { flex: 1; padding: 11px 12px; border: 1px solid var(--line); border-radius: 12px; background: transparent; color: var(--text); font-size: 13px; text-align: center; }
+    .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); font-weight: 800; }
+    .btn.danger { background: var(--danger-surface); border-color: #6b3a37; color: var(--danger); font-weight: 800; }
+    .btn.ghost { color: var(--muted); }
+    .btn[aria-disabled="true"] { opacity: .38; }
+
+    .facts { margin: 12px 0 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+    .facts li { display: flex; justify-content: space-between; gap: 12px; padding: 9px 0; border-bottom: 1px solid var(--line); color: var(--muted); font-size: 12px; }
+    .facts li b { color: var(--text); font-weight: 700; }
+    .facts li.warn b { color: var(--danger); }
+
+    .state-banner { display: flex; gap: 11px; padding: 13px 14px; margin-bottom: 12px; border: 1px solid #4d4148; border-radius: 15px; background: #241f23; }
+    .state-banner .glyph { width: 30px; height: 30px; flex: 0 0 auto; display: grid; place-items: center; border-radius: 50%; background: rgb(240 168 183 / 14%); color: var(--accent); }
+    .state-banner strong { display: block; margin-bottom: 3px; font-size: 13px; }
+    .state-banner span { display: block; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .state-banner.failure { border-color: #6b3a37; background: #2d2020; }
+    .state-banner.failure .glyph { background: var(--danger-surface); color: var(--danger); }
+    .state-banner.safe { border-color: #365840; background: #1b2b21; }
+    .state-banner.safe .glyph { background: var(--success-surface); color: var(--success); }
+    .spinner { width: 14px; height: 14px; border: 2px solid rgb(240 168 183 / 26%); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .field { margin-top: 12px; }
+    .field label { display: block; margin-bottom: 6px; color: var(--muted); font-size: 12px; }
+    .field .input { min-height: 44px; display: flex; align-items: center; padding: 10px 12px; border: 1px solid #62555d; border-radius: 12px; color: var(--faint); font-size: 13px; }
+    .field .counter { display: block; margin-top: 6px; color: var(--faint); font-size: 11px; text-align: right; }
+    .choice { display: flex; gap: 8px; margin-top: 8px; }
+    .choice span { flex: 1; padding: 10px; border: 1px solid var(--line); border-radius: 12px; color: var(--muted); font-size: 12px; text-align: center; }
+    .choice span[aria-checked="true"] { border-color: var(--accent); color: var(--text); background: rgb(240 168 183 / 10%); }
+
+    .progress { height: 6px; margin-top: 10px; border-radius: 999px; background: var(--surface-3); overflow: hidden; }
+    .progress i { display: block; height: 100%; background: var(--accent); }
+
+    .legend { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-top: 18px; }
+    .legend div { padding: 12px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface-2); color: var(--muted); font-size: 12px; }
+    .legend strong { display: block; margin-bottom: 5px; color: var(--text); }
+    footer { margin-top: 24px; color: var(--faint); font-size: 12px; line-height: 1.65; }
+    footer code { color: var(--muted); }
+    [hidden] { display: none !important; }
+
+    @media (max-width: 820px) {
+      header, .stage-grid { grid-template-columns: 1fr; }
+      .contract { max-width: none; }
+      .stage { padding: 18px 12px 28px; }
+      .legend { grid-template-columns: 1fr; }
+    }
+    @media (prefers-reduced-motion: reduce) { .spinner { animation: none; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <div class="eyebrow">seok-jun/my-honey-chat · Issue #338</div>
+      <h1>대화 스냅샷 되돌리기</h1>
+      <p class="lede">
+        고른 스냅샷 하나로 그 Persona의 대화 원본을 통째로 교체하고, 기억·관계·기분·Scene이 새 원본 기준으로
+        안전해진 뒤에야 대화를 다시 연다. 이 HTML은 화면 배치, 정보 계층, UI 상태와 인터랙션의 구현 기준이다.
+      </p>
+    </div>
+    <div class="contract">
+      <strong>이 문서가 정하는 것</strong><br />
+      상태 11개의 레이아웃·문구·action 위치와 각 상태에서 무엇을 할 수 없는지.<br /><br />
+      <strong>정하지 않는 것</strong><br />
+      저장 형식, transaction 경계, 복구 단계 의미. 그건 SDD의 SRC-01·REC-01이 소유한다.
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Snapshot restore states">
+    <button type="button" role="tab" aria-selected="true" data-target="s-entry">1 진입점</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-validating">2 검사 중</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-preview">3 미리보기</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-empty">4 빈 스냅샷</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-oversized">5 한도 초과</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-replacing">6 교체·복구 중</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-retry">7 재시도 가능</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-repair">8 기준 다시 정하기</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-safe">9 안전 · 남은 작업</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-done">10 완료</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-aborted">11 취소됨</button>
+  </div>
+
+  <!-- 1 -->
+  <section class="stage" id="s-entry">
+    <div class="stage-grid">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+        <div class="topbar"><span class="back">←</span><strong>설정</strong></div>
+        <div class="screen">
+          <div class="section-title">대화 백업</div>
+          <div class="card">
+            <h4>파일로 내보내기</h4>
+            <p>지금 대화를 파일로 저장해요.</p>
+            <span class="hint">파일이 만들어졌다고 해서 되돌리기에 쓸 수 있다는 뜻은 아니에요. 되돌리기 가능 여부는 파일을 고를 때 확인해요.</span>
+            <div class="row"><span class="btn">내보내기</span></div>
+          </div>
+          <div class="card">
+            <h4>기존 백업 합치기</h4>
+            <p>예전 백업을 지금 대화에 중복 없이 더해요. 지워지는 건 없어요.</p>
+            <div class="row"><span class="btn">파일 가져오기</span></div>
+          </div>
+          <div class="section-title" style="margin-top:18px">스냅샷으로 되돌리기</div>
+          <div class="card">
+            <h4>스냅샷 파일 고르기</h4>
+            <p>고른 스냅샷 하나로 이 Persona의 대화를 <b>통째로 교체</b>해요. 지금 대화는 남지 않아요.</p>
+            <span class="hint">합치기와 다른 동작이에요. 합치기는 이 형식을 되돌리기로 해석하지 않아요.</span>
+            <div class="row"><span class="btn danger">파일 고르기</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="stage-copy">
+        <h2>진입점은 둘로 나뉜다</h2>
+        <ul>
+          <li>기존 <b>내보내기</b>와 <b>합치기</b>는 그대로 접근 가능하고 의미도 그대로다.</li>
+          <li><b>되돌리기</b>는 별도 섹션에 두고 파괴적이라는 사실을 진입 전에 알린다.</li>
+          <li>두 진입점은 서로의 파일을 자기 방식으로 해석하지 않는다.</li>
+        </ul>
+        <div class="rule">
+          <strong>내보내기 안내를 분리한다</strong>
+          파일 생성 성공과 되돌리기 가능 여부는 다른 사실이다. 내보내기 직후에 "되돌릴 수 있다"고 말하지 않는다.
+        </div>
+        <div class="rule stop">
+          <strong>합치기는 되돌리기가 아니다</strong>
+          합치기 경로가 새 형식을 만나도 교체로 해석하지 않는다. 사용자가 고른 진입점이 동작을 정한다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 -->
+  <section class="stage" id="s-validating" hidden>
+    <div class="stage-grid">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+        <div class="topbar"><span class="back">←</span><strong>스냅샷 확인</strong></div>
+        <div class="screen">
+          <div class="state-banner">
+            <div class="glyph"><div class="spinner"></div></div>
+            <div><strong>파일을 확인하고 있어요</strong><span>아직 아무것도 바뀌지 않았어요. 지금 나가도 대화는 그대로예요.</span></div>
+          </div>
+          <div class="card">
+            <h4>확인 중</h4>
+            <p>형식과 순서, 이 Persona의 스냅샷이 맞는지 보고 있어요.</p>
+            <div class="progress"><i style="width:46%"></i></div>
+          </div>
+          <div class="row"><span class="btn ghost">취소</span></div>
+        </div>
+      </div>
+      <div class="stage-copy">
+        <h2>검사 중에는 아무것도 바뀌지 않는다</h2>
+        <ul>
+          <li>파일을 읽고 검증하는 동안 대화·기억·Persona는 건드리지 않는다.</li>
+          <li>이 단계의 취소는 즉시 끝난다. 되돌릴 것이 없기 때문이다.</li>
+          <li>진행률은 읽은 양만 나타낸다. 성공 가능성을 암시하지 않는다.</li>
+        </ul>
+        <div class="rule">
+          <strong>"아직 바뀌지 않았다"를 먼저 말한다</strong>
+          파괴적 동작의 준비 단계에서 가장 먼저 필요한 정보는 되돌릴 수 있는지다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 -->
+  <section class="stage" id="s-preview" hidden>
+    <div class="stage-grid">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+        <div class="topbar"><span class="back">←</span><strong>스냅샷 확인</strong></div>
+        <div class="screen">
+          <div class="card">
+            <h4>이 스냅샷으로 되돌릴까요?</h4>
+            <p>아래 내용으로 지금 대화를 통째로 교체해요.</p>
+            <ul class="facts">
+              <li><span>대상</span><b>유란</b></li>
+              <li><span>스냅샷 메시지</span><b>1,438개</b></li>
+              <li><span>기간</span><b>2026-05-02 ~ 09-20</b></li>
+              <li><span>지금 대화</span><b>2,104개 → 남지 않음</b></li>
+              <li><span>Persona 설정</span><b>내보낼 때와 같음</b></li>
+            </ul>
+            <span class="hint">기억·관계·기분·Scene은 새 대화 기준으로 다시 만들어져요. 그 전까지는 대화를 보낼 수 없어요.</span>
+          </div>
+          <div class="row">
+            <span class="btn ghost">다른 파일</span>
+            <span class="btn danger">되돌리기</span>
+          </div>
+        </div>
+      </div>
+      <div class="stage-copy">
+        <h2>결정에 필요한 사실만 센다</h2>
+        <ul>
+          <li>스냅샷 건수·기간, 지금 대화 건수, 대상 Persona, 설정 일치 여부.</li>
+          <li>대화 내용은 미리보기에 옮기지 않는다. 숫자와 경계만 보여준다.</li>
+          <li>되돌리기 버튼은 durable 사실이 갖춰졌을 때만 활성화한다.</li>
+        </ul>
+        <div class="rule">
+          <strong>설정이 다르면 그 사실을 센다</strong>
+          같은 revision인데 내용이 다르면 되돌리기를 막고 왜 막혔는지 보여준다. 추정해서 진행하지 않는다.
+        </div>
+        <div class="rule stop">
+          <strong>내용을 로그에 남기지 않는다</strong>
+          미리보기와 이후 입력 어디서도 대화 원문·입력값을 기록하지 않는다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 -->
+  <section class="stage" id="s-empty" hidden>
+    <div class="stage-grid">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+        <div class="topbar"><span class="back">←</span><strong>스냅샷 확인</strong></div>
+        <div class="screen">
+          <div class="state-banner failure">
+            <div class="glyph">!</div>
+            <div><strong>비어 있는 스냅샷이에요</strong><span>되돌리면 이 Persona의 대화가 전부 사라지고 아무것도 남지 않아요.</span></div>
+          </div>
+          <div class="card">
+            <ul class="facts">
+              <li><span>스냅샷 메시지</span><b>0개</b></li>
+              <li><span>지금 대화</span><b>2,104개 → 남지 않음</b></li>
+            </ul>
+            <span class="hint">빈 대화로 시작하려는 게 맞을 때만 진행해요.</span>
+          </div>
+          <div class="row">
+            <span class="btn ghost">다른 파일</span>
+            <span class="btn danger">비우고 시작</span>
+          </div>
+        </div>
+      </div>
+      <div class="stage-copy">
+        <h2>빈 스냅샷은 별도로 확인받는다</h2>
+        <ul>
+          <li>형식은 올바르지만 결과가 "전부 삭제"이므로 일반 미리보기와 구분한다.</li>
+          <li>확인 문구는 결과를 그대로 말한다. "비우고 시작".</li>
+          <li>기본 초점은 취소 쪽에 둔다.</li>
+        </ul>
+        <div class="rule stop">
+          <strong>오류로 처리하지 않는다</strong>
+          빈 스냅샷은 유효한 입력이다. 막는 게 아니라 결과를 정확히 알리고 한 번 더 묻는다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 -->
+  <section class="stage" id="s-oversized" hidden>
+    <div class="stage-grid">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+        <div class="topbar"><span class="back">←</span><strong>스냅샷 확인</strong></div>
+        <div class="screen">
+          <div class="state-banner failure">
+            <div class="glyph">!</div>
+            <div><strong>이 파일은 쓸 수 없어요</strong><span>대화는 그대로예요. 아무것도 교체되지 않았어요.</span></div>
+          </div>
+          <div class="card">
+            <ul class="facts">
+              <li><span>한 메시지 크기</span><b class="warn">한도 초과</b></li>
+              <li><span>지금 대화</span><b>2,104개 · 그대로</b></li>
+            </ul>
+            <span class="hint">이 파일은 그대로는 쓸 수 없어요. 다른 스냅샷을 골라 주세요.</span>
+          </div>
+          <div class="row">
+            <span class="btn ghost">닫기</span>
+            <span class="btn">다른 파일</span>
+          </div>
+        </div>
+      </div>
+      <div class="stage-copy">
+        <h2>못 쓰는 파일은 재시도를 권하지 않는다</h2>
+        <ul>
+          <li>교체가 일어나지 않았다는 사실을 가장 먼저 말한다.</li>
+          <li>나가는 길은 <b>닫기</b>와 <b>다른 파일</b> 둘뿐이다.</li>
+          <li>어느 한도에 걸렸는지는 말하되 원문은 보여주지 않는다.</li>
+        </ul>
+        <div class="rule stop">
+          <strong>같은 파일 재시도 버튼을 두지 않는다</strong>
+          파일이 그대로인 한 결과도 그대로다. 끝없이 누르게 만드는 버튼은 복구 수단이 아니다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 -->
+  <section class="stage" id="s-replacing" hidden>
+    <div class="stage-grid">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+        <div class="topbar"><span class="back">←</span><strong>유란</strong></div>
+        <div class="screen">
+          <div class="state-banner">
+            <div class="glyph"><div class="spinner"></div></div>
+            <div><strong>대화를 되돌리고 있어요</strong><span>기억과 상태를 새 대화 기준으로 다시 만드는 중이에요. 안전해지면 알려드릴게요.</span></div>
+          </div>
+          <div class="card">
+            <p>이 동안에는 메시지를 보낼 수 없어요. 앱을 닫아도 이어서 진행돼요.</p>
+            <div class="progress"><i style="width:62%"></i></div>
+          </div>
+          <div class="row"><span class="btn ghost" aria-disabled="true">취소</span></div>
+          <span class="hint" style="display:block;margin-top:8px;color:var(--faint);font-size:11px">교체가 시작된 뒤에는 취소할 수 없어요.</span>
+        </div>
+      </div>
+      <div class="stage-copy">
+        <h2>교체 전후로 취소의 의미가 다르다</h2>
+        <ul>
+          <li><b>교체 전</b> 취소는 보상이 끝날 때까지 기다린 뒤 완료로 표시한다. 즉시 사라지지 않는다.</li>
+          <li><b>교체 후</b>에는 취소가 없다. 되돌리기를 되돌리는 동작은 제공하지 않는다.</li>
+          <li>앱을 닫아도 이어진다는 사실을 명시한다.</li>
+        </ul>
+        <div class="rule stop">
+          <strong>파괴적 undo를 만들지 않는다</strong>
+          교체 후의 나가는 길은 재시도와 기준 다시 정하기뿐이다.
+        </div>
+        <div class="rule">
+          <strong>버튼 상태는 저장된 사실에서 나온다</strong>
+          화면을 다시 만들어도 진행 중인 작업을 읽어서 판단한다. 동기화 중이 아니라는 이유로 안전하다고 보지 않는다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 7 -->
+  <section class="stage" id="s-retry" hidden>
+    <div class="stage-grid">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+        <div class="topbar"><span class="back">←</span><strong>유란</strong></div>
+        <div class="screen">
+          <div class="state-banner failure">
+            <div class="glyph">!</div>
+            <div><strong>잠시 멈췄어요</strong><span>새 대화는 이미 저장됐어요. 이어서 다시 시도할 수 있어요.</span></div>
+          </div>
+          <div class="card">
+            <p>기억과 상태를 다시 만드는 중에 멈췄어요. 대화는 안전해질 때까지 잠겨 있어요.</p>
+          </div>
+          <div class="row"><span class="btn primary">다시 시도</span></div>
+        </div>
+      </div>
+      <div class="stage-copy">
+        <h2>재시도 가능한 실패는 그렇게 말한다</h2>
+        <ul>
+          <li>원본 교체가 끝났다는 사실을 먼저 알린다. 되돌아갈 곳이 없다는 뜻이기도 하다.</li>
+          <li>버튼은 하나다. 다시 시도.</li>
+          <li>남은 작업이 끝나기 전까지 대화 잠금은 유지한다.</li>
+        </ul>
+        <div class="rule">
+          <strong>실패를 성공으로 표시하지 않는다</strong>
+          증명되지 않은 상태에서 완료로 넘어가지 않는다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 8 -->
+  <section class="stage" id="s-repair" hidden>
+    <div class="stage-grid">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+        <div class="topbar"><span class="back">←</span><strong>기준 다시 정하기</strong></div>
+        <div class="screen">
+          <div class="state-banner failure">
+            <div class="glyph">!</div>
+            <div><strong>예전 형식이라 상태를 알 수 없어요</strong><span>대화는 되돌아갔지만, 그때의 관계·기분·장면까지는 파일에 들어 있지 않아요.</span></div>
+          </div>
+          <div class="card">
+            <p>지금 기준을 직접 정해 주세요. 과거를 복원하는 게 아니라 여기서부터 쓸 기준을 세우는 거예요.</p>
+            <div class="field">
+              <label>지금 어디에 있나요</label>
+              <div class="choice"><span aria-checked="true">떨어져 있음</span><span aria-checked="false">같이 있음</span></div>
+            </div>
+            <div class="field">
+              <label>한 줄로 적어 주세요 (선택)</label>
+              <div class="input">예: 어제 다투고 아직 서먹해</div>
+              <span class="counter">0 / 200</span>
+            </div>
+          </div>
+          <div class="row">
+            <span class="btn ghost">나중에</span>
+            <span class="btn primary">이 기준으로 시작</span>
+          </div>
+        </div>
+      </div>
+      <div class="stage-copy">
+        <h2>복원이 아니라 새 기준이다</h2>
+        <ul>
+          <li>파일에 없던 상태를 있었던 것처럼 만들지 않는다. 사용자가 지금 정하는 값이다.</li>
+          <li>입력은 길이 제한이 있고 화면에 남은 글자 수를 보여준다.</li>
+          <li><b>나중에</b>를 고르면 잠긴 상태로 남고 같은 화면으로 다시 들어올 수 있다.</li>
+        </ul>
+        <div class="rule stop">
+          <strong>영구히 막힌 상태를 만들지 않는다</strong>
+          이 화면은 언제든 다시 열 수 있어야 한다. 한 번 닫으면 끝나는 복구는 복구가 아니다.
+        </div>
+        <div class="rule stop">
+          <strong>입력은 로그에 남기지 않는다</strong>
+          여기 적은 문장은 진단 기록·전송 대상이 아니다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9 -->
+  <section class="stage" id="s-safe" hidden>
+    <div class="stage-grid">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+        <div class="topbar"><span class="back">←</span><strong>유란</strong></div>
+        <div class="screen">
+          <div class="state-banner safe">
+            <div class="glyph">✓</div>
+            <div><strong>다시 대화할 수 있어요</strong><span>남은 정리는 백그라운드에서 이어서 해요. 대화를 막지 않아요.</span></div>
+          </div>
+          <div class="card">
+            <h4>되돌린 대화</h4>
+            <p>1,438개 · 2026-05-02 ~ 09-20</p>
+            <span class="hint">아직 정리 중인 기억이 있어서 예전 이야기를 덜 기억할 수 있어요.</span>
+          </div>
+        </div>
+      </div>
+      <div class="stage-copy">
+        <h2>안전과 완료는 다르다</h2>
+        <ul>
+          <li>안전해지면 대화를 먼저 연다. 남은 작업을 기다리게 하지 않는다.</li>
+          <li>남은 작업이 있다는 사실과 그 영향을 한 줄로 알린다.</li>
+          <li>남은 작업의 진행률이나 개별 실패는 화면에 올리지 않는다.</li>
+        </ul>
+        <div class="rule">
+          <strong>기대치를 정확히 말한다</strong>
+          "덜 기억할 수 있다"는 실제 관찰 가능한 결과다. 완료라고 말하지 않는다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10 -->
+  <section class="stage" id="s-done" hidden>
+    <div class="stage-grid">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+        <div class="topbar"><span class="back">←</span><strong>유란</strong></div>
+        <div class="screen">
+          <div class="state-banner safe">
+            <div class="glyph">✓</div>
+            <div><strong>되돌리기가 끝났어요</strong><span>이 대화 기준으로 기억과 상태가 정리됐어요.</span></div>
+          </div>
+          <div class="card">
+            <p>평소처럼 이어서 대화하면 돼요.</p>
+          </div>
+        </div>
+      </div>
+      <div class="stage-copy">
+        <h2>완료는 한 번만 말한다</h2>
+        <ul>
+          <li>배너는 확인하거나 다음 대화가 시작되면 사라진다.</li>
+          <li>완료 후에는 되돌리기 관련 action을 남기지 않는다.</li>
+        </ul>
+        <div class="rule">
+          <strong>완료 표시는 증명된 뒤에만</strong>
+          남은 작업이 있으면 9번 상태에 머문다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 11 -->
+  <section class="stage" id="s-aborted" hidden>
+    <div class="stage-grid">
+      <div class="phone">
+        <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+        <div class="topbar"><span class="back">←</span><strong>유란</strong></div>
+        <div class="screen">
+          <div class="state-banner">
+            <div class="glyph">↩</div>
+            <div><strong>되돌리기를 취소했어요</strong><span>대화는 그대로예요. 바뀐 건 없어요.</span></div>
+          </div>
+          <div class="card">
+            <p>다시 하려면 설정에서 스냅샷 파일을 고르면 돼요.</p>
+          </div>
+        </div>
+      </div>
+      <div class="stage-copy">
+        <h2>취소는 정리가 끝난 뒤에 표시한다</h2>
+        <ul>
+          <li>사용자가 취소를 누른 즉시가 아니라, 보상이 끝나 실제로 원래 상태가 된 뒤에 이 화면을 보여준다.</li>
+          <li>그 사이에는 6번 상태의 진행 표시를 유지한다.</li>
+        </ul>
+        <div class="rule stop">
+          <strong>끝나지 않은 취소를 끝난 것처럼 보이지 않는다</strong>
+          "바뀐 건 없어요"는 보상이 실제로 완료됐을 때만 사실이다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="legend">
+    <div><strong>잠금</strong>안전 단계 전까지 메시지 전송·백업 가져오기를 허용하지 않는다.</div>
+    <div><strong>지속</strong>앱을 닫아도 진행 중인 작업은 이어진다. 화면은 저장된 사실을 다시 읽는다.</div>
+    <div><strong>기록 금지</strong>대화 원문과 사용자가 적은 기준 문장은 어떤 진단 기록에도 남기지 않는다.</div>
+  </div>
+
+  <footer>
+    상태 전이: 진입점 → 검사 중 → (미리보기 | 빈 스냅샷 | 한도 초과) → 교체·복구 중 → (재시도 가능 | 기준 다시 정하기 | 안전·남은 작업) → 완료.
+    교체 전 취소만 <b>취소됨</b>으로 간다.<br />
+    이 문서는 화면 기준만 정한다. 형식·transaction·복구 단계의 의미는
+    <code>docs/sdd/conversation-snapshot-restore/change-plans/SRC-01.md</code>와 <code>REC-01.md</code>가 소유한다.
+  </footer>
+</main>
+<script>
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const stages = document.querySelectorAll('.stage');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
+    stages.forEach(stage => stage.hidden = stage.id !== tab.dataset.target);
+  }));
+</script>
+</body>
+</html>
