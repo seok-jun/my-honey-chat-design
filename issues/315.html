@@ -1,0 +1,608 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #315 — Persona Media 삭제·Placeholder UI/UX Visual Spec</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: Inter, Pretendard, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --page: #0b090b;
+      --surface: #171317;
+      --surface-2: #1d191d;
+      --surface-3: #2a2429;
+      --mine: #8e4e61;
+      --text: #f7f1f3;
+      --muted: #b9adb1;
+      --faint: #8f8388;
+      --accent: #f0a8b7;
+      --accent-ink: #2a1720;
+      --danger: #ffb4ab;
+      --danger-surface: #452523;
+      --line: #3b3338;
+      --shadow: 0 28px 80px rgb(0 0 0 / 45%);
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: radial-gradient(circle at 50% -20%, #34262f 0, var(--page) 40%); color: var(--text); }
+    button { font: inherit; }
+    main { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 40px 0 72px; }
+    header { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; margin-bottom: 24px; }
+    h1 { margin: 8px 0 10px; font-size: clamp(28px, 5vw, 46px); line-height: 1.06; letter-spacing: -.035em; }
+    h2, h3, p { margin-top: 0; }
+    .eyebrow { color: var(--accent); font-weight: 750; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; }
+    .lede { max-width: 760px; color: var(--muted); line-height: 1.65; margin-bottom: 0; }
+    .contract { max-width: 330px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 16px; background: rgb(29 25 29 / 72%); color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .contract strong { color: var(--text); }
+
+    .tabs { display: flex; gap: 8px; overflow-x: auto; padding: 8px 0 18px; scrollbar-width: thin; }
+    .tabs button { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 999px; padding: 9px 14px; background: var(--surface-2); color: var(--muted); cursor: pointer; }
+    .tabs button[aria-selected="true"] { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); font-weight: 750; }
+
+    .stage { min-height: 780px; padding: 28px; border: 1px solid var(--line); border-radius: 24px; background: rgb(23 19 23 / 88%); box-shadow: var(--shadow); }
+    .compare { display: grid; grid-template-columns: repeat(2, minmax(300px, 1fr)); gap: 28px; align-items: start; }
+    .col-label { display: flex; align-items: center; gap: 8px; margin: 0 auto 12px; width: min(390px, 100%); font-size: 13px; font-weight: 800; color: var(--muted); }
+    .col-label .tag { padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); font-size: 11px; letter-spacing: .04em; }
+    .col-label .tag.proposed { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+    .stage-copy { margin-top: 28px; display: grid; grid-template-columns: repeat(2, minmax(260px, 1fr)); gap: 12px 28px; }
+    .stage-copy h2 { grid-column: 1 / -1; margin-bottom: 0; font-size: 24px; letter-spacing: -.02em; }
+    .stage-copy ul { margin: 0; padding-left: 20px; }
+    .stage-copy li { color: var(--muted); line-height: 1.65; }
+    .rule { padding: 14px 16px; border-left: 3px solid var(--accent); border-radius: 0 12px 12px 0; background: var(--surface-2); color: var(--muted); line-height: 1.6; font-size: 14px; }
+    .rule strong { display: block; margin-bottom: 4px; color: var(--text); }
+    .rule.stop { border-left-color: var(--danger); }
+    .proposal { display: inline-block; margin-left: 4px; padding: 1px 6px; border: 1px dashed #7a6670; border-radius: 6px; color: var(--faint); font-size: 10px; font-weight: 600; vertical-align: middle; white-space: nowrap; }
+
+    /* phone chrome */
+    .phone { position: relative; width: min(390px, 100%); height: 720px; margin: 0 auto; overflow: hidden; border: 1px solid #52464d; border-radius: 32px; background: #120f12; box-shadow: 0 18px 52px rgb(0 0 0 / 55%); }
+    .statusbar { height: 26px; display: flex; justify-content: space-between; align-items: end; padding: 0 18px 5px; background: var(--surface); font-size: 10px; color: var(--muted); }
+    .topbar { height: 60px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; background: var(--surface); border-bottom: 1px solid #211c20; }
+    .topbar .back { width: 24px; color: var(--muted); font-size: 18px; }
+    .topbar strong { font-size: 17px; font-weight: 600; }
+    .avatar { width: 38px; height: 38px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(145deg, #f0a8b7, #5c3c4b); color: var(--accent-ink); font-weight: 850; font-size: 14px; }
+    .identity { flex: 1; min-width: 0; }
+    .identity strong { display: block; font-size: 15px; }
+    .identity span { color: var(--accent); font-size: 11px; }
+    .top-icons { color: var(--muted); letter-spacing: 10px; white-space: nowrap; font-size: 15px; }
+    .screen { position: absolute; inset: 86px 0 0; overflow: hidden; }
+
+    /* gallery */
+    .grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 6px; padding: 8px; }
+    .tile { position: relative; aspect-ratio: 1; border-radius: 10px; overflow: hidden; background: var(--surface-3); display: grid; place-items: center; }
+    .synthetic { position: absolute; inset: 0; display: grid; place-items: start; padding: 8px 10px; color: #d9cfd3; font-size: 12px; font-weight: 700; letter-spacing: .04em;
+      background: repeating-linear-gradient(135deg, #4a4247 0 10px, #433b40 10px 20px); }
+    .synthetic.alt { background: repeating-linear-gradient(135deg, #3f4550 0 10px, #394049 10px 20px); }
+    .synthetic.alt2 { background: repeating-linear-gradient(135deg, #504640 0 10px, #483f3a 10px 20px); }
+    .play { position: relative; width: 42px; height: 42px; display: grid; place-items: center; color: #fff; font-size: 24px; text-shadow: 0 1px 6px rgb(0 0 0 / 60%); }
+    .tile-btn { position: absolute; right: 4px; bottom: 4px; width: 40px; height: 40px; display: grid; place-items: center; color: #fff; font-size: 17px; text-shadow: 0 1px 4px rgb(0 0 0 / 70%); }
+    .tile-btn.del { color: var(--muted); text-shadow: none; }
+    .tile.missing { border: 1px dashed #5a4d54; }
+    .missing-body { display: grid; justify-items: center; gap: 6px; padding: 0 14px; text-align: center; color: var(--muted); font-size: 11px; line-height: 1.35; }
+    .missing-body .glyph { font-size: 22px; color: var(--faint); }
+    .tile .badge { position: absolute; left: 6px; top: 6px; padding: 2px 6px; border-radius: 6px; background: rgb(0 0 0 / 55%); color: #fff; font-size: 9px; }
+    .empty { position: absolute; inset: 0; display: grid; place-items: center; color: var(--muted); font-size: 14px; }
+    .callout { position: absolute; z-index: 6; left: 50%; bottom: calc(100% + 6px); transform: translateX(-50%); padding: 3px 7px; border-radius: 6px; background: #ffd479; color: #2a1d00; font-size: 10px; font-weight: 800; white-space: nowrap; pointer-events: none; }
+    .ring { position: relative; outline: 2px dashed #ffd479; outline-offset: 2px; }
+    .tile .callout { left: 6px; right: 6px; top: 6px; bottom: auto; transform: none; white-space: normal; text-align: center; }
+
+    /* viewer */
+    .viewer { position: absolute; inset: 26px 0 0; background: #000; }
+    .viewer .close { position: absolute; top: 12px; right: 14px; width: 40px; height: 40px; display: grid; place-items: center; color: #fff; font-size: 20px; }
+    .viewer .media { position: absolute; inset: 64px 0 64px; }
+    .viewer .media .synthetic { font-size: 14px; }
+    .viewer .bottom { position: absolute; left: 0; right: 0; bottom: 18px; display: flex; justify-content: center; gap: 12px; }
+    .obtn { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 20px; border: 1px solid #8f8388; border-radius: 999px; color: var(--accent); font-size: 14px; font-weight: 600; background: rgb(0 0 0 / 40%); }
+    .tbtn { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 16px; border-radius: 999px; color: var(--danger); font-size: 14px; font-weight: 600; background: rgb(0 0 0 / 40%); }
+    .disabled { opacity: .38; }
+    .ico { width: 1.1em; height: 1.1em; vertical-align: -0.15em; }
+    .mini-spin { width: 16px; height: 16px; border: 2px solid rgb(240 168 183 / 26%); border-top-color: var(--accent); border-radius: 50%; animation: spin 1s linear infinite; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    /* dialog */
+    .scrim { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; padding: 24px; background: rgb(0 0 0 / 60%); }
+    .dialog { width: 100%; padding: 24px; border-radius: 28px; background: #2b2429; box-shadow: 0 16px 40px rgb(0 0 0 / 50%); }
+    .dialog h3 { margin: 0 0 16px; font-size: 22px; font-weight: 500; }
+    .dialog p { margin: 0 0 8px; color: var(--muted); font-size: 14px; line-height: 1.55; }
+    .dialog p.warn { color: var(--danger); }
+    .dialog .actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 20px; }
+    .dialog .cancel { padding: 10px 12px; color: var(--accent); font-size: 14px; font-weight: 600; }
+    .dialog .confirm { padding: 10px 22px; border-radius: 999px; background: var(--danger); color: #690005; font-size: 14px; font-weight: 700; }
+
+    /* snackbar */
+    .snackbar { position: absolute; z-index: 4; left: 12px; right: 12px; bottom: 16px; padding: 14px 16px; border-radius: 6px; background: #ece0e3; color: #33282c; font-size: 14px; box-shadow: 0 6px 18px rgb(0 0 0 / 40%); }
+
+    /* chat */
+    .chat { position: absolute; inset: 86px 0 68px; overflow: hidden; padding: 14px 14px; }
+    .msg { display: flex; flex-direction: column; margin-bottom: 12px; }
+    .msg.mine { align-items: flex-end; }
+    .bubble { max-width: 300px; padding: 10px 14px; border-radius: 19px 19px 19px 5px; background: var(--surface-3); font-size: 15px; line-height: 1.4; }
+    .msg.mine .bubble { border-radius: 19px 19px 5px 19px; background: var(--mine); }
+    .time { padding: 2px 5px; color: var(--faint); font-size: 10px; }
+    .bmedia { position: relative; width: 240px; border-radius: 12px; overflow: hidden; }
+    .bmedia.img { height: 170px; }
+    .bmedia.vid { height: 250px; background: #000; display: grid; place-items: center; }
+    .bmedia.vid .play { width: 56px; height: 56px; border-radius: 50%; background: rgb(0 0 0 / 60%); font-size: 26px; }
+    .savebtn { display: flex; justify-content: flex-end; padding-top: 2px; color: var(--text); font-size: 16px; height: 34px; align-items: center; }
+    .gap8 { height: 8px; }
+    .oldtext { color: var(--muted); font-size: 12px; }
+    .audio-btn { display: inline-flex; align-items: center; gap: 7px; height: 38px; padding: 0 18px; border: 1px solid #8f8388; border-radius: 999px; color: var(--accent); font-size: 14px; }
+    .ph { width: 220px; height: 120px; display: grid; place-content: center; justify-items: center; gap: 6px; border-radius: 12px; border: 1px dashed rgb(255 255 255 / 22%); background: rgb(0 0 0 / 22%); color: var(--muted); font-size: 12px; }
+    .ph .glyph { font-size: 22px; color: var(--muted); opacity: .8; }
+    .msg.mine .ph { color: #eadde1; border-color: rgb(255 255 255 / 30%); }
+    .ph.chip { width: auto; height: 38px; display: inline-flex; place-content: initial; align-items: center; gap: 7px; padding: 0 14px; border-radius: 999px; }
+    .ph.chip .glyph { font-size: 15px; }
+    .composer { position: absolute; left: 0; right: 0; bottom: 0; height: 68px; display: flex; gap: 8px; align-items: center; padding: 12px; background: var(--surface); border-top: 1px solid var(--line); }
+    .composer .input { flex: 1; height: 42px; display: flex; align-items: center; padding: 0 14px; border: 1px solid var(--line); border-radius: 22px; background: #1d181b; color: var(--faint); font-size: 14px; }
+    .composer .ic { width: 38px; height: 38px; display: grid; place-items: center; border-radius: 50%; background: var(--surface-3); color: var(--accent); }
+
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 700; }
+    td { color: var(--text); }
+    td.src { color: var(--muted); }
+    .table-wrap { overflow-x: auto; }
+    .panel { margin-top: 24px; padding: 20px 22px; border: 1px solid var(--line); border-radius: 18px; background: rgb(29 25 29 / 72%); }
+    .panel h3 { margin-bottom: 12px; font-size: 18px; }
+    .panel ul { margin: 0; padding-left: 20px; }
+    .panel li { color: var(--muted); line-height: 1.65; }
+    footer { margin-top: 24px; color: var(--faint); font-size: 12px; line-height: 1.65; }
+    footer code, .panel code { color: var(--muted); }
+    [hidden] { display: none !important; }
+
+    @media (max-width: 860px) {
+      header, .compare, .stage-copy { grid-template-columns: 1fr; }
+      .contract { max-width: none; }
+      .stage { padding: 18px 12px 28px; }
+    }
+    @media (prefers-reduced-motion: reduce) { .mini-spin { animation: none; } }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <div class="eyebrow">seok-jun/my-honey-chat · Issue #315</div>
+      <h1>[Media][Lifecycle] Persona-scoped 사용자 미디어 자산·Chat 참조 분리·갤러리 보존</h1>
+      <p class="lede">
+        대상 화면: 「미디어 모아보기」, 전체 화면 미디어 뷰어, 미디어 삭제 확인 dialog, 채팅 message bubble의 media 자리.
+        미디어는 Persona가 소유한 자산이고 message는 그 자산을 참조한다. 사용자가 미디어를 직접 지워도 대화는 남고,
+        그 자리에 「삭제된 미디어」가 보인다. 이 HTML은 화면 배치, 정보 계층, UI 상태와 인터랙션의 구현 기준이다.
+      </p>
+    </div>
+    <div class="contract">
+      <strong>이 문서가 정하는 것</strong><br />
+      삭제 진입 위치, 영향 고지 dialog, 삭제 뒤 화면, 갤러리 타일과 bubble의 <code>DELETED</code>·<code>MISSING</code> 표현, 문구.<br /><br />
+      <strong>정하지 않는 것</strong><br />
+      catalog 저장, 가용성 판정, 파일 삭제 journal, 갤러리 source 전환. SDD <code>persona-media-assets</code>의 D-006·D-009·D-010·D-011과 MEDIA-03이 소유한다.
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Issue 315 visual spec states">
+    <button type="button" role="tab" aria-selected="true" data-target="s-gallery">1 미디어 모아보기</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-viewer">2 전체 화면 뷰어</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-confirm">3 삭제 확인</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-result">4 삭제 결과</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-bubble">5 대화 placeholder</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-unchanged">6 바뀌지 않는 표시</button>
+  </div>
+
+  <!-- 1 Gallery -->
+  <section class="stage" id="s-gallery">
+    <div class="compare">
+      <div>
+        <div class="col-label"><span class="tag">Current</span>미디어 모아보기</div>
+        <div class="phone">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+          <div class="topbar"><span class="back">←</span><strong>미디어 모아보기</strong></div>
+          <div class="screen">
+            <div class="grid">
+              <div class="tile"><div class="synthetic">이미지</div><span class="tile-btn">⤓</span></div>
+              <div class="tile"><div class="synthetic alt">영상</div><span class="play">▶</span><span class="tile-btn">⤓</span></div>
+              <div class="tile ring"><span class="callout">파일 없음: 빈 타일 + 저장 버튼</span><span class="tile-btn">⤓</span></div>
+              <div class="tile"><div class="synthetic alt2">이미지</div><span class="tile-btn">⤓</span></div>
+              <div class="tile"><span class="play">▶</span><span class="tile-btn">⤓</span></div>
+              <div class="tile"><div class="synthetic">이미지</div><span class="tile-btn">⤓</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="col-label"><span class="tag proposed">Proposed</span>미디어 모아보기</div>
+        <div class="phone">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+          <div class="topbar"><span class="back">←</span><strong>미디어 모아보기</strong></div>
+          <div class="screen">
+            <div class="grid">
+              <div class="tile"><div class="synthetic">이미지</div><span class="tile-btn">⤓</span></div>
+              <div class="tile"><div class="synthetic alt">영상</div><span class="play">▶</span><span class="tile-btn">⤓</span></div>
+              <div class="tile missing ring">
+                <span class="callout">MISSING · 오른쪽 아래 = 삭제</span>
+                <div class="missing-body"><span class="glyph">▨</span>미디어를 찾을 수 없음</div>
+                <span class="tile-btn del"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13M10.5 11v5.5M13.5 11v5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+              <div class="tile"><div class="synthetic alt2">이미지</div><span class="tile-btn">⤓</span></div>
+              <div class="tile missing">
+                <div class="missing-body"><span class="glyph">▨</span>미디어를 찾을 수 없음</div>
+                <span class="tile-btn del"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13M10.5 11v5.5M13.5 11v5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>
+              </div>
+              <div class="tile"><div class="synthetic">이미지</div><span class="tile-btn">⤓</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="stage-copy">
+      <h2>격자와 순서는 그대로, 누락만 구분한다</h2>
+      <ul>
+        <li>Top bar, 2열 격자(<code>GridCells.Adaptive(132.dp)</code>, 간격 6dp, 여백 8dp), 정사각 타일, 정렬(최신순)은 Current와 같다.</li>
+        <li><b>AVAILABLE</b> 타일은 Current와 똑같다. 탭하면 뷰어, 오른쪽 아래 ⤓는 「갤러리에 저장」. 타일에 삭제 아이콘을 추가하지 않는다.</li>
+        <li><b>MISSING</b> 타일: 점선 테두리, 가운데에 누락 아이콘(<code>BrokenImage</code>)과 「미디어를 찾을 수 없음」. 영상이어도 ▶를 그리지 않는다.</li>
+        <li>MISSING 타일은 열기와 저장이 없다. 타일 본문은 눌러도 반응하지 않는다. 저장 버튼 자리(오른쪽 아래)에 삭제 아이콘(<code>DeleteOutline</code>, contentDescription 「미디어 삭제」<span class="proposal">제안 문구</span>)을 둔다. 누르면 3번 삭제 확인으로 간다.</li>
+        <li><b>DELETED</b> 항목은 목록에 없다. 모든 항목이 사라지면 기존 빈 상태 「아직 모아볼 이미지나 영상이 없어.」를 그대로 쓴다.</li>
+      </ul>
+      <div>
+        <div class="rule">
+          <strong>삭제 진입은 두 곳뿐이다</strong>
+          AVAILABLE은 뷰어 하단(2번), MISSING은 타일의 삭제 아이콘. 길게 누르기 같은 숨은 제스처는 만들지 않는다.
+        </div>
+        <div class="rule stop" style="margin-top:12px">
+          <strong>연결되지 않은 항목은 삭제 진입이 없다</strong>
+          <code>mediaId == null</code>(key가 <code>legacy:</code>)인 항목은 AVAILABLE이면 Current 타일 그대로, MISSING이면 누락 표시만 하고 삭제 아이콘을 그리지 않는다. backfill 뒤 asset이 되면 삭제할 수 있다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 Viewer -->
+  <section class="stage" id="s-viewer" hidden>
+    <div class="compare">
+      <div>
+        <div class="col-label"><span class="tag">Current</span>뷰어 (모아보기·대화 공통)</div>
+        <div class="phone">
+          <div class="viewer">
+            <span class="close">✕</span>
+            <div class="media"><div class="synthetic">이미지 · 전체 화면</div></div>
+            <div class="bottom"><span class="obtn">⤓ 갤러리에 저장</span></div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="col-label"><span class="tag proposed">Proposed</span>모아보기에서 연 뷰어</div>
+        <div class="phone">
+          <div class="viewer">
+            <span class="close">✕</span>
+            <div class="media"><div class="synthetic">이미지 · 전체 화면</div></div>
+            <div class="bottom"><span class="tbtn ring"><span class="callout">새 action · 저장 왼쪽</span><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13M10.5 11v5.5M13.5 11v5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> 삭제</span><span class="obtn">⤓ 갤러리에 저장</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="stage-copy">
+      <h2>삭제는 저장 옆, 한 단계 약하게</h2>
+      <ul>
+        <li>검은 전체 화면, 오른쪽 위 ✕ 닫기, 미디어 영역(위아래 64dp 여백)은 Current와 같다.</li>
+        <li>하단 가운데 한 줄에 <b>[삭제] [갤러리에 저장]</b>을 12dp 간격으로 둔다. 기존 「갤러리에 저장」 OutlinedButton은 오른쪽에 그대로 남는다.</li>
+        <li>「삭제」<span class="proposal">제안 문구</span>는 error 색 TextButton + <code>DeleteOutline</code> 아이콘이다. 누르면 뷰어 위에 3번 dialog가 뜬다.</li>
+        <li>이미지와 영상 모두 같다. 영상은 재생 중이어도 버튼 위치가 같다.</li>
+        <li>「저장 중」(기존 진행 표시) 동안에는 삭제 버튼을 비활성화한다(투명도 38%).</li>
+      </ul>
+      <div>
+        <div class="rule stop">
+          <strong>대화에서 연 뷰어에는 삭제가 없다</strong>
+          message bubble을 눌러 연 뷰어는 Current와 같다(저장만). 삭제는 모아보기 항목에서만 한다(D-010). 모아보기에서 열었더라도 <code>mediaId == null</code>이면 삭제 버튼을 그리지 않는다.
+        </div>
+        <div class="rule" style="margin-top:12px">
+          <strong>비활성 예시</strong>
+          <span style="display:inline-flex;gap:10px;margin-top:8px;padding:10px;border-radius:12px;background:#000">
+            <span class="tbtn disabled"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13M10.5 11v5.5M13.5 11v5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> 삭제</span><span class="obtn"><span class="mini-spin"></span>저장 중</span>
+          </span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 Confirm -->
+  <section class="stage" id="s-confirm" hidden>
+    <div class="compare">
+      <div>
+        <div class="col-label"><span class="tag proposed">Proposed</span>뷰어에서 삭제 (AVAILABLE)</div>
+        <div class="phone">
+          <div class="viewer">
+            <span class="close">✕</span>
+            <div class="media"><div class="synthetic">이미지 · 전체 화면</div></div>
+            <div class="bottom"><span class="tbtn"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13M10.5 11v5.5M13.5 11v5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> 삭제</span><span class="obtn">⤓ 갤러리에 저장</span></div>
+          </div>
+          <div class="scrim">
+            <div class="dialog" role="dialog" aria-modal="true">
+              <h3>이 미디어를 삭제할까?</h3>
+              <p>이 미디어가 대화에 남아 있으면 그 자리는 「삭제된 미디어」로 표시돼. 대화 내용은 지워지지 않아.</p>
+              <p>필요하면 먼저 「갤러리에 저장」해줘.</p>
+              <p class="warn">삭제하면 되돌릴 수 없어.</p>
+              <div class="actions"><span class="cancel">취소</span><span class="confirm">삭제</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="col-label"><span class="tag proposed">Proposed</span>누락 타일에서 삭제 (MISSING)</div>
+        <div class="phone">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+          <div class="topbar"><span class="back">←</span><strong>미디어 모아보기</strong></div>
+          <div class="screen">
+            <div class="grid">
+              <div class="tile"><div class="synthetic">이미지</div><span class="tile-btn">⤓</span></div>
+              <div class="tile"><div class="synthetic alt">영상</div><span class="play">▶</span><span class="tile-btn">⤓</span></div>
+              <div class="tile missing"><div class="missing-body"><span class="glyph">▨</span>미디어를 찾을 수 없음</div><span class="tile-btn del"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13M10.5 11v5.5M13.5 11v5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <div class="tile"><div class="synthetic alt2">이미지</div><span class="tile-btn">⤓</span></div>
+            </div>
+          </div>
+          <div class="scrim">
+            <div class="dialog" role="dialog" aria-modal="true">
+              <h3>이 미디어를 삭제할까?</h3>
+              <p>이 미디어가 대화에 남아 있으면 그 자리는 「삭제된 미디어」로 표시돼. 대화 내용은 지워지지 않아.</p>
+              <p class="warn">삭제하면 되돌릴 수 없어.</p>
+              <div class="actions"><span class="cancel">취소</span><span class="confirm">삭제</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="stage-copy">
+      <h2>영향을 먼저 말하고 한 번 묻는다</h2>
+      <ul>
+        <li>Material3 <code>AlertDialog</code>. 제목 → 영향 고지 → error 색 경고 → [취소] [삭제] 순서다.</li>
+        <li>영향 고지는 세 가지다: 대화 자리는 「삭제된 미디어」로 남고 대화 내용은 지워지지 않는다 / 되돌릴 수 없다 / 필요하면 먼저 저장한다(D-010).</li>
+        <li>MISSING 항목은 저장할 파일이 없으므로 「필요하면 먼저 「갤러리에 저장」해줘.」 줄을 뺀다.</li>
+        <li>참조하는 message 개수는 보여주지 않는다. 0개일 수도 있어서 “남아 있으면”으로 말한다.</li>
+        <li><b>취소</b>, 바깥 영역 탭, 뒤로 가기: dialog만 닫힌다. 뷰어나 모아보기는 그대로이고 서비스는 호출하지 않는다.</li>
+        <li><b>삭제</b>: 한 번만 호출한다. 결과가 올 때까지 두 버튼을 비활성화하고 dialog를 닫지 않는다. 결과는 4번 상태로 간다.</li>
+      </ul>
+      <div>
+        <div class="rule stop">
+          <strong>확인 버튼은 결과를 그대로 말한다</strong>
+          「삭제」는 error 색 filled 버튼이다. 기본 초점은 두지 않는다. 이 dialog 안에 저장 버튼 같은 다른 action을 넣지 않는다.
+        </div>
+        <div class="rule" style="margin-top:12px">
+          <strong>문구</strong>
+          제목 「이 미디어를 삭제할까?」, 고지 두 줄, 경고 「삭제하면 되돌릴 수 없어.」, 버튼 「취소」·「삭제」 모두 <span class="proposal">제안 문구</span>. 「삭제된 미디어」와 「갤러리에 저장」은 PLAN·기존 문구다. 톤은 기존 미디어 문구(반말)에 맞춘다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 4 Result -->
+  <section class="stage" id="s-result" hidden>
+    <div class="compare">
+      <div>
+        <div class="col-label"><span class="tag proposed">Proposed</span>성공 · 모아보기로 돌아옴</div>
+        <div class="phone">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+          <div class="topbar"><span class="back">←</span><strong>미디어 모아보기</strong></div>
+          <div class="screen">
+            <div class="grid">
+              <div class="tile ring"><span class="callout">지운 첫 항목이 빠지고 뒤 항목이 당겨짐</span><div class="synthetic alt">영상</div><span class="play">▶</span><span class="tile-btn">⤓</span></div>
+              <div class="tile missing"><div class="missing-body"><span class="glyph">▨</span>미디어를 찾을 수 없음</div><span class="tile-btn del"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13M10.5 11v5.5M13.5 11v5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <div class="tile"><div class="synthetic alt2">이미지</div><span class="tile-btn">⤓</span></div>
+              <div class="tile missing"><div class="missing-body"><span class="glyph">▨</span>미디어를 찾을 수 없음</div><span class="tile-btn del"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13M10.5 11v5.5M13.5 11v5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span></div>
+              <div class="tile"><div class="synthetic">이미지</div><span class="tile-btn">⤓</span></div>
+            </div>
+          </div>
+          <div class="snackbar">미디어를 삭제했어.</div>
+        </div>
+      </div>
+      <div>
+        <div class="col-label"><span class="tag proposed">Proposed</span>실패 · 뷰어 유지</div>
+        <div class="phone">
+          <div class="viewer">
+            <span class="close">✕</span>
+            <div class="media"><div class="synthetic">이미지 · 전체 화면</div></div>
+            <div class="bottom" style="bottom:86px"><span class="tbtn"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13M10.5 11v5.5M13.5 11v5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg> 삭제</span><span class="obtn">⤓ 갤러리에 저장</span></div>
+          </div>
+          <div class="snackbar">지금은 미디어를 삭제할 수 없어. 잠시 뒤에 다시 해줘.</div>
+        </div>
+      </div>
+    </div>
+    <div class="stage-copy">
+      <h2>지워지면 바로 사라지고, 실패하면 그대로다</h2>
+      <ul>
+        <li><b>DELETED</b> 결과: dialog와 뷰어를 닫고 모아보기로 돌아온다. 항목은 목록에서 빠진다. snackbar 「미디어를 삭제했어.」<span class="proposal">제안 문구</span>.</li>
+        <li><b>ALREADY_DELETED</b>, <b>NOT_FOUND</b>: 사용자가 원한 결과와 같으므로 성공과 똑같이 닫는다. 오류를 보여주지 않는다.</li>
+        <li><b>BLOCKED</b>: dialog만 닫고 뷰어(또는 모아보기)는 그대로 둔다. snackbar 「지금은 미디어를 삭제할 수 없어. 잠시 뒤에 다시 해줘.」<span class="proposal">제안 문구</span>.</li>
+        <li>예외: BLOCKED와 같은 화면. snackbar 「미디어를 삭제하지 못했어.」<span class="proposal">제안 문구</span> (기존 「프로필 사진을 삭제하지 못했어.」와 같은 형식).</li>
+        <li>MISSING 타일에서 시작했다면 뷰어가 없으므로 모아보기에 그대로 머문다.</li>
+      </ul>
+      <div>
+        <div class="rule">
+          <strong>snackbar는 모아보기 화면 위에 보인다</strong>
+          뷰어·모아보기가 떠 있는 동안에도 결과 snackbar가 화면 아래에 보여야 한다. 채팅으로 돌아간 뒤에야 보이면 안 된다.
+        </div>
+        <div class="rule stop" style="margin-top:12px">
+          <strong>파일 삭제가 늦어도 화면은 DELETED다</strong>
+          tombstone이 커밋되면 성공으로 표시한다. 파일 제거 재시도(pending)는 화면에 올리지 않는다(02-to-be §4).
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 5 Bubble placeholders -->
+  <section class="stage" id="s-bubble" hidden>
+    <div class="compare">
+      <div>
+        <div class="col-label"><span class="tag">Current</span>파일이 없는 media bubble</div>
+        <div class="phone">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+          <div class="topbar"><div class="avatar">P</div><div class="identity"><strong>Persona 이름</strong><span>노말</span></div><span class="top-icons">▦⚙⋮</span></div>
+          <div class="chat">
+            <div class="msg mine">
+              <div class="bubble"><span class="oldtext">이미지 파일을 열 수 없어.</span><div class="gap8"></div>사용자 메시지 본문 (합성)</div>
+              <span class="time">18:20</span>
+            </div>
+            <div class="msg">
+              <div class="bubble">
+                <div class="bmedia vid"><span class="play">▶</span></div>
+                <div class="savebtn">⤓</div>
+                <div class="gap8"></div>assistant 답변 본문 (합성)
+              </div>
+              <span class="time">18:21</span>
+            </div>
+            <div class="msg">
+              <div class="bubble"><span class="audio-btn">♪ 음성 답장 재생</span></div>
+              <span class="time">18:22</span>
+            </div>
+          </div>
+          <div class="composer"><span class="ic">＋</span><div class="input">메시지</div><span class="ic">➤</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="col-label"><span class="tag proposed">Proposed</span>DELETED · MISSING placeholder</div>
+        <div class="phone">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+          <div class="topbar"><div class="avatar">P</div><div class="identity"><strong>Persona 이름</strong><span>노말</span></div><span class="top-icons">▦⚙⋮</span></div>
+          <div class="chat">
+            <div class="msg mine">
+              <div class="bubble"><div class="ph"><span class="glyph"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 7h14M10 7V4.5h4V7M7 7l1 13h8l1-13M10.5 11v5.5M13.5 11v5.5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></span>삭제된 미디어</div><div class="gap8"></div>사용자 메시지 본문 (합성)</div>
+              <span class="time">18:20</span>
+            </div>
+            <div class="msg">
+              <div class="bubble"><div class="ph"><span class="glyph">▨</span>미디어를 찾을 수 없음</div><div class="gap8"></div>assistant 답변 본문 (합성)</div>
+              <span class="time">18:21</span>
+            </div>
+            <div class="msg">
+              <div class="bubble"><span class="ph chip"><span class="glyph">▨</span>미디어를 찾을 수 없음</span></div>
+              <span class="time">18:22</span>
+            </div>
+          </div>
+          <div class="composer"><span class="ic">＋</span><div class="input">메시지</div><span class="ic">➤</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="stage-copy">
+      <h2>media 자리에 상태만 남긴다</h2>
+      <ul>
+        <li>적용 조건: <code>state.messageMedia[message.id]</code>가 있고 availability가 <code>DELETED</code> 또는 <code>MISSING</code>일 때만(D-011). bubble 모양, 색, 시간 표시, 본문 순서는 그대로다.</li>
+        <li><b>이미지·영상</b>: 종류와 상관없이 220×120dp 고정 상자. 모서리 12dp, 점선 테두리(흰색 22%), 배경 검정 22%. 가운데에 아이콘과 문구(12sp, muted).</li>
+        <li><b>DELETED</b>: <code>DeleteOutline</code> + 「삭제된 미디어」. <b>MISSING</b>: <code>BrokenImage</code> + 「미디어를 찾을 수 없음」. 문구는 PLAN D-011 그대로다.</li>
+        <li><b>음성</b>: 「음성 답장 재생」 버튼 자리에 같은 높이의 알약 모양 chip으로 같은 아이콘·문구를 그린다.</li>
+        <li>placeholder는 누를 수 없다. 뷰어를 열지 않고, 아래 ⤓ 저장 버튼도 그리지 않는다.</li>
+        <li>본문이 있으면 placeholder와 본문 사이 간격 8dp는 지금과 같다.</li>
+      </ul>
+      <div>
+        <div class="rule">
+          <strong>Current의 두 표현을 하나로 바꾼다</strong>
+          연결된 media는 이미지의 「이미지 파일을 열 수 없어.」 문구와 영상의 빈 검정 상자(240×320) 대신 같은 placeholder를 쓴다.
+        </div>
+        <div class="rule stop" style="margin-top:12px">
+          <strong>대화 text는 줄지 않는다</strong>
+          placeholder는 media 자리만 바꾼다. 본문, 행동 묘사, rollback 메뉴(길게 누르기) 동작은 그대로다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 6 Unchanged -->
+  <section class="stage" id="s-unchanged" hidden>
+    <div class="compare">
+      <div>
+        <div class="col-label"><span class="tag proposed">Proposed</span>placeholder를 그리지 않는 row</div>
+        <div class="phone">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+          <div class="topbar"><div class="avatar">P</div><div class="identity"><strong>Persona 이름</strong><span>노말</span></div><span class="top-icons">▦⚙⋮</span></div>
+          <div class="chat">
+            <div class="msg mine">
+              <div class="bubble">복원된 사용자 메시지 본문 (합성)</div>
+              <span class="time">18:30 · 연결 없음, media 없음</span>
+            </div>
+            <div class="msg">
+              <div class="bubble">
+                <div class="bmedia img"><div class="synthetic">이미지</div></div>
+                <div class="savebtn">⤓</div>
+                <div class="gap8"></div>AVAILABLE media가 있는 답변 (합성)
+              </div>
+              <span class="time">18:31 · AVAILABLE</span>
+            </div>
+            <div class="msg mine">
+              <div class="bubble"><span class="oldtext">이미지 파일을 열 수 없어.</span><div class="gap8"></div>사용자 메시지 본문 (합성)</div>
+              <span class="time">18:32 · 연결되지 않은 descriptor, 파일 없음</span>
+            </div>
+          </div>
+          <div class="composer"><span class="ic">＋</span><div class="input">메시지</div><span class="ic">➤</span></div>
+        </div>
+      </div>
+      <div>
+        <div class="col-label"><span class="tag proposed">Proposed</span>대화에서 연 뷰어</div>
+        <div class="phone">
+          <div class="viewer">
+            <span class="close">✕</span>
+            <div class="media"><div class="synthetic">이미지 · 전체 화면</div></div>
+            <div class="bottom"><span class="obtn ring"><span class="callout">Current와 같음 · 삭제 없음</span>⤓ 갤러리에 저장</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="stage-copy">
+      <h2>근거가 없으면 흔적을 만들지 않는다</h2>
+      <ul>
+        <li><b>연결 없음 + media 없음</b>: 복원·병합으로 들어온 「[사진]」 row처럼 media 연결도 descriptor도 없는 row는 지금처럼 본문만 보인다. placeholder를 추측해서 만들지 않는다(D-011).</li>
+        <li><b>AVAILABLE</b>: 이미지·영상·음성 bubble은 Current와 같다.</li>
+        <li><b>연결되지 않은 descriptor</b>(backfill 전 등): 지금처럼 descriptor로 그린다. 파일이 없으면 기존 「이미지 파일을 열 수 없어.」 문구 또는 빈 영상 상자가 그대로 나온다(02-to-be §3.4).</li>
+        <li><b>대화에서 연 뷰어</b>: 저장만 있다. 삭제 버튼을 그리지 않는다.</li>
+      </ul>
+      <div>
+        <div class="rule">
+          <strong>시간 옆 설명은 문서용이다</strong>
+          왼쪽 phone의 “· 연결 없음” 같은 설명은 이 Visual Spec의 주석이다. 앱에 표시하지 않는다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="panel">
+    <h3>문구 목록</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>문구</th><th>위치</th><th>출처</th></tr></thead>
+      <tbody>
+        <tr><td>삭제된 미디어</td><td>bubble placeholder (DELETED)</td><td class="src">PLAN D-011</td></tr>
+        <tr><td>미디어를 찾을 수 없음</td><td>bubble placeholder, 갤러리 타일 (MISSING)</td><td class="src">PLAN D-011</td></tr>
+        <tr><td>삭제</td><td>뷰어 하단 버튼, dialog 확인 버튼</td><td class="src">제안 문구</td></tr>
+        <tr><td>미디어 삭제</td><td>MISSING 타일 삭제 아이콘 contentDescription</td><td class="src">제안 문구</td></tr>
+        <tr><td>이 미디어를 삭제할까?</td><td>dialog 제목</td><td class="src">제안 문구</td></tr>
+        <tr><td>이 미디어가 대화에 남아 있으면 그 자리는 「삭제된 미디어」로 표시돼. 대화 내용은 지워지지 않아.</td><td>dialog 고지</td><td class="src">제안 문구 (내용은 D-010)</td></tr>
+        <tr><td>필요하면 먼저 「갤러리에 저장」해줘.</td><td>dialog 고지 (AVAILABLE만)</td><td class="src">제안 문구 (내용은 D-010)</td></tr>
+        <tr><td>삭제하면 되돌릴 수 없어.</td><td>dialog 경고 (error 색)</td><td class="src">제안 문구</td></tr>
+        <tr><td>취소</td><td>dialog 취소 버튼</td><td class="src">기존 패턴</td></tr>
+        <tr><td>미디어를 삭제했어.</td><td>성공 snackbar</td><td class="src">제안 문구</td></tr>
+        <tr><td>지금은 미디어를 삭제할 수 없어. 잠시 뒤에 다시 해줘.</td><td>BLOCKED snackbar</td><td class="src">제안 문구</td></tr>
+        <tr><td>미디어를 삭제하지 못했어.</td><td>예외 snackbar</td><td class="src">제안 문구</td></tr>
+        <tr><td>미디어 모아보기 · 갤러리에 저장 · 저장 중 · 아직 모아볼 이미지나 영상이 없어.</td><td>기존 화면</td><td class="src">기존 (변경 없음)</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="panel">
+    <h3>범위 밖 — 이 Visual Spec이 바꾸지 않는 것</h3>
+    <ul>
+      <li>갤러리 source를 catalog와 연결되지 않은 descriptor의 합집합으로 바꾸는 것(D-009, MEDIA-03). 화면이 그대로라 Visual Spec 변경이 없다.</li>
+      <li>rollback 메뉴와 「스냅샷 복원」 진입 재개방(D-013, MEDIA-05). 기존 위치의 기존 진입이라 Visual Spec 변경이 없다. 모양은 #106·#338 Visual Spec을 따른다.</li>
+      <li>음성(AUDIO)을 갤러리에 보이기, 새 내보내기 UX, Persona 삭제 UI, 노출 기간 유실 media 복구 결과 안내. 이 Issue에서 새 화면을 만들지 않는다.</li>
+      <li>연결되지 않은 descriptor의 파일 누락 표현 통일. 이번 범위는 연결된 asset의 <code>DELETED</code>·<code>MISSING</code>만이다.</li>
+    </ul>
+  </div>
+
+  <footer>
+    상태 흐름: 모아보기 → (AVAILABLE 타일 → 뷰어 → 삭제) 또는 (MISSING 타일 → 삭제 아이콘) → 삭제 확인 → (취소 → 원래 화면) 또는 (삭제 → 성공이면 모아보기에서 항목 제거 + snackbar, BLOCKED·예외면 원래 화면 + snackbar).
+    이후 그 media를 참조하던 message는 대화에서 「삭제된 미디어」 placeholder로 보인다.<br />
+    모든 이미지·영상·대화 본문은 합성 자리 표시다. 실제 사용자 대화나 미디어를 쓰지 않았다.<br />
+    동작 의미의 기준: <code>docs/sdd/persona-media-assets/02-to-be.md</code> D-006·D-010·D-011·D-014, <code>change-plans/MEDIA-04-ui-placeholder-delete.md</code>.
+  </footer>
+</main>
+<script>
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const stages = document.querySelectorAll('.stage');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
+    stages.forEach(stage => stage.hidden = stage.id !== tab.dataset.target);
+  }));
+</script>
+</body>
+</html>
