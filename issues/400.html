@@ -1,0 +1,401 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #400 — 노말/언리밋 콘텐츠 모드 제거 UI/UX Visual Spec</title>
+  <style>
+    :root {
+      color-scheme: dark;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --page: #0b090b;
+      --background: #120f12;   /* HoneyColors.background */
+      --surface: #171317;      /* 상단바·composer 배경 */
+      --surface-2: #1d191d;    /* HoneyColors.surface */
+      --surface-3: #2a2429;    /* 상대 말풍선·노말 칩 배경 */
+      --mine: #8e4e61;         /* NormalBubble */
+      --mine-icon: #f0a8b7;    /* NormalIcon · primary */
+      --unl-bubble: #a33b22;   /* UnlimitedBubble (제거 대상) */
+      --unl-icon: #ff7043;     /* UnlimitedIcon (제거 대상) */
+      --unl-chip: #3a1c14;     /* 언리밋 칩 배경 (제거 대상) */
+      --chip-text: #b9adb1;
+      --action: #c79be0;       /* ACTION_ACCENT */
+      --text: #f7f1f3;
+      --muted: #b9adb1;
+      --faint: #8f8388;
+      --accent: #f0a8b7;
+      --accent-ink: #2a1720;
+      --danger: #ffb4ab;
+      --line: #3b3338;
+      --removed: #ff8a80;
+      --shadow: 0 28px 80px rgb(0 0 0 / 45%);
+    }
+
+    * { box-sizing: border-box; }
+    body { margin: 0; min-width: 320px; background: radial-gradient(circle at 50% -20%, #34262f 0, var(--page) 40%); color: var(--text); }
+    button { font: inherit; }
+    main { width: min(1180px, calc(100% - 32px)); margin: 0 auto; padding: 40px 0 72px; }
+    header { display: grid; grid-template-columns: 1fr auto; gap: 24px; align-items: end; margin-bottom: 24px; }
+    h1 { margin: 8px 0 10px; font-size: clamp(26px, 4.6vw, 42px); line-height: 1.1; letter-spacing: -.03em; }
+    h2, h3, p { margin-top: 0; }
+    code { color: var(--muted); }
+    .eyebrow { color: var(--accent); font-weight: 750; letter-spacing: .08em; text-transform: uppercase; font-size: 12px; }
+    .lede { max-width: 760px; color: var(--muted); line-height: 1.65; margin-bottom: 0; }
+    .contract { max-width: 340px; padding: 14px 16px; border: 1px solid var(--line); border-radius: 16px; background: rgb(29 25 29 / 72%); color: var(--muted); font-size: 13px; line-height: 1.5; }
+    .contract strong { color: var(--text); }
+
+    .tabs { display: flex; gap: 8px; overflow-x: auto; padding: 8px 0 18px; }
+    .tabs button { flex: 0 0 auto; border: 1px solid var(--line); border-radius: 999px; padding: 9px 14px; background: var(--surface-2); color: var(--muted); cursor: pointer; }
+    .tabs button[aria-selected="true"] { color: var(--accent-ink); background: var(--accent); border-color: var(--accent); font-weight: 750; }
+    .tabs button:focus-visible { outline: 3px solid rgb(240 168 183 / 45%); outline-offset: 2px; }
+
+    .stage { padding: 28px; border: 1px solid var(--line); border-radius: 24px; background: rgb(23 19 23 / 88%); box-shadow: var(--shadow); }
+    .compare { display: grid; grid-template-columns: repeat(2, minmax(300px, 1fr)); gap: 28px; align-items: start; }
+    .col-label { display: flex; align-items: center; gap: 8px; margin: 0 auto 12px; width: min(390px, 100%); font-size: 13px; font-weight: 800; color: var(--muted); }
+    .col-label .tag { padding: 3px 9px; border-radius: 999px; border: 1px solid var(--line); font-size: 11px; letter-spacing: .04em; }
+    .col-label .tag.proposed { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+    .stage-copy { margin-top: 28px; display: grid; grid-template-columns: repeat(2, minmax(260px, 1fr)); gap: 12px 28px; }
+    .stage-copy h2 { grid-column: 1 / -1; margin-bottom: 0; font-size: 22px; letter-spacing: -.02em; }
+    .stage-copy ul { margin: 0; padding-left: 20px; }
+    .stage-copy li { color: var(--muted); line-height: 1.65; }
+    .rule { padding: 14px 16px; border-left: 3px solid var(--accent); border-radius: 0 12px 12px 0; background: var(--surface-2); color: var(--muted); line-height: 1.6; font-size: 14px; }
+    .rule + .rule { margin-top: 12px; }
+    .rule strong { display: block; margin-bottom: 4px; color: var(--text); }
+    .rule.stop { border-left-color: var(--removed); }
+
+    /* phone chrome */
+    .phone { position: relative; width: min(390px, 100%); height: 700px; margin: 0 auto; overflow: hidden; border: 1px solid #52464d; border-radius: 32px; background: var(--background); box-shadow: 0 18px 52px rgb(0 0 0 / 55%); }
+    .statusbar { height: 26px; display: flex; justify-content: space-between; align-items: end; padding: 0 18px 5px; background: var(--surface); font-size: 10px; color: var(--muted); }
+    .topbar { min-height: 68px; display: flex; align-items: center; padding: 12px 18px; background: var(--surface); }
+    .avatar { flex: 0 0 44px; width: 44px; height: 44px; border-radius: 50%; display: grid; place-items: center; background: linear-gradient(145deg, #f0a8b7, #5c3c4b); color: var(--accent-ink); font-weight: 800; font-size: 20px; }
+    .identity { flex: 1; min-width: 0; padding-left: 12px; display: flex; flex-direction: column; align-items: flex-start; gap: 3px; }
+    .identity .name { font-size: 18px; font-weight: 600; line-height: 1.2; }
+    .top-ic { width: 40px; height: 40px; display: grid; place-items: center; color: var(--text); font-size: 17px; }
+
+    /* ContentModeChip (Current only) */
+    .chip { position: relative; display: inline-flex; align-items: center; gap: 5px; padding: 5px 10px; border-radius: 999px; background: var(--surface-3); color: var(--chip-text); font-size: 12px; line-height: 1; }
+    .chip .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--chip-text); }
+    .chip.unl { background: var(--unl-chip); color: var(--unl-icon); font-weight: 600; }
+    .chip .flame { width: 14px; height: 14px; }
+    .ring { outline: 2px dashed #ffd479; outline-offset: 3px; }
+    .callout { display: inline-block; margin-top: 4px; padding: 2px 7px; border-radius: 6px; background: #ffd479; color: #2a1d00; font-size: 10px; font-weight: 800; }
+
+    /* chat body */
+    .chat { position: absolute; inset: 94px 0 68px; overflow: hidden; padding: 14px; display: flex; flex-direction: column; gap: 8px; }
+    .msg { display: flex; }
+    .msg.mine { justify-content: flex-end; }
+    .bubble { max-width: 300px; padding: 10px 14px; border-radius: 19px 19px 19px 5px; background: var(--surface-3); font-size: 15px; line-height: 1.4; }
+    .msg.mine .bubble { border-radius: 19px 19px 5px 19px; background: var(--mine); }
+    .phone.unlimited .msg.mine .bubble { background: var(--unl-bubble); }
+
+    /* composer */
+    .composer { position: absolute; left: 0; right: 0; bottom: 0; height: 68px; display: flex; gap: 2px; align-items: center; padding: 10px 8px; background: var(--surface); }
+    .composer .ic { width: 40px; height: 40px; display: grid; place-items: center; color: var(--text); font-size: 18px; }
+    .composer .ic.action { color: var(--action); }
+    .composer .input { flex: 1; height: 46px; display: flex; align-items: center; padding: 0 16px; border: 1px solid #5a4d54; border-radius: 22px; color: var(--faint); font-size: 14px; }
+    .composer .send { color: var(--mine-icon); }
+    .phone.unlimited .composer .send { color: var(--unl-icon); }
+    .ico { width: 20px; height: 20px; }
+
+    /* AlertDialog */
+    .scrim { position: absolute; inset: 0; z-index: 5; display: grid; place-items: center; padding: 24px; background: rgb(0 0 0 / 60%); }
+    .dialog { width: 100%; padding: 24px; border-radius: 28px; background: #2b2429; box-shadow: 0 16px 40px rgb(0 0 0 / 50%); }
+    .dialog h3 { margin: 0 0 16px; font-size: 22px; font-weight: 500; }
+    .dialog p { margin: 0 0 6px; color: #d5c9cd; font-size: 14px; line-height: 1.55; }
+    .dialog .actions { display: flex; justify-content: flex-end; align-items: center; gap: 8px; margin-top: 20px; }
+    .dialog .cancel { padding: 10px 12px; color: var(--accent); font-size: 14px; font-weight: 600; }
+    .dialog .confirm { padding: 10px 22px; border-radius: 999px; background: var(--accent); color: var(--accent-ink); font-size: 14px; font-weight: 600; }
+    .removed-stamp { position: absolute; z-index: 6; top: 14px; left: 50%; transform: translateX(-50%); padding: 4px 10px; border-radius: 999px; background: var(--removed); color: #3a0a06; font-size: 11px; font-weight: 800; white-space: nowrap; }
+
+    .none-card { height: 700px; width: min(390px, 100%); margin: 0 auto; display: grid; place-content: center; justify-items: center; gap: 10px; padding: 24px; border: 1px dashed var(--line); border-radius: 32px; color: var(--muted); text-align: center; line-height: 1.6; font-size: 14px; }
+    .none-card .big { font-size: 32px; color: var(--faint); }
+    .none-card strong { color: var(--text); font-size: 16px; }
+
+    .swatches { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 10px; }
+    .sw { display: flex; align-items: center; gap: 8px; font-size: 12px; color: var(--muted); }
+    .sw i { display: inline-block; width: 22px; height: 22px; border-radius: 6px; border: 1px solid rgb(255 255 255 / 15%); }
+    .sw.gone { text-decoration: line-through; opacity: .7; }
+
+    .panel { margin-top: 24px; padding: 20px 22px; border: 1px solid var(--line); border-radius: 18px; background: rgb(29 25 29 / 72%); }
+    .panel h3 { margin-bottom: 12px; font-size: 18px; }
+    .panel ul { margin: 0; padding-left: 20px; }
+    .panel li { color: var(--muted); line-height: 1.65; }
+    table { width: 100%; border-collapse: collapse; font-size: 13px; }
+    th, td { text-align: left; padding: 9px 10px; border-bottom: 1px solid var(--line); vertical-align: top; }
+    th { color: var(--muted); font-weight: 700; }
+    .table-wrap { overflow-x: auto; }
+    footer { margin-top: 24px; color: var(--faint); font-size: 12px; line-height: 1.65; }
+    [hidden] { display: none !important; }
+
+    @media (max-width: 860px) {
+      header, .compare, .stage-copy { grid-template-columns: 1fr; }
+      .contract { max-width: none; }
+      .stage { padding: 18px 12px 28px; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div>
+      <div class="eyebrow">seok-jun/my-honey-chat · Issue #400</div>
+      <h1>#400 [Chat][Mode] 노말/언리밋 콘텐츠 모드 제거</h1>
+      <p class="lede">
+        대상 화면: 채팅 화면 (상단바, 사용자 말풍선·전송 아이콘).
+        상단바의 모드 칩, 언리밋 확인 시트, 모드 전환용 xAI key 안내 시트를 없애고, 사용자 말풍선과 아이콘 색을 기존 노말 핑크 하나로 고정한다.
+        이 HTML은 화면 배치, 정보 계층, UI 상태와 인터랙션의 구현 기준이다.
+      </p>
+    </div>
+    <div class="contract">
+      <strong>이 문서가 정하는 것</strong><br />
+      채팅 상단바 구성, 사용자 말풍선·전송 아이콘 색, 모드 시트 제거.<br /><br />
+      <strong>정하지 않는 것</strong><br />
+      수위 정책(L4/L3), 미디어 reference, 모델 선택, 최근 흐름 블록. 모두 Issue 본문이 소유하며 화면 변화가 없다.
+    </div>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Issue 400 visual spec states">
+    <button type="button" role="tab" aria-selected="true" data-target="s-default">1 기본 채팅 화면</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-unlimited">2 언리밋 상태 (제거)</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-sheets">3 모드 시트 (제거)</button>
+  </div>
+
+  <!-- 1 Default -->
+  <section class="stage" id="s-default">
+    <div class="compare">
+      <div>
+        <div class="col-label"><span class="tag">Current</span>노말 (앱 시작 시 기본)</div>
+        <div class="phone">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+          <div class="topbar">
+            <div class="avatar">페</div>
+            <div class="identity">
+              <span class="name">페르소나</span>
+              <span class="chip ring"><span class="dot"></span>노말</span>
+            </div>
+            <span class="top-ic" aria-label="미디어 모아보기">▦</span>
+            <span class="top-ic" aria-label="더보기">⋮</span>
+          </div>
+          <div class="chat">
+            <div class="msg"><div class="bubble">메시지 예시</div></div>
+            <div class="msg mine"><div class="bubble">메시지 예시</div></div>
+            <div class="msg"><div class="bubble">메시지 예시</div></div>
+            <div class="msg mine"><div class="bubble">메시지 예시</div></div>
+          </div>
+          <div class="composer">
+            <span class="ic" aria-label="참고 이미지 추가">▣</span>
+            <span class="ic action" aria-label="행동 묘사 추가">✦</span>
+            <span class="input">메시지</span>
+            <span class="ic send" aria-label="전송"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20.5 21 12 3 3.5l.01 6.6L15 12 3.01 13.9z" fill="currentColor"/></svg></span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="col-label"><span class="tag proposed">Proposed</span>단일 상태</div>
+        <div class="phone">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+          <div class="topbar">
+            <div class="avatar">페</div>
+            <div class="identity">
+              <span class="name">페르소나</span>
+            </div>
+            <span class="top-ic" aria-label="미디어 모아보기">▦</span>
+            <span class="top-ic" aria-label="더보기">⋮</span>
+          </div>
+          <div class="chat">
+            <div class="msg"><div class="bubble">메시지 예시</div></div>
+            <div class="msg mine"><div class="bubble">메시지 예시</div></div>
+            <div class="msg"><div class="bubble">메시지 예시</div></div>
+            <div class="msg mine"><div class="bubble">메시지 예시</div></div>
+          </div>
+          <div class="composer">
+            <span class="ic" aria-label="참고 이미지 추가">▣</span>
+            <span class="ic action" aria-label="행동 묘사 추가">✦</span>
+            <span class="input">메시지</span>
+            <span class="ic send" aria-label="전송"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20.5 21 12 3 3.5l.01 6.6L15 12 3.01 13.9z" fill="currentColor"/></svg></span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="stage-copy">
+      <h2>상단바에는 Persona 이름만 남는다</h2>
+      <ul>
+        <li>아바타(44dp) → 이름(18sp, SemiBold) → 미디어 모아보기 → 더보기 순서는 그대로다.</li>
+        <li>이름 아래의 <code>ContentModeChip</code>(점 아이콘 + 「노말」)을 지운다. 이름 Column에는 이름 한 줄만 남고, 세로 가운데 정렬은 기존 Row 정렬(<code>CenterVertically</code>)을 따른다.</li>
+        <li>상단바에서 탭할 수 있는 요소는 아바타 옆 아이콘 두 개뿐이다. 이름 영역은 탭 대상이 아니다.</li>
+        <li>사용자 말풍선은 항상 <code>#8E4E61</code>, 전송 아이콘은 항상 <code>#F0A8B7</code>이다. 상대 말풍선 <code>#2A2429</code>와 행동 묘사 accent <code>#C79BE0</code>는 바뀌지 않는다.</li>
+      </ul>
+      <div>
+        <div class="rule">
+          <strong>노말 화면과 똑같아 보여야 한다</strong>
+          Current 노말 화면에서 칩만 빠진 모습이 Proposed다. 새 색, 새 라벨, 새 아이콘을 추가하지 않는다.
+        </div>
+        <div class="rule">
+          <strong>색 기준 (Compose 값)</strong>
+          <div class="swatches">
+            <span class="sw"><i style="background:#8e4e61"></i>사용자 말풍선 #8E4E61</span>
+            <span class="sw"><i style="background:#f0a8b7"></i>전송 아이콘 #F0A8B7</span>
+            <span class="sw"><i style="background:#171317"></i>상단바 #171317</span>
+            <span class="sw"><i style="background:#2a2429"></i>상대 말풍선 #2A2429</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 2 Unlimited -->
+  <section class="stage" id="s-unlimited" hidden>
+    <div class="compare">
+      <div>
+        <div class="col-label"><span class="tag">Current</span>언리밋 (칩 탭 → 확인 후)</div>
+        <div class="phone unlimited">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+          <div class="topbar">
+            <div class="avatar">페</div>
+            <div class="identity">
+              <span class="name">페르소나</span>
+              <span class="chip unl ring"><svg class="flame" viewBox="0 0 24 24" aria-hidden="true"><path d="M13.5.67s.74 2.65.74 4.8c0 2.06-1.35 3.73-3.41 3.73-2.07 0-3.63-1.67-3.63-3.73l.03-.36C5.21 7.51 4 10.62 4 14c0 4.42 3.58 8 8 8s8-3.58 8-8C20 8.61 17.41 3.8 13.5.67zM11.71 19c-1.78 0-3.22-1.4-3.22-3.14 0-1.62 1.05-2.76 2.81-3.12 1.77-.36 3.6-1.21 4.62-2.58.39 1.29.59 2.65.59 4.04 0 2.65-2.15 4.8-4.8 4.8z" fill="currentColor"/></svg>언리밋</span>
+            </div>
+            <span class="top-ic" aria-label="미디어 모아보기">▦</span>
+            <span class="top-ic" aria-label="더보기">⋮</span>
+          </div>
+          <div class="chat">
+            <div class="msg"><div class="bubble">메시지 예시</div></div>
+            <div class="msg mine"><div class="bubble">메시지 예시</div></div>
+            <div class="msg"><div class="bubble">메시지 예시</div></div>
+            <div class="msg mine"><div class="bubble">메시지 예시</div></div>
+          </div>
+          <div class="composer">
+            <span class="ic" aria-label="참고 이미지 추가">▣</span>
+            <span class="ic action" aria-label="행동 묘사 추가">✦</span>
+            <span class="input">메시지</span>
+            <span class="ic send" aria-label="전송"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 20.5 21 12 3 3.5l.01 6.6L15 12 3.01 13.9z" fill="currentColor"/></svg></span>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="col-label"><span class="tag proposed">Proposed</span>이 상태는 없다</div>
+        <div class="none-card">
+          <span class="big">∅</span>
+          <strong>언리밋 화면 상태 없음</strong>
+          <span>칩, 불꽃 아이콘, 엠버 말풍선·아이콘, 600ms 색 전환 애니메이션이 모두 사라진다.<br />채팅 화면은 1번 탭의 Proposed 한 가지 모습뿐이다.</span>
+        </div>
+      </div>
+    </div>
+    <div class="stage-copy">
+      <h2>언리밋 색과 전환 애니메이션을 지운다</h2>
+      <ul>
+        <li>Current: 사용자 말풍선 <code>#A33B22</code>, 전송 아이콘 <code>#FF7043</code>, 칩 배경 <code>#3A1C14</code>에 불꽃 아이콘 + SemiBold 「언리밋」.</li>
+        <li>노말 ↔ 언리밋 사이 색은 <code>animateColorAsState</code>(600ms)로 바뀌었다. 전환할 대상이 없으므로 애니메이션 없이 고정 색을 쓴다.</li>
+        <li>앱을 다시 켜면 노말로 돌아가던 동작도 사용자에게 보이는 상태로는 사라진다.</li>
+      </ul>
+      <div>
+        <div class="rule stop">
+          <strong>제거되는 색</strong>
+          <div class="swatches">
+            <span class="sw gone"><i style="background:#a33b22"></i>UnlimitedBubble #A33B22</span>
+            <span class="sw gone"><i style="background:#ff7043"></i>UnlimitedIcon #FF7043</span>
+            <span class="sw gone"><i style="background:#3a1c14"></i>칩 배경 #3A1C14</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 3 Sheets -->
+  <section class="stage" id="s-sheets" hidden>
+    <div class="compare">
+      <div>
+        <div class="col-label"><span class="tag">Current</span>칩 탭 시 뜨는 시트 두 종류</div>
+        <div class="phone">
+          <div class="statusbar"><span>9:41</span><span>▮▮▮</span></div>
+          <div class="topbar">
+            <div class="avatar">페</div>
+            <div class="identity"><span class="name">페르소나</span><span class="chip"><span class="dot"></span>노말</span></div>
+            <span class="top-ic">▦</span><span class="top-ic">⋮</span>
+          </div>
+          <div class="scrim" style="align-content:center; gap:14px;">
+            <div class="dialog" role="dialog" aria-modal="true">
+              <h3>언리밋으로 바꿀까?</h3>
+              <p>· 대화·이미지·영상의 수위 상한이 올라가</p>
+              <p>· 앱을 다시 켜면 노말로 돌아와</p>
+              <div class="actions"><span class="cancel">취소</span><span class="confirm">켜기</span></div>
+            </div>
+            <div class="dialog" role="dialog" aria-modal="true">
+              <h3>xAI key가 필요해</h3>
+              <p>대화는 xAI Grok으로만 동작해. 설정에서 xAI API key를 먼저 저장해줘.</p>
+              <div class="actions"><span class="cancel">취소</span><span class="confirm">설정 열기</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="col-label"><span class="tag proposed">Proposed</span>모드 시트 없음</div>
+        <div class="none-card">
+          <span class="big">∅</span>
+          <strong>모드 확인 시트·모드 xAI key 안내 시트 없음</strong>
+          <span>시트를 여는 칩이 없으므로 두 시트 모두 화면에 나타나지 않는다.<br />관련 action(켜기·취소·설정 열기)도 없다.</span>
+        </div>
+      </div>
+    </div>
+    <div class="stage-copy">
+      <h2>두 AlertDialog를 통째로 지운다</h2>
+      <ul>
+        <li>「언리밋으로 바꿀까?」: 켜는 방향에만 뜨던 확인 시트. 본문 두 줄(<code>UNLIMITED_CONFIRM_DETAILS</code>)과 [취소] [켜기]를 함께 지운다.</li>
+        <li>「xAI key가 필요해」: key 없이 칩을 탭했을 때 뜨던 안내 시트. [취소] [설정 열기]를 함께 지운다.</li>
+        <li>Current에서는 두 시트가 동시에 뜨지 않는다. 여기서는 비교를 위해 겹쳐 보였다.</li>
+      </ul>
+      <div>
+        <div class="rule">
+          <strong>기존 전송 차단은 그대로</strong>
+          xAI key 없이 대화를 보낼 수 없다는 기존 규칙과 그 화면 표현은 바꾸지 않는다. 이 Visual Spec 범위 밖이며 새 안내 UI를 만들지 않는다.
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="panel">
+    <h3>범위 안의 UI 상태</h3>
+    <div class="table-wrap"><table>
+      <thead><tr><th>상태</th><th>Proposed</th></tr></thead>
+      <tbody>
+        <tr><td>기본 채팅 화면</td><td>유일한 상태. 상단바에 Persona 이름만, 사용자 말풍선 <code>#8E4E61</code>, 전송 아이콘 <code>#F0A8B7</code>.</td></tr>
+        <tr><td>노말 / 언리밋 모드 상태</td><td>없음. 모드 칩과 모드별 색이 없다.</td></tr>
+        <tr><td>언리밋 확인 시트</td><td>없음.</td></tr>
+        <tr><td>모드 전환용 xAI key 안내 시트</td><td>없음.</td></tr>
+      </tbody>
+    </table></div>
+  </div>
+
+  <div class="panel">
+    <h3>사용자 action</h3>
+    <ul>
+      <li>모드를 전환하는 action은 더 이상 없다. 상단바 이름 영역을 탭해도 아무 일도 일어나지 않는다.</li>
+      <li>미디어 모아보기, 더보기 메뉴, 사진 첨부, 행동 묘사, 전송 등 나머지 action과 그 이후 화면은 바뀌지 않는다.</li>
+    </ul>
+  </div>
+
+  <div class="panel">
+    <h3>범위 밖 — 이 Visual Spec이 바꾸지 않는 것</h3>
+    <ul>
+      <li>xAI key 없이 대화 전송이 막히는 기존 동작과 그 표현. 규칙은 유지되며 시각 변경이 없다.</li>
+      <li>대화 수위 L4 / 미디어 수위 L3 단일 정책, 미디어 reference 통일, 미디어 턴 모델 선택, 최근 흐름 블록 전면 적용. 화면에 드러나지 않으므로 Issue 본문을 따른다.</li>
+      <li>별도 콘텐츠 사용자 설정, 요금제·연령 확인 UI. 이 Issue에서 새 화면을 만들지 않는다.</li>
+    </ul>
+  </div>
+
+  <footer>
+    Persona 이름 「페르소나」, 말풍선 「메시지 예시」는 합성 자리 표시다. 실제 대화, 사용자 데이터의 Persona 이름, prompt를 쓰지 않았다.<br />
+    색 기준: <code>feature-ui/.../ChatScreen.kt</code>의 <code>NormalBubble</code>·<code>NormalIcon</code>·<code>UnlimitedBubble</code>·<code>UnlimitedIcon</code>, <code>ContentModeChip</code>, <code>ModeSheetDialog</code>, 테마 <code>HoneyColors</code>.
+  </footer>
+</main>
+<script>
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const stages = document.querySelectorAll('.stage');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
+    stages.forEach(stage => stage.hidden = stage.id !== tab.dataset.target);
+  }));
+</script>
+</body>
+</html>
