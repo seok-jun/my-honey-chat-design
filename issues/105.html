@@ -1,0 +1,470 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Issue #105 — Persona 조정 모드 · Detail UI/UX Visual Spec</title>
+<style>
+:root { color-scheme: light dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 20px 72px; background: Canvas; color: CanvasText; }
+main { max-width: 1180px; margin: 0 auto; }
+header { margin-bottom: 20px; }
+h1, h2, h3, p { margin-top: 0; }
+.meta, .muted { opacity: .66; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+button { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); background: Canvas; color: CanvasText; border-radius: 10px; padding: 8px 12px; cursor: pointer; font: inherit; font-size: 14px; }
+button[aria-selected="true"], .primary { font-weight: 700; border-color: CanvasText; }
+button[disabled] { opacity: .38; cursor: not-allowed; }
+.danger { border-color: color-mix(in srgb, #c62828 60%, Canvas); color: color-mix(in srgb, #c62828 85%, CanvasText); }
+.stage { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 18px; padding: 24px; }
+.pair { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; }
+.pair > div { flex: 0 0 min(390px, 100%); }
+.phone { width: min(390px, 100%); min-height: 720px; border: 1px solid color-mix(in srgb, CanvasText 25%, Canvas); border-radius: 28px; overflow: hidden; position: relative; background: Canvas; }
+.caption { text-align: center; font-size: 12px; opacity: .7; margin-top: 8px; }
+.appbar { min-height: 60px; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid color-mix(in srgb, CanvasText 12%, Canvas); }
+.avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; border: 1px solid color-mix(in srgb, CanvasText 22%, Canvas); font-weight: 700; flex: 0 0 auto; }
+.grow { flex: 1; min-width: 0; }
+.title { font-weight: 750; }
+.sub { font-size: 12px; opacity: .62; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.content { padding: 14px; }
+.card { border: 1px solid color-mix(in srgb, CanvasText 15%, Canvas); border-radius: 16px; padding: 12px; margin-bottom: 10px; }
+.card.active { border-width: 2px; border-color: CanvasText; }
+.row { display: flex; gap: 10px; align-items: center; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.badge { display: inline-block; margin: 5px 4px 0 0; padding: 2px 8px; border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 999px; font-size: 11px; }
+.badge.strong { font-weight: 700; border-color: CanvasText; }
+.field { margin: 0 0 12px; }
+.field label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 5px; }
+.field .hint { font-size: 11px; opacity: .6; margin-top: 4px; }
+.input { min-height: 40px; border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 10px; padding: 9px 10px; font-size: 14px; }
+.input.placeholder { opacity: .5; }
+.input.error { border-color: #c62828; }
+.errtext { color: #c62828; font-size: 11px; margin-top: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.chip { font-size: 12px; padding: 4px 10px; border-radius: 999px; border: 1px solid color-mix(in srgb, CanvasText 20%, Canvas); }
+.chip.on { font-weight: 700; border-color: CanvasText; }
+.stepper { display: flex; gap: 6px; align-items: center; font-size: 12px; padding: 8px 14px; border-bottom: 1px solid color-mix(in srgb, CanvasText 10%, Canvas); }
+.dot { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; border: 1px solid color-mix(in srgb, CanvasText 30%, Canvas); font-size: 11px; }
+.dot.on { font-weight: 700; border-color: CanvasText; }
+.line { flex: 0 0 28px; height: 1px; background: color-mix(in srgb, CanvasText 25%, Canvas); }
+details.more { border: 1px dashed color-mix(in srgb, CanvasText 22%, Canvas); border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; }
+details.more summary { font-size: 13px; font-weight: 700; cursor: pointer; }
+.slot { border: 1px solid color-mix(in srgb, CanvasText 16%, Canvas); border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+.slot.disabled { opacity: .45; }
+.thumb { width: 64px; height: 64px; border-radius: 12px; border: 1px dashed color-mix(in srgb, CanvasText 30%, Canvas); display: grid; place-items: center; font-size: 11px; opacity: .8; flex: 0 0 auto; }
+.thumb.filled { border-style: solid; font-weight: 700; }
+.footer { position: absolute; left: 0; right: 0; bottom: 0; display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid color-mix(in srgb, CanvasText 12%, Canvas); background: Canvas; }
+.footer .primary { margin-left: auto; }
+.chat { padding: 16px; }
+.bubble { max-width: 78%; border: 1px solid color-mix(in srgb, CanvasText 16%, Canvas); border-radius: 16px; padding: 9px 12px; margin-bottom: 10px; font-size: 14px; }
+.bubble.me { margin-left: auto; }
+.scrim { position: absolute; inset: 0; background: color-mix(in srgb, CanvasText 35%, transparent); display: grid; place-items: center; padding: 22px; }
+.dialog { background: Canvas; border-radius: 20px; padding: 18px; width: 100%; border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); }
+.dialog ul { padding-left: 18px; margin: 8px 0 12px; font-size: 13px; line-height: 1.6; }
+.dialog .actions { justify-content: flex-end; }
+.menu { position: absolute; right: 18px; top: 148px; width: 170px; background: Canvas; border: 1px solid color-mix(in srgb, CanvasText 20%, Canvas); border-radius: 12px; padding: 6px; box-shadow: 0 6px 20px color-mix(in srgb, CanvasText 18%, transparent); }
+.menu div { padding: 9px 10px; font-size: 14px; border-radius: 8px; }
+.menu .off { opacity: .38; }
+.snack { position: absolute; left: 14px; right: 14px; bottom: 16px; border-radius: 12px; padding: 11px 14px; background: CanvasText; color: Canvas; font-size: 13px; display: flex; justify-content: space-between; gap: 12px; }
+.center { min-height: 520px; display: grid; place-items: center; text-align: center; padding: 28px; }
+.spinner { width: 28px; height: 28px; border-radius: 50%; border: 3px solid color-mix(in srgb, CanvasText 20%, Canvas); border-top-color: CanvasText; margin: 0 auto 12px; }
+.note { max-width: 860px; margin: 18px auto 0; font-size: 13px; line-height: 1.65; opacity: .78; }
+.note li { margin-bottom: 4px; }
+table.spec { border-collapse: collapse; margin: 14px auto 0; font-size: 13px; max-width: 860px; width: 100%; }
+table.spec th, table.spec td { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); padding: 6px 8px; text-align: left; vertical-align: top; }
+[hidden] { display: none !important; }
+</style>
+
+<style>
+.editbar { background: color-mix(in srgb, #7e57c2 14%, Canvas); border-bottom: 1px solid color-mix(in srgb, #7e57c2 45%, Canvas); }
+.editbanner { font-size: 12px; padding: 8px 14px; background: color-mix(in srgb, #7e57c2 9%, Canvas); border-bottom: 1px dashed color-mix(in srgb, #7e57c2 40%, Canvas); }
+.proposal { border: 1px solid color-mix(in srgb, #7e57c2 45%, Canvas); border-radius: 14px; padding: 10px 12px; margin-bottom: 10px; font-size: 13px; }
+.kind { display: inline-block; font-size: 11px; font-weight: 700; padding: 2px 8px; border-radius: 999px; border: 1px solid CanvasText; margin-right: 6px; }
+.diff { font-size: 12px; line-height: 1.55; margin: 6px 0 0; padding-left: 0; list-style: none; }
+.diff li { margin-bottom: 3px; }
+.diff .from { opacity: .55; text-decoration: line-through; }
+.draftbar { position: absolute; left: 0; right: 0; bottom: 64px; padding: 10px 14px; border-top: 1px solid color-mix(in srgb, #7e57c2 40%, Canvas); background: color-mix(in srgb, #7e57c2 8%, Canvas); display: flex; gap: 8px; align-items: center; font-size: 13px; }
+.draftbar .primary { margin-left: auto; }
+.composer { position: absolute; left: 0; right: 0; bottom: 0; display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid color-mix(in srgb, CanvasText 12%, Canvas); background: Canvas; }
+.composer .input { flex: 1; }
+.divider { text-align: center; font-size: 11px; opacity: .6; margin: 6px 0 12px; }
+.sheet { position: absolute; left: 0; right: 0; bottom: 0; background: Canvas; border-radius: 20px 20px 0 0; border-top: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); padding: 16px; max-height: 88%; overflow: auto; }
+.section-title { font-size: 13px; font-weight: 750; margin: 16px 0 8px; }
+.slider { display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 6px; }
+.slider .bar { flex: 1; height: 4px; border-radius: 4px; background: color-mix(in srgb, CanvasText 18%, Canvas); position: relative; }
+.slider .bar i { position: absolute; top: -5px; width: 14px; height: 14px; border-radius: 50%; background: CanvasText; }
+.radio { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 12px; padding: 10px 12px; margin-bottom: 8px; font-size: 13px; }
+.radio.on { border-color: CanvasText; border-width: 2px; }
+.warn { border: 1px solid color-mix(in srgb, #c62828 50%, Canvas); border-radius: 12px; padding: 10px 12px; font-size: 12px; margin: 8px 0; }
+.scroll { position: absolute; top: 96px; left: 0; right: 0; bottom: 128px; overflow: hidden; padding: 12px 14px; }
+</style>
+</head>
+<body>
+<main>
+
+<header>
+<div class="meta">seok-jun/my-honey-chat · Issue #105</div>
+<h1>Persona 조정 모드 · Detail 편집 · Tuning / Evolution / Retcon</h1>
+<p>Chat 상단의 <b>✎ 조정</b>으로 일반 대화와 분리된 조정 모드에 들어가 자연어로 변경을 요청하고, 변경안을 초안에 쌓아 전체 변경을 확인한 뒤 한 번에 저장한다. 긴 설정은 Persona Detail에서 섹션별로 편집한다. 이 HTML은 화면 배치, 정보 계층, UI 상태와 action 이후 화면의 구현 기준이다. 모든 이름·문장은 합성 예시다.</p>
+</header>
+
+<div class="tabs" role="tablist" aria-label="Visual spec state">
+<button type="button" role="tab" aria-selected="true" data-target="current">Current</button>
+<button type="button" role="tab" aria-selected="false" data-target="entry">진입점</button>
+<button type="button" role="tab" aria-selected="false" data-target="session">조정 모드 · 초안</button>
+<button type="button" role="tab" aria-selected="false" data-target="review">전체 변경 확인</button>
+<button type="button" role="tab" aria-selected="false" data-target="retcon">Retcon → Detail</button>
+<button type="button" role="tab" aria-selected="false" data-target="blocked">적용 불가·실패</button>
+<button type="button" role="tab" aria-selected="false" data-target="resume">다시 열기·복구</button>
+<button type="button" role="tab" aria-selected="false" data-target="detail">Detail</button>
+<button type="button" role="tab" aria-selected="false" data-target="detail-save">Detail 저장 · 종류</button>
+</div>
+
+<section class="stage" id="current">
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona 편집</div></div></div>
+<div class="content">
+<div class="field"><label>이름</label><div class="input">하린</div></div>
+<div class="field"><label>관계 설정</label><div class="input">오래 알고 지낸 친구</div></div>
+<div class="field"><label>기본 화법</label><div class="input">편한 반말</div></div>
+<div class="field"><label>추가 배경</label><div class="input" style="min-height:64px">호칭·첫 만남·취향을 모두 여기에 섞어 쓴다</div></div>
+<div class="section-title">성향</div>
+<div class="slider">장난기<span class="bar"><i style="left:62%"></i></span></div>
+<div class="section-title">자연어로 조정</div>
+<div class="input placeholder">성향 수치만 바꿀 수 있음</div>
+<p class="muted" style="font-size:12px;margin-top:10px">Core 변경 요청은 거절된다. 호칭·첫 만남·취향을 둘 칸이 없다.</p>
+</div>
+</div>
+<div class="caption">Current · 기존 Persona 편집 화면</div>
+</div>
+</div>
+<ul class="note">
+<li>기존 편집 화면은 <b>최초 실행 생성</b>에 계속 쓰인다. 기존 Persona의 편집 진입(설정 "편집", Library ⋮ "상세 설정")은 Detail로 바뀐다.</li>
+<li>"자연어로 조정" 섹션은 조정 모드가 들어오는 변경에서 함께 빠진다(Q-2 A).</li>
+</ul>
+</section>
+
+<section class="stage" id="entry" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar"><div class="avatar">하</div><div class="grow"><div class="title">하린 <span style="font-weight:400">▾</span></div><div class="sub">탭해서 Persona 전환</div></div><button type="button">✎ 조정</button><button type="button">갤러리</button><button type="button">설정</button></div>
+<div class="chat"><div class="bubble">오늘 퇴근 언제 해?</div><div class="bubble me">곧! 이따 연락할게</div></div>
+</div>
+<div class="caption">진입점 1 · Chat 상단 "✎ 조정"</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><div class="avatar">하</div><div class="grow"><div class="title">하린 <span style="font-weight:400">▾</span></div><div class="sub">답장 뒤에 조정할 수 있어</div></div><button type="button">✎ 조정</button><button type="button">갤러리</button><button type="button">설정</button></div>
+<div class="chat"><div class="bubble me">지금 뭐 해?</div><div class="bubble" style="opacity:.55">입력 중…</div></div>
+<div class="snack"><span>답장을 기다리는 동안에는 조정 모드를 열 수 없어요.</span></div>
+</div>
+<div class="caption">답장 대기 중 · "✎ 조정" 비활성</div>
+</div>
+</div>
+<ul class="note">
+<li>"✎ 조정"은 현재 active Persona의 조정 모드를 연다. 아바타·이름 영역은 지금처럼 Library 진입점이다.</li>
+<li>Detail 상단의 "대화로 조정"도 같은 Persona의 조정 모드를 연다. 조정 모드 상단의 "상세 설정"은 Detail로 간다.</li>
+<li>답장 대기 중에는 Library와 같은 이유로 열지 않는다.</li>
+</ul>
+</section>
+
+<section class="stage" id="session" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar editbar"><button type="button" aria-label="닫기">✕</button><div class="avatar">하</div><div class="grow"><div class="title">하린 조정</div><div class="sub">조정 모드 · 일반 대화와 분리</div></div><button type="button">상세 설정</button></div><div class="editbanner">여기서 나눈 말은 대화 기록·기억·관계에 남지 않아요. 적용한 변경만 Persona 설정에 저장돼요.</div>
+<div class="scroll">
+<div class="bubble me">질문은 좀 줄이고 장난은 조금 더 쳐줘</div>
+<div class="proposal"><span class="kind">성향 조정</span>표현만 바뀌어요. 지난 대화 해석은 그대로예요.
+<ul class="diff"><li>질문 빈도 <span class="from">30</span> → 15</li><li>장난기 <span class="from">65</span> → 75</li></ul>
+<div class="actions"><button type="button" class="primary">초안에 담기</button><button type="button">다시 조정</button></div></div>
+<div class="bubble me">앞으로 나를 오빠라고 불러</div>
+<div class="proposal"><span class="kind">지금부터 변화</span>지금부터 호칭이 바뀌어요. 지난 대화는 변화 전 모습으로 남아요.
+<ul class="diff"><li>호칭 <span class="from">(비어 있음)</span> → 오빠</li></ul>
+<div class="actions"><button type="button" class="primary">초안에 담기</button><button type="button">다시 조정</button></div></div>
+</div>
+<div class="draftbar"><span><b>초안</b> · 변경 3개 (저장 전)</span><button type="button">초안 취소</button><button type="button" class="primary">변경 확인</button></div>
+<div class="composer"><div class="input placeholder">바꾸고 싶은 점을 말해줘</div><button type="button">보내기</button></div>
+</div>
+<div class="caption">요청 → 변경안 → 초안에 누적 (아직 저장 안 됨)</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar editbar"><button type="button" aria-label="닫기">✕</button><div class="avatar">하</div><div class="grow"><div class="title">하린 조정</div><div class="sub">조정 모드 · 일반 대화와 분리</div></div><button type="button">상세 설정</button></div><div class="editbanner">여기서 나눈 말은 대화 기록·기억·관계에 남지 않아요. 적용한 변경만 Persona 설정에 저장돼요.</div>
+<div class="scroll">
+<div class="bubble me">장난은 너무 많이 말고 조금만</div>
+<div class="proposal"><span class="kind">성향 조정</span>초안의 장난기 75를 70으로 고쳐요.
+<ul class="diff"><li>장난기 <span class="from">75 (초안)</span> → 70</li></ul>
+<div class="actions"><button type="button" class="primary">초안에 담기</button><button type="button">다시 조정</button></div></div>
+<div class="divider">변경안을 고르지 않고 다른 요청을 보내면 이 변경안은 초안에 담기지 않아요</div>
+</div>
+<div class="draftbar"><span><b>초안</b> · 변경 3개 (저장 전)</span><button type="button">초안 취소</button><button type="button" class="primary">변경 확인</button></div>
+<div class="composer"><div class="input placeholder">바꾸고 싶은 점을 말해줘</div><button type="button">보내기</button></div>
+</div>
+<div class="caption">"다시 조정" · 초안 값을 기준으로 다시 제안</div>
+</div>
+</div>
+<ul class="note">
+<li>조정 모드는 Chat과 다른 색의 상단 바와 안내 띠로 구분한다. 메시지는 Persona별 Edit Session 저장소에만 남는다.</li>
+<li>변경안 카드: 종류 배지(성향 조정 / 지금부터 변화 / 원래부터 → Detail), 영향 설명 한 줄, 필드별 before → after. before는 초안 시작 시 저장값 또는 이미 담긴 초안 값이다.</li>
+<li>"초안에 담기"는 저장이 아니다. 초안 바가 생기고 변경 수를 보인다. 같은 필드를 다시 담으면 최종값만 남는다.</li>
+<li>"다시 조정"은 같은 요청을 초안 기준으로 다시 제안받는다. 변경안 카드를 무시하고 새 요청을 보내도 된다.</li>
+<li>조정 모드를 닫아도 초안과 대화는 남는다(다시 열기 탭).</li>
+</ul>
+</section>
+
+<section class="stage" id="review" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar editbar"><button type="button" aria-label="닫기">✕</button><div class="avatar">하</div><div class="grow"><div class="title">하린 조정</div><div class="sub">조정 모드 · 일반 대화와 분리</div></div><button type="button">상세 설정</button></div><div class="editbanner">여기서 나눈 말은 대화 기록·기억·관계에 남지 않아요. 적용한 변경만 Persona 설정에 저장돼요.</div>
+<div class="scrim" style="place-items:end;padding:0">
+<div class="sheet">
+<div class="title" style="font-size:17px">변경 확인</div>
+<p class="muted" style="font-size:12px">초안을 시작할 때 저장된 값과 비교한 최종 변경이에요.</p>
+<div class="section-title">성향</div>
+<ul class="diff"><li>질문 빈도 <span class="from">30</span> → 15</li><li>장난기 <span class="from">65</span> → 70</li></ul>
+<div class="section-title">설정 (지금부터 변화)</div>
+<ul class="diff"><li>호칭 <span class="from">(비어 있음)</span> → 오빠</li></ul>
+<p class="muted" style="font-size:12px">설정이 바뀌어 지난 대화는 "변화 전 모습"으로 남아요. 대화·기억은 지워지지 않아요.</p>
+<div class="actions" style="justify-content:flex-end"><button type="button">초안 취소</button><button type="button">다시 조정</button><button type="button" class="primary">전체 적용</button></div>
+</div></div>
+</div>
+<div class="caption">전체 diff · 한 번 저장(revision 1회)</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><div class="avatar">하</div><div class="grow"><div class="title">하린 <span style="font-weight:400">▾</span></div><div class="sub">탭해서 Persona 전환</div></div><button type="button">✎ 조정</button><button type="button">갤러리</button><button type="button">설정</button></div>
+<div class="chat"><div class="bubble">오빠, 퇴근하면 연락해!</div></div>
+<div class="snack"><span>하린의 설정을 바꿨어. 다음 대화부터 반영돼.</span></div>
+</div>
+<div class="caption">전체 적용 → 조정 모드 닫고 Chat</div>
+</div>
+</div>
+<ul class="note">
+<li>"전체 적용"은 성향과 설정을 한 번에 저장한다. 설정 변경이 하나라도 있으면 종류는 "지금부터 변화(Evolution)"로 기록하고, 성향만 있으면 기존 종류를 유지한다.</li>
+<li>"원래부터(Retcon)" 변경안은 초안에 담기지 않으므로 이 화면에 섞이지 않는다(Retcon → Detail 탭).</li>
+<li>"초안 취소"는 확인 없이 초안만 비운다. 저장된 Persona는 바뀌지 않는다. 조정 대화 기록은 남는다.</li>
+<li>적용 성공 뒤 Edit Session에 "적용됨" 표시를 남기고 초안을 비운다.</li>
+</ul>
+</section>
+
+<section class="stage" id="retcon" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar editbar"><button type="button" aria-label="닫기">✕</button><div class="avatar">하</div><div class="grow"><div class="title">하린 조정</div><div class="sub">조정 모드 · 일반 대화와 분리</div></div><button type="button">상세 설정</button></div><div class="editbanner">여기서 나눈 말은 대화 기록·기억·관계에 남지 않아요. 적용한 변경만 Persona 설정에 저장돼요.</div>
+<div class="scroll">
+<div class="bubble me">처음 만난 곳을 회사가 아니라 소개팅으로 바꿔줘</div>
+<div class="proposal"><span class="kind">원래부터</span>과거 설정 자체를 바꾸는 요청이에요. 지난 대화·기억과 맞지 않을 수 있어서 상세 설정에서 확인하고 저장해요.
+<ul class="diff"><li>관계 시작 <span class="from">같은 회사 입사 동기</span> → 소개팅에서 처음 만남</li></ul>
+<div class="actions"><button type="button" class="primary">상세 설정에서 확인</button><button type="button">다시 조정</button></div></div>
+</div>
+<div class="composer"><div class="input placeholder">바꾸고 싶은 점을 말해줘</div><button type="button">보내기</button></div>
+</div>
+<div class="caption">RETCON_REQUEST · 초안에 담지 않음</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">하린 상세 설정</div><div class="sub">조정 모드에서 가져온 변경 1개</div></div><button type="button" class="primary">저장</button></div>
+<div class="content">
+<div class="warn"><b>원래부터 이랬던 것으로 바꿔요.</b> 지난 대화나 기억 중 이 설정과 맞지 않는 내용은 앞으로 따르지 않아요. 대화·기억 원문은 지워지지 않아요.</div>
+<div class="section-title">관계</div>
+<div class="field"><label>관계 시작</label><div class="input">소개팅에서 처음 만남</div><div class="hint">조정 모드에서 가져옴 · 저장 전</div></div>
+<p class="muted" style="font-size:12px">조정 모드 초안에 담긴 다른 변경은 그대로 남아요. 이 화면은 이 변경만 가져와요.</p>
+</div>
+</div>
+<div class="caption">Detail · 변경을 채운 채 열림, Retcon 경고</div>
+</div>
+</div>
+<ul class="note">
+<li>"상세 설정에서 확인"은 Detail을 열고 해당 필드에 변경안 값을 채운다(저장 전). 저장하면 종류 선택 dialog에서 "원래부터(Retcon)"가 기본 선택이다(Detail 저장 탭).</li>
+<li>Retcon 변경과 조정 모드 초안은 서로 섞지 않는다. Detail에서 저장해도 초안은 그대로 남고, 초안의 before는 Detail 저장 뒤 다시 계산하지 않는다(적용 시 낡음 판정 → 적용 불가 탭).</li>
+</ul>
+</section>
+
+<section class="stage" id="blocked" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar editbar"><button type="button" aria-label="닫기">✕</button><div class="avatar">하</div><div class="grow"><div class="title">하린 조정</div><div class="sub">조정 모드 · 일반 대화와 분리</div></div><button type="button">상세 설정</button></div><div class="editbanner">여기서 나눈 말은 대화 기록·기억·관계에 남지 않아요. 적용한 변경만 Persona 설정에 저장돼요.</div>
+<div class="scrim" style="place-items:end;padding:0">
+<div class="sheet">
+<div class="title" style="font-size:17px">이 초안은 적용할 수 없어요</div>
+<p style="font-size:13px">초안을 만든 뒤 하린의 설정이 다른 곳에서 바뀌었어요. 지금 설정을 기준으로 다시 확인해줘.</p>
+<div class="actions" style="justify-content:flex-end"><button type="button">초안 취소</button><button type="button" class="primary">지금 기준으로 다시 보기</button></div>
+</div></div>
+</div>
+<div class="caption">오래된 초안 · 기준 revision 불일치</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar editbar"><button type="button" aria-label="닫기">✕</button><div class="avatar">하</div><div class="grow"><div class="title">하린 조정</div><div class="sub">조정 모드 · 일반 대화와 분리</div></div><button type="button">상세 설정</button></div><div class="editbanner">여기서 나눈 말은 대화 기록·기억·관계에 남지 않아요. 적용한 변경만 Persona 설정에 저장돼요.</div>
+<div class="scroll">
+<div class="bubble me">배경 이야기를 전부 새로 써줘. 어린 시절부터 지금까지…</div>
+<div class="proposal" style="border-style:dashed"><b>변경안을 만들지 못했어요.</b> 한 번에 바꾸려는 내용이 너무 길어요. 바꿀 부분을 좁혀서 다시 말해줘.
+<div class="actions"><button type="button">다시 시도</button></div></div>
+<div class="proposal" style="border-style:dashed"><b>지금은 조정할 수 없어요.</b> 대화를 되돌리는 중이에요. 끝나면 다시 시도해줘.</div>
+<div class="proposal" style="border-style:dashed"><b>변경안을 받지 못했어요.</b> 연결 문제나 API key 문제일 수 있어요.<div class="actions"><button type="button">다시 시도</button></div></div>
+</div>
+<div class="composer"><div class="input placeholder">바꾸고 싶은 점을 말해줘</div><button type="button">보내기</button></div>
+</div>
+<div class="caption">모델 실패 · 출력 잘림 · rollback/복원 중</div>
+</div>
+</div>
+<table class="spec">
+<tr><th>상황</th><th>표시</th><th>저장</th></tr>
+<tr><td>초안 기준 revision ≠ 현재 revision</td><td>"적용할 수 없어요" 시트</td><td>Persona 변경 없음, 초안 유지</td></tr>
+<tr><td>출력 잘림·형식 오류·범위 밖 값</td><td>요청 아래 실패 카드, "범위를 좁혀" 안내</td><td>변경안 없음. 실패 사실만 기록(원문 log 없음)</td></tr>
+<tr><td>키 없음·연결 실패</td><td>실패 카드 + 다시 시도</td><td>같음</td></tr>
+<tr><td>rollback·스냅샷 복원 진행 중</td><td>조회만 가능, 보내기·적용 비활성, 안내 카드</td><td>Edit Session 쓰기 없음</td></tr>
+<tr><td>Persona 삭제가 시작된 뒤 돌아온 변경안</td><td>표시하지 않음(조정 모드 닫힘)</td><td>버림</td></tr>
+</table>
+</section>
+
+<section class="stage" id="resume" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar editbar"><button type="button" aria-label="닫기">✕</button><div class="avatar">하</div><div class="grow"><div class="title">하린 조정</div><div class="sub">조정 모드 · 일반 대화와 분리</div></div><button type="button">상세 설정</button></div><div class="editbanner">여기서 나눈 말은 대화 기록·기억·관계에 남지 않아요. 적용한 변경만 Persona 설정에 저장돼요.</div>
+<div class="scroll">
+<div class="divider">어제 · 지난 조정</div>
+<div class="bubble me" style="opacity:.7">말투를 조금 더 다정하게</div>
+<div class="proposal" style="opacity:.7"><span class="kind">성향 조정</span>적용됨<ul class="diff"><li>감정 표현 <span class="from">65</span> → 75</li></ul></div>
+<div class="divider">오늘</div>
+<div class="bubble me">앞으로 나를 오빠라고 불러</div>
+<div class="proposal"><span class="kind">지금부터 변화</span>초안에 담김<ul class="diff"><li>호칭 <span class="from">(비어 있음)</span> → 오빠</li></ul></div>
+</div>
+<div class="draftbar"><span><b>저장 안 한 초안</b> · 변경 1개</span><button type="button">초안 취소</button><button type="button" class="primary">변경 확인</button></div>
+<div class="composer"><div class="input placeholder">바꾸고 싶은 점을 말해줘</div><button type="button">보내기</button></div>
+</div>
+<div class="caption">다시 열기 · 지난 기록 + 남은 초안</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar editbar"><button type="button" aria-label="닫기">✕</button><div class="avatar">하</div><div class="grow"><div class="title">하린 조정</div><div class="sub">조정 모드 · 일반 대화와 분리</div></div><button type="button">상세 설정</button></div><div class="editbanner">여기서 나눈 말은 대화 기록·기억·관계에 남지 않아요. 적용한 변경만 Persona 설정에 저장돼요.</div>
+<div class="scroll">
+<div class="proposal"><b>지난번 적용이 끝까지 기록되지 않았어요.</b> 확인해 보니 하린의 설정에는 이미 반영돼 있어요. 초안을 정리했어요.</div>
+<div class="proposal" style="border-style:dashed"><b>지난 초안은 지금 설정과 맞지 않아요.</b> 그사이 다른 변경이 있었어요. 지금 기준으로 다시 확인해줘.<div class="actions"><button type="button">초안 취소</button><button type="button" class="primary">지금 기준으로 다시 보기</button></div></div>
+</div>
+<div class="composer"><div class="input placeholder">바꾸고 싶은 점을 말해줘</div><button type="button">보내기</button></div>
+</div>
+<div class="caption">복구 · 적용됨 / 낡음 판정</div>
+</div>
+</div>
+<ul class="note">
+<li>조정 모드를 다시 열면 그 Persona의 지난 조정 기록과 저장 안 한 초안을 보인다. 다른 Persona의 기록은 보이지 않는다.</li>
+<li>열 때 초안의 기준 revision과 목표 값을 현재 Persona와 비교한다: 이미 반영됨 → 초안 정리 안내 / 기준과 같음 → 초안 유지 / 그 밖 → 낡음 안내.</li>
+<li>보존 기간이 지난 오래된 기록은 자동으로 정리된다(상한은 PLAN에서 정함).</li>
+</ul>
+</section>
+
+<section class="stage" id="detail" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">하린 상세 설정</div></div><button type="button">대화로 조정</button><button type="button" class="primary">저장</button></div>
+<div class="content" style="height:620px;overflow:hidden">
+<div class="section-title">기본 정보</div>
+<div class="field"><label>이름 *</label><div class="input">하린</div></div>
+<div class="row"><div class="field grow"><label>나이대 *</label><div class="input">20대 중반</div></div><div class="field grow"><label>직업 또는 역할 *</label><div class="input">카페 사장</div></div></div>
+<div class="section-title">관계</div>
+<div class="field"><label>관계 설정 *</label><div class="input">오래 알고 지낸 친구</div></div>
+<div class="field"><label>나를 부르는 호칭</label><div class="input placeholder">예: 이름, 별명</div></div>
+<div class="field"><label>관계 시작</label><div class="input placeholder">첫 만남이나 친해진 계기</div></div>
+<div class="section-title">성격</div>
+<div class="field"><label>성격·가치관</label><div class="input placeholder">핵심 성격, 중요하게 여기는 것</div></div>
+<div class="row"><div class="field grow"><label>좋아하는 것</label><div class="input placeholder">비어 있음</div></div><div class="field grow"><label>싫어하는 것</label><div class="input placeholder">비어 있음</div></div></div>
+</div>
+</div>
+<div class="caption">Detail · 위쪽 섹션</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">하린 상세 설정</div></div><button type="button">대화로 조정</button><button type="button" class="primary">저장</button></div>
+<div class="content" style="height:620px;overflow:hidden">
+<div class="section-title">대화 스타일</div>
+<div class="field"><label>기본 화법 *</label><div class="input">편한 반말</div></div>
+<div class="slider">답변 길이<span class="bar"><i style="left:38%"></i></span></div>
+<div class="slider">질문 빈도<span class="bar"><i style="left:28%"></i></span></div>
+<div class="slider">장난기<span class="bar"><i style="left:62%"></i></span></div>
+<details class="more"><summary>성향 전체 (9개)</summary></details>
+<div class="section-title">서사</div>
+<div class="field"><label>추가 배경</label><div class="input" style="min-height:70px">긴 배경과 주요 설정</div></div>
+<div class="section-title">외형</div>
+<div class="field"><label>외형 설명</label><div class="input placeholder">사진 대신 글로</div></div>
+<div class="card"><div class="row"><div class="thumb filled">FACE</div><div class="grow"><div class="title">외형 사진</div><div class="sub">외형 준비됨 · 체형 없음</div></div><button type="button">관리</button></div></div>
+</div>
+</div>
+<div class="caption">Detail · 아래쪽 섹션</div>
+</div>
+</div>
+<table class="spec">
+<tr><th>섹션</th><th>필드 (저장 key)</th><th>필수</th><th>최대</th></tr>
+<tr><td>기본 정보</td><td>이름(name), 나이대(ageRange), 직업 또는 역할(occupation)</td><td>필수</td><td>40 / 40 / 120</td></tr>
+<tr><td>관계</td><td>관계 설정(relationshipConcept)</td><td>필수</td><td>200</td></tr>
+<tr><td></td><td><b>나를 부르는 호칭(addressToUser)</b>, <b>관계 시작(relationshipOrigin)</b></td><td>선택(신규)</td><td>80 / 800</td></tr>
+<tr><td>성격</td><td><b>성격·가치관(personalityValues)</b>, <b>좋아하는 것(likes)</b>, <b>싫어하는 것(dislikes)</b></td><td>선택(신규)</td><td>800 / 400 / 400</td></tr>
+<tr><td>대화 스타일</td><td>기본 화법(speechStyle), 성향 9개</td><td>필수 / 0~1</td><td>200</td></tr>
+<tr><td>서사</td><td>추가 배경(narrative)</td><td>선택</td><td>2000</td></tr>
+<tr><td>외형</td><td>외형 설명(appearanceDescription), 외형 사진 화면(#100) 진입</td><td>선택</td><td>2000</td></tr>
+</table>
+<ul class="note">
+<li>설정 "편집"과 Library ⋮ "상세 설정"은 이 화면을 연다. 최초 실행 생성은 기존 편집 화면을 그대로 쓰되 새 필드를 보존한다.</li>
+<li>외형 사진 "관리"는 #100의 외형 사진 화면을 연다. 외형 추출 규칙은 기존 편집 화면과 같다.</li>
+<li>기존 추가 배경 내용을 새 필드로 자동으로 나누지 않는다.</li>
+</ul>
+</section>
+
+<section class="stage" id="detail-save" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">하린 상세 설정</div></div><button type="button" class="primary">저장</button></div>
+<div class="scrim">
+<div class="dialog">
+<div class="title" style="font-size:17px">이 변경을 어떻게 반영할까?</div>
+<p class="muted" style="font-size:12px">바뀐 설정: 직업 또는 역할</p>
+<div class="radio on"><b>지금부터 바뀐 것</b><br><span class="muted">지난 대화는 변화 전 모습으로 남아요.</span></div>
+<div class="radio"><b>원래부터 그랬던 것</b><br><span class="muted">지난 대화·기억 중 맞지 않는 설정은 따르지 않아요.</span></div>
+<div class="actions"><button type="button">취소</button><button type="button" class="primary">저장</button></div>
+</div></div>
+</div>
+<div class="caption">설정(Core) 변경 저장 · 종류 선택</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">하린 상세 설정</div></div><button type="button" class="primary">저장</button></div>
+<div class="scrim">
+<div class="dialog">
+<div class="title" style="font-size:17px">원래부터 그랬던 것으로 저장할까?</div>
+<div class="warn">지난 대화나 기억 중 이 설정과 맞지 않는 내용은 앞으로 따르지 않아요. 대화·기억 원문은 지워지지 않고, 내가 직접 말한 사실·취향·경계는 그대로 따라요.</div>
+<div class="actions"><button type="button">돌아가기</button><button type="button" class="primary danger">저장</button></div>
+</div></div>
+</div>
+<div class="caption">Retcon 확인 (한 번 더)</div>
+</div>
+</div>
+<ul class="note">
+<li>설정(Core) 필드가 바뀐 저장만 종류를 묻는다. 기본 선택은 "지금부터 바뀐 것"이다. 조정 모드에서 넘어온 Retcon 변경이 있으면 "원래부터"가 기본 선택이다.</li>
+<li>성향만 바뀐 저장은 묻지 않고 바로 저장하며 기록된 종류를 유지한다.</li>
+<li>값이 바뀌지 않은 저장은 아무 것도 기록하지 않는다(revision·종류 유지).</li>
+<li>저장 중에는 버튼을 잠그고, 답장 대기·rollback 중이면 "지금은 저장할 수 없어요"를 보인다(기존 저장 규칙).</li>
+</ul>
+</section>
+
+</main>
+<script>
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const stages = document.querySelectorAll('.stage');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
+    stages.forEach(stage => stage.hidden = stage.id !== tab.dataset.target);
+  }));
+</script>
+</body>
+</html>
