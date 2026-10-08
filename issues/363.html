@@ -110,13 +110,14 @@
           <li>placeholder와 같은 전체 화면 <code>TextView</code>, 가운데 정렬, 앱 기본 글자 크기. 제목·아이콘·버튼 없음.</li>
           <li>세 줄: ① 무엇이 안 됐는지 ② 저장값을 바꾸지 않았다는 사실 ③ 오류 코드. 줄 순서 고정.</li>
           <li>placeholder와의 차이: 문구가 세 줄이고 마지막 줄에 오류 코드가 있다. 시간이 지나도 바뀌지 않는다(placeholder는 게시되면 채팅으로 넘어간다).</li>
+          <li>안내 상태에서는 Android 13+ 알림 권한 요청을 띄우지 않는다. 정상 상태(placeholder·채팅)는 지금처럼 요청한다.</li>
           <li>문구에 경로, Persona 이름·ID, 예외 내용, 대화 내용을 넣지 않는다. 오류 코드는 아래 다섯 값만.</li>
         </ul>
         <h3>상태</h3>
         <table>
           <thead><tr><th>상태</th><th>화면</th><th>사용자 action</th></tr></thead>
           <tbody>
-            <tr><td>Persona 초기화 실패</td><td>안내 (오류 코드 1개)</td><td>없음. 뒤로/홈으로 앱을 닫을 수 있다. 다시 열면 같은 판정을 다시 한다</td></tr>
+            <tr><td>Persona 초기화 실패</td><td>안내 (오류 코드 1개). 알림 권한 요청을 띄우지 않는다</td><td>없음. 뒤로/홈으로 앱을 닫을 수 있다. process가 남아 있는 동안 다시 열면 같은 안내를 다시 보인다. process가 끝난 뒤 다시 열면 Persona 저장소 열기를 다시 시도한다</td></tr>
             <tr><td>정상, 아직 게시 전</td><td>기존 placeholder 그대로</td><td>기다림 → 게시되면 채팅 화면</td></tr>
             <tr><td>정상, 게시됨</td><td>채팅 화면 (변경 없음)</td><td>기존과 같음</td></tr>
           </tbody>
