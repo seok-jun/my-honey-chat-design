@@ -116,7 +116,7 @@
         <table>
           <thead><tr><th>상태</th><th>화면</th><th>사용자 action</th></tr></thead>
           <tbody>
-            <tr><td>Persona 초기화 실패</td><td>안내 (오류 코드 1개). 알림 권한 요청을 띄우지 않는다</td><td>없음. 뒤로/홈으로 앱을 닫을 수 있다. process가 남아 있는 동안 다시 열면 같은 안내를 다시 보인다. process가 끝난 뒤 다시 열면 Persona 저장소 열기를 다시 시도한다</td></tr>
+            <tr><td>Persona 초기화 실패</td><td>안내 (오류 코드 1개). 알림 권한 요청을 띄우지 않는다</td><td>없음. 뒤로/홈으로 앱을 닫을 수 있다. 다시 열 때마다 Persona 저장소 열기를 다시 시도한다. 성공하면 바로 정상 경로(placeholder → 채팅)로 가고, 실패하면 같은 안내(오류 코드는 새 판정 결과)를 보인다</td></tr>
             <tr><td>정상, 아직 게시 전</td><td>기존 placeholder 그대로</td><td>기다림 → 게시되면 채팅 화면</td></tr>
             <tr><td>정상, 게시됨</td><td>채팅 화면 (변경 없음)</td><td>기존과 같음</td></tr>
           </tbody>
