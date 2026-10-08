@@ -1,154 +1,439 @@
 <!doctype html>
 <html lang="ko">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Issue #100 — Persona Library UI/UX Visual Spec</title>
-  <style>
-    :root { color-scheme: light dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
-    * { box-sizing: border-box; }
-    body { margin: 0; padding: 32px 20px 72px; background: Canvas; color: CanvasText; }
-    main { max-width: 1180px; margin: 0 auto; }
-    header { margin-bottom: 24px; }
-    h1, h2, h3, p { margin-top: 0; }
-    .meta, .muted { opacity: .66; }
-    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
-    button { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); background: Canvas; color: CanvasText; border-radius: 10px; padding: 9px 13px; cursor: pointer; }
-    button[aria-selected="true"], .primary { font-weight: 700; border-color: CanvasText; }
-    .stage { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 18px; padding: 24px; min-height: 720px; }
-    .phone { width: min(420px, 100%); min-height: 750px; margin: 0 auto; border: 1px solid color-mix(in srgb, CanvasText 25%, Canvas); border-radius: 28px; overflow: hidden; background: Canvas; }
-    .appbar { min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 10px 16px; border-bottom: 1px solid color-mix(in srgb, CanvasText 12%, Canvas); }
-    .avatar { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; border: 1px solid color-mix(in srgb, CanvasText 22%, Canvas); font-weight: 700; flex: 0 0 auto; }
-    .grow { flex: 1; min-width: 0; }
-    .title { font-weight: 750; }
-    .sub { font-size: 12px; opacity: .62; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
-    .content { padding: 16px; }
-    .card { border: 1px solid color-mix(in srgb, CanvasText 15%, Canvas); border-radius: 16px; padding: 14px; margin-bottom: 12px; }
-    .card.active { border-width: 2px; }
-    .row { display: flex; gap: 12px; align-items: center; }
-    .card-actions, .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 12px; }
-    .badge { display: inline-block; margin: 6px 5px 0 0; padding: 3px 7px; border: 1px solid color-mix(in srgb, CanvasText 16%, Canvas); border-radius: 999px; font-size: 11px; }
-    .field { margin: 0 0 14px; }
-    .field label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 6px; }
-    .input { min-height: 42px; border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 10px; padding: 10px; opacity: .84; }
-    .textarea { min-height: 72px; }
-    .ref-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
-    .ref { min-height: 165px; border: 1px dashed color-mix(in srgb, CanvasText 28%, Canvas); border-radius: 14px; padding: 12px; display: flex; flex-direction: column; justify-content: space-between; }
-    .thumb { height: 78px; border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 10px; display: grid; place-items: center; font-weight: 700; opacity: .75; }
-    .status { padding: 10px 12px; border: 1px solid color-mix(in srgb, CanvasText 15%, Canvas); border-radius: 12px; margin-top: 10px; font-size: 13px; }
-    details { border-top: 1px solid color-mix(in srgb, CanvasText 12%, Canvas); padding-top: 14px; margin-top: 16px; }
-    .slider { display: grid; grid-template-columns: 1fr 72px; gap: 10px; align-items: center; margin: 10px 0; }
-    .track { height: 8px; border-radius: 999px; border: 1px solid color-mix(in srgb, CanvasText 20%, Canvas); position: relative; }
-    .track::after { content: ""; display: block; width: 62%; height: 100%; border-right: 2px solid CanvasText; }
-    .footer { display: flex; gap: 8px; padding-top: 16px; }
-    .footer .primary { margin-left: auto; }
-    .center { min-height: 560px; display: grid; place-items: center; text-align: center; padding: 28px; }
-    .chat { padding: 18px; }
-    .bubble { max-width: 78%; border: 1px solid color-mix(in srgb, CanvasText 16%, Canvas); border-radius: 16px; padding: 10px 12px; margin-bottom: 12px; }
-    .bubble.me { margin-left: auto; }
-    .note { max-width: 820px; margin: 20px auto 0; font-size: 13px; line-height: 1.6; opacity: .72; }
-    [hidden] { display: none !important; }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Issue #100 — Persona Library UI/UX Visual Spec</title>
+<style>
+:root { color-scheme: light dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+* { box-sizing: border-box; }
+body { margin: 0; padding: 32px 20px 72px; background: Canvas; color: CanvasText; }
+main { max-width: 1180px; margin: 0 auto; }
+header { margin-bottom: 20px; }
+h1, h2, h3, p { margin-top: 0; }
+.meta, .muted { opacity: .66; }
+.tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0; }
+button { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); background: Canvas; color: CanvasText; border-radius: 10px; padding: 8px 12px; cursor: pointer; font: inherit; font-size: 14px; }
+button[aria-selected="true"], .primary { font-weight: 700; border-color: CanvasText; }
+button[disabled] { opacity: .38; cursor: not-allowed; }
+.danger { border-color: color-mix(in srgb, #c62828 60%, Canvas); color: color-mix(in srgb, #c62828 85%, CanvasText); }
+.stage { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 18px; padding: 24px; }
+.pair { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; }
+.pair > div { flex: 0 0 min(390px, 100%); }
+.phone { width: min(390px, 100%); min-height: 720px; border: 1px solid color-mix(in srgb, CanvasText 25%, Canvas); border-radius: 28px; overflow: hidden; position: relative; background: Canvas; }
+.caption { text-align: center; font-size: 12px; opacity: .7; margin-top: 8px; }
+.appbar { min-height: 60px; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-bottom: 1px solid color-mix(in srgb, CanvasText 12%, Canvas); }
+.avatar { width: 40px; height: 40px; border-radius: 50%; display: grid; place-items: center; border: 1px solid color-mix(in srgb, CanvasText 22%, Canvas); font-weight: 700; flex: 0 0 auto; }
+.grow { flex: 1; min-width: 0; }
+.title { font-weight: 750; }
+.sub { font-size: 12px; opacity: .62; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.content { padding: 14px; }
+.card { border: 1px solid color-mix(in srgb, CanvasText 15%, Canvas); border-radius: 16px; padding: 12px; margin-bottom: 10px; }
+.card.active { border-width: 2px; border-color: CanvasText; }
+.row { display: flex; gap: 10px; align-items: center; }
+.actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+.badge { display: inline-block; margin: 5px 4px 0 0; padding: 2px 8px; border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 999px; font-size: 11px; }
+.badge.strong { font-weight: 700; border-color: CanvasText; }
+.field { margin: 0 0 12px; }
+.field label { display: block; font-size: 12px; font-weight: 700; margin-bottom: 5px; }
+.field .hint { font-size: 11px; opacity: .6; margin-top: 4px; }
+.input { min-height: 40px; border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 10px; padding: 9px 10px; font-size: 14px; }
+.input.placeholder { opacity: .5; }
+.input.error { border-color: #c62828; }
+.errtext { color: #c62828; font-size: 11px; margin-top: 4px; }
+.chips { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.chip { font-size: 12px; padding: 4px 10px; border-radius: 999px; border: 1px solid color-mix(in srgb, CanvasText 20%, Canvas); }
+.chip.on { font-weight: 700; border-color: CanvasText; }
+.stepper { display: flex; gap: 6px; align-items: center; font-size: 12px; padding: 8px 14px; border-bottom: 1px solid color-mix(in srgb, CanvasText 10%, Canvas); }
+.dot { width: 22px; height: 22px; border-radius: 50%; display: grid; place-items: center; border: 1px solid color-mix(in srgb, CanvasText 30%, Canvas); font-size: 11px; }
+.dot.on { font-weight: 700; border-color: CanvasText; }
+.line { flex: 0 0 28px; height: 1px; background: color-mix(in srgb, CanvasText 25%, Canvas); }
+details.more { border: 1px dashed color-mix(in srgb, CanvasText 22%, Canvas); border-radius: 12px; padding: 10px 12px; margin-bottom: 12px; }
+details.more summary { font-size: 13px; font-weight: 700; cursor: pointer; }
+.slot { border: 1px solid color-mix(in srgb, CanvasText 16%, Canvas); border-radius: 14px; padding: 12px; margin-bottom: 10px; }
+.slot.disabled { opacity: .45; }
+.thumb { width: 64px; height: 64px; border-radius: 12px; border: 1px dashed color-mix(in srgb, CanvasText 30%, Canvas); display: grid; place-items: center; font-size: 11px; opacity: .8; flex: 0 0 auto; }
+.thumb.filled { border-style: solid; font-weight: 700; }
+.footer { position: absolute; left: 0; right: 0; bottom: 0; display: flex; gap: 8px; padding: 12px 14px; border-top: 1px solid color-mix(in srgb, CanvasText 12%, Canvas); background: Canvas; }
+.footer .primary { margin-left: auto; }
+.chat { padding: 16px; }
+.bubble { max-width: 78%; border: 1px solid color-mix(in srgb, CanvasText 16%, Canvas); border-radius: 16px; padding: 9px 12px; margin-bottom: 10px; font-size: 14px; }
+.bubble.me { margin-left: auto; }
+.scrim { position: absolute; inset: 0; background: color-mix(in srgb, CanvasText 35%, transparent); display: grid; place-items: center; padding: 22px; }
+.dialog { background: Canvas; border-radius: 20px; padding: 18px; width: 100%; border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); }
+.dialog ul { padding-left: 18px; margin: 8px 0 12px; font-size: 13px; line-height: 1.6; }
+.dialog .actions { justify-content: flex-end; }
+.menu { position: absolute; right: 18px; top: 148px; width: 170px; background: Canvas; border: 1px solid color-mix(in srgb, CanvasText 20%, Canvas); border-radius: 12px; padding: 6px; box-shadow: 0 6px 20px color-mix(in srgb, CanvasText 18%, transparent); }
+.menu div { padding: 9px 10px; font-size: 14px; border-radius: 8px; }
+.menu .off { opacity: .38; }
+.snack { position: absolute; left: 14px; right: 14px; bottom: 16px; border-radius: 12px; padding: 11px 14px; background: CanvasText; color: Canvas; font-size: 13px; display: flex; justify-content: space-between; gap: 12px; }
+.center { min-height: 520px; display: grid; place-items: center; text-align: center; padding: 28px; }
+.spinner { width: 28px; height: 28px; border-radius: 50%; border: 3px solid color-mix(in srgb, CanvasText 20%, Canvas); border-top-color: CanvasText; margin: 0 auto 12px; }
+.note { max-width: 860px; margin: 18px auto 0; font-size: 13px; line-height: 1.65; opacity: .78; }
+.note li { margin-bottom: 4px; }
+table.spec { border-collapse: collapse; margin: 14px auto 0; font-size: 13px; max-width: 860px; width: 100%; }
+table.spec th, table.spec td { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); padding: 6px 8px; text-align: left; vertical-align: top; }
+[hidden] { display: none !important; }
+</style>
 </head>
 <body>
 <main>
-  <header>
-    <div class="meta">seok-jun/my-honey-chat · Issue #100</div>
-    <h1>Persona Library · 생성 · 편집 · FACE/BODY reference</h1>
-    <p>Persona를 Library로 관리하고, 외형 reference는 FACE primary + BODY optional 구조로 편집한다. reference 원본은 NORMAL 생성에, 등록 시 추출한 텍스트는 UNLIMITED 생성에 사용한다.</p>
-  </header>
+<header>
+<div class="meta">seok-jun/my-honey-chat · Issue #100</div>
+<h1>Persona Library · Quick Builder · 복제·삭제·전환 · 외형 사진</h1>
+<p>Chat 상단의 현재 Persona에서 Library로 들어가 Persona를 확인·전환·복제·삭제하고, 2단계 Quick Builder로 새 Persona를 만들어 바로 대화를 시작한다. 이 HTML은 화면 배치, 정보 계층, UI 상태와 action 이후 화면의 구현 기준이다.</p>
+</header>
 
-  <div class="tabs" role="tablist" aria-label="Visual spec state">
-    <button type="button" role="tab" aria-selected="true" data-target="current">Current</button>
-    <button type="button" role="tab" aria-selected="false" data-target="library">Library</button>
-    <button type="button" role="tab" aria-selected="false" data-target="editor">Editor</button>
-    <button type="button" role="tab" aria-selected="false" data-target="references">References</button>
-    <button type="button" role="tab" aria-selected="false" data-target="analysis">Analysis</button>
-    <button type="button" role="tab" aria-selected="false" data-target="switched">After Switch</button>
-  </div>
+<div class="tabs" role="tablist" aria-label="Visual spec state">
+<button type="button" role="tab" aria-selected="true" data-target="current">Current</button>
+<button type="button" role="tab" aria-selected="false" data-target="library">Library</button>
+<button type="button" role="tab" aria-selected="false" data-target="library-states">Library 상태</button>
+<button type="button" role="tab" aria-selected="false" data-target="builder1">만들기 1 · 기본 정보</button>
+<button type="button" role="tab" aria-selected="false" data-target="builder2">만들기 2 · 외형 사진</button>
+<button type="button" role="tab" aria-selected="false" data-target="photos">외형 사진</button>
+<button type="button" role="tab" aria-selected="false" data-target="duplicate">복제</button>
+<button type="button" role="tab" aria-selected="false" data-target="delete">삭제</button>
+<button type="button" role="tab" aria-selected="false" data-target="switched">전환 후</button>
+</div>
 
-  <section class="stage" id="current">
-    <div class="phone">
-      <div class="appbar"><div class="avatar">유</div><div class="grow"><div class="title">유란</div><div class="sub">현재 단일 Persona</div></div><button type="button">설정</button></div>
-      <div class="chat"><div class="bubble">현재는 한 Persona와 한 character reference를 전제로 한다.</div><div class="bubble me">다른 Persona나 FACE/BODY reference를 따로 관리할 수 없다.</div></div>
-    </div>
-  </section>
+<section class="stage" id="current">
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar"><div class="avatar">하</div><div class="grow"><div class="title">하린</div><div class="sub">단일 Persona</div></div><button type="button">갤러리</button><button type="button">설정</button></div>
+<div class="chat"><div class="bubble">현재는 활성 Persona 하나만 보이고, 다른 Persona를 만들거나 고르는 화면이 없다.</div><div class="bubble me">Persona 편집은 설정의 단일 편집 화면에서만 한다.</div></div>
+</div>
+<div class="caption">Current · Chat</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona 편집</div></div></div>
+<div class="content">
+<div class="field"><label>이름</label><div class="input">하린</div></div>
+<div class="field"><label>나이대</label><div class="input">20대 중반</div></div>
+<div class="field"><label>직업 또는 역할</label><div class="input">카페 사장</div></div>
+<div class="field"><label>관계 설정</label><div class="input">오래 알고 지낸 친구</div></div>
+<div class="field"><label>기본 화법</label><div class="input">편한 반말</div></div>
+<div class="field"><label>외형 참고 이미지</label><div class="input placeholder">사진 1장 · 외형 추출</div></div>
+<p class="muted" style="font-size:12px">한 화면에 정체성·외형·성향·자연어 조정이 모두 있다. 이 화면은 #105에서 상세 설정으로 바뀌며 #100은 바꾸지 않는다.</p>
+</div>
+</div>
+<div class="caption">Current · Persona 편집 (변경 없음)</div>
+</div>
+</div>
+</section>
 
-  <section class="stage" id="library" hidden>
-    <div class="phone">
-      <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona Library</div><div class="sub">내 Persona 3개</div></div><button type="button" class="primary">＋ 새 Persona</button></div>
-      <div class="content">
-        <div class="card active"><div class="row"><div class="avatar">유</div><div class="grow"><div class="title">유란</div><div class="sub">친근하고 장난스러운 관계</div><span class="badge">현재 사용 중</span><span class="badge">외형 준비됨</span></div><button type="button">⋮</button></div><div class="card-actions"><button type="button">편집</button><button type="button">복제</button></div></div>
-        <div class="card"><div class="row"><div class="avatar">서</div><div class="grow"><div class="title">서연</div><div class="sub">직장 동료 · 차분한 말투</div><span class="badge">사용자 생성</span></div><button type="button">⋮</button></div><div class="card-actions"><button type="button" class="primary">이 Persona로 대화</button><button type="button">편집</button></div></div>
-        <div class="card"><div class="row"><div class="avatar">나</div><div class="grow"><div class="title">나리</div><div class="sub">오래된 친구</div><span class="badge">텍스트 Persona</span></div><button type="button">⋮</button></div><div class="card-actions"><button type="button" class="primary">이 Persona로 대화</button><button type="button">편집</button></div></div>
-        <p class="muted">reference가 없는 text-only Persona도 허용한다. 외형 상태 badge는 오류가 있을 때만 과도하게 강조하지 않는다.</p>
-      </div>
-    </div>
-  </section>
+<section class="stage" id="library" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar"><div class="avatar">하</div><div class="grow"><div class="title">하린 <span style="font-weight:400">▾</span></div><div class="sub">탭해서 Persona 전환</div></div><button type="button">갤러리</button><button type="button">설정</button></div>
+<div class="chat"><div class="bubble">Chat 상단의 현재 Persona(아바타+이름) 영역 전체가 Library 진입점이다.</div></div>
+</div>
+<div class="caption">진입점 · Chat 상단</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona</div><div class="sub">3개</div></div></div>
+<div class="content">
+<div class="card active"><div class="row"><div class="avatar">하</div><div class="grow"><div class="title">하린</div><div class="sub">오래 알고 지낸 친구 · 카페 사장</div><span class="badge strong">대화 중</span><span class="badge">외형 준비됨</span></div><button type="button" aria-label="더보기">⋮</button></div></div>
+<div class="card"><div class="row"><div class="avatar">서</div><div class="grow"><div class="title">서연</div><div class="sub">같은 팀 동료 · 마케터</div><span class="badge">분석 대기</span></div><button type="button" aria-label="더보기">⋮</button></div><div class="actions"><button type="button" class="primary">이 Persona로 대화</button></div></div>
+<div class="card"><div class="row"><div class="avatar">도</div><div class="grow"><div class="title">도윤</div><div class="sub">동네 형 · 대학원생</div></div><button type="button" aria-label="더보기">⋮</button></div><div class="actions"><button type="button" class="primary">이 Persona로 대화</button></div></div>
+</div>
+<div class="footer"><button type="button" class="primary" style="margin-left:0;width:100%">＋ 새 Persona 만들기</button></div>
+<div class="menu"><div>상세 설정</div><div>외형 사진</div><div>복제</div><div class="danger" style="border:0">삭제</div></div>
+</div>
+<div class="caption">Library · ⋮ 메뉴 열림(하린)</div>
+</div>
+</div>
+<table class="spec">
+<tr><th>영역</th><th>규칙</th></tr>
+<tr><td>목록 순서</td><td>대화 중인 Persona를 맨 위에 고정하고, 나머지는 생성 순서대로 둔다.</td></tr>
+<tr><td>카드</td><td>프로필 사진(없으면 이름 첫 글자), 이름, <code>관계 설정 · 직업 또는 역할</code> 한 줄 요약, 상태 배지. 대화 중인 카드는 굵은 테두리와 <b>대화 중</b> 배지이며 "이 Persona로 대화" 버튼이 없다.</td></tr>
+<tr><td>외형 배지</td><td>얼굴 사진 기준 한 개만: READY → <b>외형 준비됨</b>, PENDING·NOT_ANALYZED → <b>분석 대기</b>, FAILED → <b>분석 실패</b>. 얼굴 사진이 없으면 배지를 두지 않는다(text-only Persona).</td></tr>
+<tr><td>⋮ 메뉴</td><td>상세 설정 · 외형 사진 · 복제 · 삭제. 상세 설정은 그 Persona로 전환한 뒤 기존 Persona 편집 화면을 연다(#105 전까지). 외형 사진은 전환 없이 그 Persona의 "외형 사진" 화면을 연다. import/export/share(#101)는 메뉴에 두지 않는다.</td></tr>
+<tr><td>이 Persona로 대화</td><td>전환 후 Library를 닫고 Chat으로 돌아간다("전환 후" 탭).</td></tr>
+</table>
+</section>
 
-  <section class="stage" id="editor" hidden>
-    <div class="phone">
-      <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">새 Persona</div><div class="sub">기본 설정</div></div></div>
-      <div class="content">
-        <div class="row" style="margin-bottom:16px"><div class="avatar">＋</div><div><div class="title">프로필 이미지</div><div class="sub">선택 · FACE reference와 별도 자산</div></div></div>
-        <div class="field"><label>이름 *</label><div class="input">서연</div></div>
-        <div class="field"><label>나이대 *</label><div class="input">20대 후반</div></div>
-        <div class="field"><label>직업 또는 역할 *</label><div class="input">직장 동료</div></div>
-        <div class="field"><label>관계 설정 *</label><div class="input textarea">같은 프로젝트를 오래 함께한 가까운 동료</div></div>
-        <div class="field"><label>기본 화법 *</label><div class="input textarea">차분하고 자연스러운 반말</div></div>
-        <div class="field"><label>추가 배경</label><div class="input textarea muted">선택 입력</div></div>
-        <div class="field"><label>외형 설명</label><div class="input textarea muted">사용자가 직접 적는 외형 정보 · 언리밋 분석 실패 시 fallback 가능</div></div>
-        <button type="button" class="primary">외형 reference 설정 ›</button>
-        <details><summary><strong>고급 설정</strong> · Tunable Persona</summary><div class="slider"><span>주도성</span><div class="track"></div></div><div class="slider"><span>장난기</span><div class="track"></div></div><div class="slider"><span>애정 표현</span><div class="track"></div></div><div class="slider"><span>질문 빈도</span><div class="track"></div></div></details>
-        <div class="footer"><button type="button">취소</button><button type="button" class="primary">저장</button></div>
-      </div>
-    </div>
-  </section>
+<section class="stage" id="library-states" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona</div></div></div>
+<div class="center"><div><div class="spinner"></div><div class="muted">불러오는 중</div></div></div>
+</div>
+<div class="caption">Loading</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona</div><div class="sub">1개</div></div></div>
+<div class="content">
+<div class="card active"><div class="row"><div class="avatar">하</div><div class="grow"><div class="title">하린</div><div class="sub">오래 알고 지낸 친구 · 카페 사장</div><span class="badge strong">대화 중</span></div><button type="button">⋮</button></div></div>
+<p class="muted" style="font-size:13px;text-align:center;margin-top:18px">다른 Persona를 만들어 대화 상대를 바꿔 볼 수 있어요.</p>
+</div>
+<div class="footer"><button type="button" class="primary" style="margin-left:0;width:100%">＋ 새 Persona 만들기</button></div>
+<div class="menu"><div>상세 설정</div><div>외형 사진</div><div>복제</div><div class="off">삭제 · 마지막 Persona</div></div>
+</div>
+<div class="caption">Persona 1개 · 삭제 비활성</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona</div></div></div>
+<div class="center"><div><div class="title" style="margin-bottom:6px">Persona 목록을 불러오지 못했어</div><div class="muted" style="font-size:13px;margin-bottom:14px">잠시 뒤 다시 시도해줘.</div><button type="button" class="primary">다시 시도</button></div></div>
+</div>
+<div class="caption">Error · 읽기 실패 또는 Persona 작업 중</div>
+</div>
+</div>
+<p class="note">마지막 Persona의 삭제 항목은 메뉴에 보이되 비활성이고 "마지막 Persona"라고 적는다. 다른 Persona 작업(삭제 정리·복원)이 진행 중이라 목록을 읽을 수 없으면 Error 상태를 쓴다. 빈 목록 상태는 없다(Persona는 항상 1개 이상).</p>
+</section>
 
-  <section class="stage" id="references" hidden>
-    <div class="phone">
-      <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">외형 reference</div><div class="sub">노말=원본 · 언리밋=추출 텍스트</div></div></div>
-      <div class="content">
-        <div class="ref-grid">
-          <div class="ref"><div><strong>얼굴 참조 *</strong><p class="muted">reference 기능을 쓸 때 필수. 한 명의 얼굴이 선명한 사진 권장.</p><div class="thumb">FACE</div></div><div class="actions"><button class="primary">사진 선택</button></div></div>
-          <div class="ref"><div><strong>체형 참조</strong><p class="muted">선택. 상반신 이상 권장, 전신이면 가장 좋음.</p><div class="thumb">BODY</div></div><div class="actions"><button>사진 선택</button></div></div>
-        </div>
-        <div class="status"><strong>노말 모드</strong><br>FACE를 첫 번째 reference로, BODY가 있으면 두 번째 reference로 사용합니다.</div>
-        <div class="status"><strong>언리밋 모드</strong><br>원본 사진은 생성 요청에 보내지 않고, 등록할 때 추출한 외형 텍스트만 사용합니다.</div>
-        <p class="muted">BODY는 FACE 없이 단독 등록할 수 없다. FACE와 BODY는 서로 다른 원본 인물이어도 된다.</p>
-        <div class="footer"><button>reference 사용 안 함</button><button class="primary">저장 및 분석</button></div>
-      </div>
-    </div>
-  </section>
+<section class="stage" id="builder1" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">✕</button><div class="grow"><div class="title">새 Persona</div></div></div>
+<div class="stepper"><span class="dot on">1</span><b>기본 정보</b><span class="line"></span><span class="dot">2</span><span class="muted">외형 사진</span></div>
+<div class="content" style="padding-bottom:80px">
+<div class="field"><label>이름 *</label><div class="input">서연</div></div>
+<div class="field"><label>관계 설정 *</label><div class="input">같은 팀 동료</div>
+<div class="chips"><span class="chip">친구</span><span class="chip">연인</span><span class="chip on">동료</span><span class="chip">선후배</span><span class="chip">처음 만난 사이</span></div><div class="hint">칩은 입력란을 채우는 바로가기다. 직접 수정할 수 있다.</div></div>
+<div class="field"><label>직업 또는 역할 *</label><div class="input">마케터</div></div>
+<div class="field"><label>나이대 *</label>
+<div class="chips"><span class="chip">10대 후반</span><span class="chip">20대 초반</span><span class="chip on">20대 중반</span><span class="chip">20대 후반</span><span class="chip">30대</span><span class="chip">직접 입력</span></div></div>
+<div class="field"><label>기본 화법 *</label>
+<div class="chips"><span class="chip on">편한 반말</span><span class="chip">다정한 존댓말</span><span class="chip">장난스러운 반말</span><span class="chip">차분한 존댓말</span><span class="chip">직접 입력</span></div></div>
+<details class="more"><summary>더 적기 (선택)</summary><div class="field" style="margin-top:10px"><label>추가 배경</label><div class="input placeholder" style="min-height:64px">나중에 상세 설정에서 적어도 돼요</div></div><div class="field"><label>외형 설명</label><div class="input placeholder" style="min-height:52px">사진 대신 글로 적을 때</div></div></details>
+</div>
+<div class="footer"><button type="button">취소</button><button type="button" class="primary">다음</button></div>
+</div>
+<div class="caption">기본 정보 · 입력 완료</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">✕</button><div class="grow"><div class="title">새 Persona</div></div></div>
+<div class="stepper"><span class="dot on">1</span><b>기본 정보</b><span class="line"></span><span class="dot">2</span><span class="muted">외형 사진</span></div>
+<div class="content">
+<div class="field"><label>이름 *</label><div class="input">서연</div></div>
+<div class="field"><label>관계 설정 *</label><div class="input error"></div><div class="errtext">관계 설정을 입력해줘.</div></div>
+<div class="field"><label>직업 또는 역할 *</label><div class="input error"></div><div class="errtext">직업이나 역할을 입력해줘.</div></div>
+<div class="field"><label>나이대 *</label><div class="chips"><span class="chip on">20대 중반</span></div></div>
+<div class="field"><label>기본 화법 *</label><div class="chips"><span class="chip on">편한 반말</span></div></div>
+</div>
+<div class="footer"><button type="button">취소</button><button type="button" class="primary">다음</button></div>
+</div>
+<div class="caption">기본 정보 · 검증 오류 ("다음"을 눌렀을 때)</div>
+</div>
+</div>
+<p class="note">필수 5개는 Persona 모델의 필수 필드(이름·나이대·직업 또는 역할·관계 설정·기본 화법)다. 나이대와 기본 화법은 칩 하나를 고르면 끝나고 "직접 입력"을 고르면 입력란이 열린다. 칩의 기본 선택은 없다. 추가 배경·외형 설명은 접힌 "더 적기"에만 있고, 성향 slider·긴 서사는 이 화면에 없다. "다음"을 누를 때만 검증하며 오류 문구는 필드 아래에 둔다. 글자 수 상한은 기존 편집 화면과 같다.</p>
+</section>
 
-  <section class="stage" id="analysis" hidden>
-    <div class="phone">
-      <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">외형 분석 상태</div><div class="sub">reference 저장 후 자동 분석</div></div></div>
-      <div class="content">
-        <div class="card"><div class="row"><div class="avatar">F</div><div class="grow"><div class="title">얼굴 참조</div><div class="sub">얼굴 특징 텍스트 추출 완료</div><span class="badge">노말 준비</span><span class="badge">언리밋 준비</span></div></div></div>
-        <div class="card"><div class="row"><div class="avatar">B</div><div class="grow"><div class="title">체형 참조</div><div class="sub">네트워크 문제로 분석 대기</div><span class="badge">노말 준비</span><span class="badge">분석 필요</span></div></div><div class="actions"><button class="primary">다시 분석</button><button>사진 교체</button></div></div>
-        <div class="status"><strong>중요</strong><br>분석 실패 때문에 이미 저장된 정상 reference를 자동 삭제하지 않는다. BODY 분석 실패는 언리밋 생성을 막지 않는다.</div>
-        <div class="status"><strong>FACE 분석이 준비되지 않은 경우</strong><br>직접 입력한 외형 설명이 있으면 fallback. 둘 다 없으면 언리밋 이미지/영상 생성 시 “외형 분석 다시 시도” 안내.</div>
-      </div>
-    </div>
-  </section>
+<section class="stage" id="builder2" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">새 Persona</div></div></div>
+<div class="stepper"><span class="dot">✓</span><span class="muted">기본 정보</span><span class="line"></span><span class="dot on">2</span><b>외형 사진</b></div>
+<div class="content">
+<p class="muted" style="font-size:13px">사진 없이도 만들 수 있어요. 이미지·영상 생성에서 외형을 맞출 때 써요.</p>
+<div class="slot"><div class="row"><div class="thumb">＋</div><div class="grow"><div class="title">프로필 사진</div><div class="sub">목록과 채팅 상단에 보이는 사진</div></div><button type="button">선택</button></div></div>
+<div class="slot"><div class="row"><div class="thumb">＋</div><div class="grow"><div class="title">얼굴 사진</div><div class="sub">한 명의 얼굴이 선명한 사진</div></div><button type="button" class="primary">선택</button></div></div>
+<div class="slot disabled"><div class="row"><div class="thumb">＋</div><div class="grow"><div class="title">체형 사진</div><div class="sub">얼굴 사진을 먼저 골라줘</div></div><button type="button" disabled>선택</button></div></div>
+</div>
+<div class="footer"><button type="button">건너뛰기</button><button type="button" class="primary">만들고 대화 시작</button></div>
+</div>
+<div class="caption">외형 사진 · 비어 있음 (체형 비활성)</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">새 Persona</div></div></div>
+<div class="stepper"><span class="dot">✓</span><span class="muted">기본 정보</span><span class="line"></span><span class="dot on">2</span><b>외형 사진</b></div>
+<div class="content">
+<div class="slot"><div class="row"><div class="thumb filled">P</div><div class="grow"><div class="title">프로필 사진</div><div class="sub">선택됨</div></div><button type="button">변경</button></div></div>
+<div class="slot"><div class="row"><div class="thumb filled">F</div><div class="grow"><div class="title">얼굴 사진</div><div class="sub">선택됨 · 만들 때 분석해요</div></div><button type="button">변경</button><button type="button">지우기</button></div></div>
+<div class="slot"><div class="row"><div class="thumb filled">B</div><div class="grow"><div class="title">체형 사진</div><div class="sub">선택됨 · 상반신 이상, 전신이면 가장 좋아요</div></div><button type="button">변경</button><button type="button">지우기</button></div></div>
+</div>
+<div class="footer"><button type="button">건너뛰기</button><button type="button" class="primary">만들고 대화 시작</button></div>
+</div>
+<div class="caption">외형 사진 · 선택 후 (아직 저장 전)</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">새 Persona</div></div></div>
+<div class="stepper"><span class="dot">✓</span><span class="muted">기본 정보</span><span class="line"></span><span class="dot on">2</span><b>외형 사진</b></div>
+<div class="content">
+<div class="slot"><div class="row"><div class="thumb filled">F</div><div class="grow"><div class="title">얼굴 사진</div><div class="sub">선택됨</div></div></div></div>
+<div class="slot"><div class="row"><div class="thumb filled">B</div><div class="grow"><div class="title">체형 사진</div><div class="sub">선택됨</div></div></div></div>
+</div>
+<div class="scrim"><div class="dialog"><div class="title" style="margin-bottom:6px">얼굴 사진을 지울까?</div><div style="font-size:13px">얼굴 사진을 지우면 체형 사진도 함께 지워져요.</div><div class="actions" style="margin-top:14px"><button type="button">취소</button><button type="button" class="danger">지우기</button></div></div></div>
+</div>
+<div class="caption">얼굴 사진 지우기 확인</div>
+</div>
+</div>
+<div class="pair" style="margin-top:24px">
+<div>
+<div class="phone">
+<div class="appbar"><div class="avatar">서</div><div class="grow"><div class="title">서연 <span style="font-weight:400">▾</span></div><div class="sub">탭해서 Persona 전환</div></div><button type="button">갤러리</button><button type="button">설정</button></div>
+<div class="center"><div class="muted">기존 빈 대화 화면</div></div>
+<div class="snack"><span>서연을 만들었어. 외형 사진을 분석하고 있어.</span></div>
+</div>
+<div class="caption">만들고 대화 시작 직후 · 분석은 뒤에서 진행</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><div class="avatar">서</div><div class="grow"><div class="title">서연 <span style="font-weight:400">▾</span></div><div class="sub">탭해서 Persona 전환</div></div><button type="button">갤러리</button><button type="button">설정</button></div>
+<div class="center"><div class="muted">기존 빈 대화 화면</div></div>
+<div class="snack"><span>얼굴 사진은 쓸 수 없어 저장하지 않았어. 외형 사진에서 다른 사진을 골라줘.</span></div>
+</div>
+<div class="caption">사진 등록이 명시적으로 거절된 경우</div>
+</div>
+</div>
+<table class="spec">
+<tr><th>규칙</th><th>내용</th></tr>
+<tr><td>Persona 생성 시점</td><td>"만들고 대화 시작" 또는 "건너뛰기"를 누를 때 1단계 정보로 Persona를 만들고, 바로 그 Persona로 전환해 Chat으로 간다. 2단계에서 고른 사진은 생성 직후 그 Persona에 등록하고 분석을 시작한다. 사진을 고르는 순간에는 저장하지 않는다.</td></tr>
+<tr><td>체형 조건</td><td>얼굴 사진을 고르지 않으면 체형 슬롯은 비활성이다. 고른 얼굴 사진을 지우면 확인 후 체형 사진도 함께 비운다.</td></tr>
+<tr><td>분석 focus</td><td>얼굴 사진은 얼굴 기준, 체형 사진은 체형 기준으로 분석한다.</td></tr>
+<tr><td>분석 결과 알림</td><td>Chat 전환 뒤 snackbar 한 번으로만 알린다. 분석 대기·분석 실패는 Library 배지로 확인하고, 다시 분석·사진 교체·체형 사진 추가는 Library ⋮ → "외형 사진" 화면에서 한다.</td></tr>
+<tr><td>등록 거절</td><td>새 등록이 명시적으로 거절되면 그 사진은 저장되지 않는다. Persona 생성은 취소하지 않는다.</td></tr>
+<tr><td>뒤로</td><td>2단계의 ←는 입력값을 유지한 채 1단계로 간다. 1단계의 ✕와 "취소"는 아무것도 만들지 않고 닫는다.</td></tr>
+</table>
+</section>
 
-  <section class="stage" id="switched" hidden>
-    <div class="phone">
-      <div class="appbar"><div class="avatar">서</div><div class="grow"><div class="title">서연</div><div class="sub">Persona Library 열기 ›</div></div><button type="button">⋮</button></div>
-      <div class="chat"><div class="bubble">전환 직후에는 서연 Persona의 대화와 외형 자산만 사용한다.</div><div class="bubble me">유란의 Memory, FACE/BODY reference, 외형 분석 텍스트는 섞이지 않는다.</div></div>
-    </div>
-  </section>
+<section class="stage" id="photos" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">외형 사진</div><div class="sub">서연</div></div></div>
+<div class="content">
+<div class="slot"><div class="row"><div class="thumb filled">P</div><div class="grow"><div class="title">프로필 사진</div><div class="sub">등록됨</div></div><button type="button">변경</button></div></div>
+<div class="slot"><div class="row"><div class="thumb filled">F</div><div class="grow"><div class="title">얼굴 사진</div><span class="badge">외형 준비됨</span></div></div><div class="actions"><button type="button">사진 바꾸기</button><button type="button">지우기</button></div></div>
+<div class="slot"><div class="row"><div class="thumb filled">B</div><div class="grow"><div class="title">체형 사진</div><span class="badge">분석 실패</span><div class="sub">상반신 이상, 전신이면 가장 좋아요</div></div></div><div class="actions"><button type="button" class="primary">다시 분석</button><button type="button">사진 바꾸기</button><button type="button">지우기</button></div></div>
+</div>
+</div>
+<div class="caption">외형 사진 · 준비됨 / 분석 실패</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">외형 사진</div><div class="sub">도윤</div></div></div>
+<div class="content">
+<div class="slot"><div class="row"><div class="thumb">＋</div><div class="grow"><div class="title">프로필 사진</div><div class="sub">없음</div></div><button type="button">선택</button></div></div>
+<div class="slot"><div class="row"><div class="thumb filled">F</div><div class="grow"><div class="title">얼굴 사진</div><span class="badge">분석 중…</span></div></div></div>
+<div class="slot"><div class="row"><div class="thumb filled">B</div><div class="grow"><div class="title">체형 사진</div><span class="badge">분석 대기</span><div class="sub">연결 문제나 API key 문제로 분석을 마치지 못했어요</div></div></div><div class="actions"><button type="button" class="primary">다시 분석</button><button type="button">사진 바꾸기</button><button type="button">지우기</button></div></div>
+</div>
+</div>
+<div class="caption">외형 사진 · 분석 중 / 분석 대기</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">외형 사진</div><div class="sub">하린</div></div></div>
+<div class="content">
+<div class="slot"><div class="row"><div class="thumb filled">F</div><div class="grow"><div class="title">얼굴 사진</div><span class="badge">외형 준비됨</span></div></div></div>
+<div class="slot"><div class="row"><div class="thumb">＋</div><div class="grow"><div class="title">체형 사진</div><div class="sub">선택 · 상반신 이상, 전신이면 가장 좋아요</div></div><button type="button">선택</button></div></div>
+</div>
+<div class="scrim"><div class="dialog"><div class="title" style="margin-bottom:6px">얼굴 사진을 지울까?</div><div style="font-size:13px">얼굴 사진을 지우면 체형 사진과 두 사진의 외형 분석도 함께 지워져요.</div><div class="actions" style="margin-top:14px"><button type="button">취소</button><button type="button" class="danger">지우기</button></div></div></div>
+</div>
+<div class="caption">얼굴 사진 지우기 확인 (체형·분석 함께 삭제)</div>
+</div>
+</div>
+<table class="spec">
+<tr><th>규칙</th><th>내용</th></tr>
+<tr><td>진입</td><td>Library ⋮ → 외형 사진. 대화 중 Persona를 바꾸지 않고 선택한 Persona의 사진만 다룬다.</td></tr>
+<tr><td>슬롯</td><td>만들기 2단계와 같은 프로필·얼굴·체형 세 슬롯이다. 얼굴 사진이 없으면 체형 슬롯은 비활성이다.</td></tr>
+<tr><td>사진 선택·바꾸기</td><td>고르는 즉시 그 슬롯에 등록하고 분석을 시작한다. 분석 중에는 그 슬롯의 버튼을 비활성화한다. 명시적으로 거절되면 새 등록은 저장되지 않고, 바꾸기였다면 기존 사진과 분석을 유지한다. 둘 다 "이 사진은 쓸 수 없어요. 다른 사진을 골라줘."를 보인다.</td></tr>
+<tr><td>다시 분석</td><td>분석 대기·분석 실패일 때만 보인다. 얼굴 사진은 얼굴 기준, 체형 사진은 체형 기준으로 다시 분석한다. 다시 분석이 명시적으로 거절되면 그 사진은 지워지고(얼굴이면 체형도 함께) "이 사진은 쓸 수 없어 지웠어요."를 보인다.</td></tr>
+<tr><td>지우기</td><td>체형 사진은 확인 없이 지운다. 얼굴 사진은 확인 dialog 뒤 체형 사진과 두 분석까지 지운다.</td></tr>
+<tr><td>상태 배지</td><td>분석 중… / 외형 준비됨(READY) / 분석 대기(PENDING·NOT_ANALYZED) / 분석 실패(FAILED). 실패·대기에서도 원본은 남는다.</td></tr>
+</table>
+</section>
 
-  <p class="note"><strong>정보 계층:</strong> Core Identity와 관계 설정이 먼저다. 외형 reference는 별도 하위 화면으로 분리해 Persona 생성 폼이 과도하게 길어지지 않게 한다. reference 기능을 켠 경우 FACE가 primary 필수 자산이고 BODY는 secondary 선택 자산이다. 사용자는 내부 상태명 대신 “노말 준비 / 언리밋 준비 / 분석 필요”만 본다. Relationship, Mood, 대화, Memory는 Persona Definition 편집 항목으로 노출하지 않는다.</p>
+<section class="stage" id="duplicate" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona</div><div class="sub">4개</div></div></div>
+<div class="content">
+<div class="card active"><div class="row"><div class="avatar">하</div><div class="grow"><div class="title">하린</div><div class="sub">오래 알고 지낸 친구 · 카페 사장</div><span class="badge strong">대화 중</span><span class="badge">외형 준비됨</span></div><button type="button">⋮</button></div></div>
+<div class="card"><div class="row"><div class="avatar">서</div><div class="grow"><div class="title">서연</div><div class="sub">같은 팀 동료 · 마케터</div></div><button type="button">⋮</button></div><div class="actions"><button type="button" class="primary">이 Persona로 대화</button></div></div>
+<div class="card"><div class="row"><div class="avatar">도</div><div class="grow"><div class="title">도윤</div><div class="sub">동네 형 · 대학원생</div></div><button type="button">⋮</button></div><div class="actions"><button type="button" class="primary">이 Persona로 대화</button></div></div>
+<div class="card"><div class="row"><div class="avatar">하</div><div class="grow"><div class="title">하린 (사본)</div><div class="sub">오래 알고 지낸 친구 · 카페 사장</div><span class="badge">외형 준비됨</span></div><button type="button">⋮</button></div><div class="actions"><button type="button" class="primary">이 Persona로 대화</button></div></div>
+</div>
+<div class="snack"><span>하린을 복제했어. 대화와 기억은 비어 있어.</span><b>대화하기</b></div>
+</div>
+<div class="caption">복제 직후 · 목록 끝에 사본 추가</div>
+</div>
+</div>
+<p class="note">복제는 확인 없이 바로 실행한다. 사본은 새 Persona이며 대화 중 Persona는 바뀌지 않는다. 정체성·성향·외형 설명·프로필/얼굴/체형 사진·외형 준비됨 분석은 복사하고, 대화·기억·관계·기분은 비어 있는 상태로 시작한다. 원본 분석이 분석 대기·분석 실패였던 사진은 복사 후 분석 대기로 시작한다. 이름 뒤 "(사본)"은 기존 이름 길이 상한 안에서 붙인다. snackbar의 "대화하기"는 사본으로 전환한다.</p>
+</section>
+
+<section class="stage" id="delete" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona</div><div class="sub">3개</div></div></div>
+<div class="content"><div class="card"><div class="title">서연</div></div></div>
+<div class="scrim"><div class="dialog"><div class="title" style="margin-bottom:6px">서연을 삭제할까?</div><div style="font-size:13px">이 Persona와 함께 아래 데이터가 지워지고 되돌릴 수 없어요.</div><ul><li>대화 기록과 기억</li><li>관계·기분 상태</li><li>프로필·얼굴·체형 사진과 외형 분석</li><li>이 Persona의 대화에서 만든 이미지·영상</li></ul><div class="muted" style="font-size:12px">다른 Persona의 데이터는 그대로예요.</div><div class="actions" style="margin-top:14px"><button type="button">취소</button><button type="button" class="danger">삭제</button></div></div></div>
+</div>
+<div class="caption">삭제 확인 · 대화 중이 아닌 Persona</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona</div><div class="sub">3개</div></div></div>
+<div class="content"><div class="card active"><div class="title">하린</div></div></div>
+<div class="scrim"><div class="dialog"><div class="title" style="margin-bottom:6px">하린을 삭제할까?</div><div style="font-size:13px">지금 대화 중인 Persona예요. 삭제하면 서연으로 대화가 바뀌어요.</div><ul><li>대화 기록과 기억</li><li>관계·기분 상태</li><li>프로필·얼굴·체형 사진과 외형 분석</li><li>이 Persona의 대화에서 만든 이미지·영상</li></ul><div class="actions" style="margin-top:14px"><button type="button">취소</button><button type="button" class="danger">삭제</button></div></div></div>
+</div>
+<div class="caption">삭제 확인 · 대화 중인 Persona (fallback 안내)</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona</div><div class="sub">2개</div></div></div>
+<div class="content">
+<div class="card active"><div class="row"><div class="avatar">서</div><div class="grow"><div class="title">서연</div><div class="sub">같은 팀 동료 · 마케터</div><span class="badge strong">대화 중</span></div><button type="button">⋮</button></div></div>
+<div class="card"><div class="row"><div class="avatar">도</div><div class="grow"><div class="title">도윤</div><div class="sub">동네 형 · 대학원생</div></div><button type="button">⋮</button></div><div class="actions"><button type="button" class="primary">이 Persona로 대화</button></div></div>
+</div>
+<div class="snack"><span>하린을 삭제했어.</span></div>
+</div>
+<div class="caption">대화 중 Persona 삭제 후 · fallback 표시</div>
+</div>
+</div>
+<p class="note">대화 중인 Persona를 지우면 앱이 정한 다음 Persona(fallback)로 바뀌며, 확인 문구에 그 이름을 미리 보인다. 삭제가 진행되는 동안 dialog의 버튼은 비활성이고, 실패하면 dialog를 닫고 "삭제하지 못했어. 다시 시도해줘."를 snackbar로 보인다. 마지막 Persona는 메뉴에서 삭제가 비활성이라 이 dialog가 열리지 않는다.</p>
+</section>
+
+<section class="stage" id="switched" hidden>
+<div class="pair">
+<div>
+<div class="phone">
+<div class="appbar"><div class="avatar">서</div><div class="grow"><div class="title">서연 <span style="font-weight:400">▾</span></div><div class="sub">탭해서 Persona 전환</div></div><button type="button">갤러리</button><button type="button">설정</button></div>
+<div class="chat"><div class="bubble">전환 직후 Chat은 서연의 대화·사진·상태만 보인다.</div><div class="bubble me">하린의 대화와 기억, 외형 사진은 섞이지 않는다.</div></div>
+</div>
+<div class="caption">전환 후 · 기존 대화가 있는 Persona</div>
+</div>
+<div>
+<div class="phone">
+<div class="appbar"><div class="avatar">도</div><div class="grow"><div class="title">도윤 <span style="font-weight:400">▾</span></div><div class="sub">탭해서 Persona 전환</div></div><button type="button">갤러리</button><button type="button">설정</button></div>
+<div class="center"><div class="muted">기존 빈 대화 화면을 그대로 쓴다.</div></div>
+</div>
+<div class="caption">전환 후 · 대화가 없는 Persona</div>
+</div>
+</div>
+</section>
+
+<div class="note">
+<strong>정보 계층과 범위</strong>
+<ul>
+<li>진입은 Chat 상단 Persona 영역 하나다. 설정 화면의 기존 Persona 편집 진입점은 그대로 둔다.</li>
+<li>Quick Builder는 대화를 시작하기 위한 Seed만 받는다. 성향 slider, 긴 서사, 자연어 조정, Tuning/Evolution/Retcon은 #105, import/export/share는 #101이다.</li>
+<li>사용자 화면에는 모드나 요금제 개념을 보이지 않는다. 외형 상태는 사진 분석 상태만 단순화해 보인다.</li>
+<li>예시 이름과 문구는 모두 합성 값이다.</li>
+</ul>
+</div>
 </main>
 <script>
-  const tabs = document.querySelectorAll('[role="tab"]');
-  const stages = document.querySelectorAll('.stage');
-  tabs.forEach(tab => tab.addEventListener('click', () => {
-    tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
-    stages.forEach(stage => stage.hidden = stage.id !== tab.dataset.target);
-  }));
+const tabs = document.querySelectorAll('[role="tab"]');
+const stages = document.querySelectorAll('.stage');
+tabs.forEach(tab => tab.addEventListener('click', () => {
+  tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
+  stages.forEach(stage => stage.hidden = stage.id !== tab.dataset.target);
+}));
 </script>
 </body>
 </html>
