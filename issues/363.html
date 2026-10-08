@@ -21,7 +21,6 @@
     .statusbar { height: 28px; font-size: 11px; padding: 6px 18px; opacity: .55; display: flex; justify-content: space-between; }
     .screen { flex: 1; display: grid; place-items: center; padding: 28px; text-align: center; }
     .tv { font-size: 15px; line-height: 1.6; white-space: pre-line; }
-    .tv .code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 14px; }
     .launcher { flex: 1; display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; padding: 40px 22px; align-content: start; }
     .icon { aspect-ratio: 1; border-radius: 16px; border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); display: grid; place-items: center; font-size: 11px; }
     .icon.app { border-color: CanvasText; font-weight: 700; }
@@ -108,7 +107,7 @@
         <h3>배치와 정보 계층</h3>
         <ul>
           <li>placeholder와 같은 전체 화면 <code>TextView</code>, 가운데 정렬, 앱 기본 글자 크기. 제목·아이콘·버튼 없음.</li>
-          <li>세 줄: ① 무엇이 안 됐는지 ② 저장값을 바꾸지 않았다는 사실 ③ 오류 코드. 줄 순서 고정.</li>
+          <li>세 줄: ① 무엇이 안 됐는지 ② 저장값을 바꾸지 않았다는 사실 ③ 오류 코드. 줄 순서 고정. 세 줄 모두 같은 글꼴·크기(별도 강조 없음).</li>
           <li>placeholder와의 차이: 문구가 세 줄이고 마지막 줄에 오류 코드가 있다. 시간이 지나도 바뀌지 않는다(placeholder는 게시되면 채팅으로 넘어간다).</li>
           <li>안내 상태에서는 Android 13+ 알림 권한 요청을 띄우지 않는다. 정상 상태(placeholder·채팅)는 지금처럼 요청한다.</li>
           <li>문구에 경로, Persona 이름·ID, 예외 내용, 대화 내용을 넣지 않는다. 오류 코드는 아래 다섯 값만.</li>
