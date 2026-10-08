@@ -3,95 +3,337 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Issue #101 — Persona Import Export Share Visual Spec</title>
+  <title>Issue #101 — Persona 가져오기·내보내기·공유 Visual Spec</title>
   <style>
     :root { color-scheme: light dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
     * { box-sizing: border-box; }
     body { margin: 0; padding: 32px 20px 72px; background: Canvas; color: CanvasText; }
     main { max-width: 1100px; margin: 0 auto; }
-    .meta,.muted { opacity:.65; }
-    .tabs { display:flex; flex-wrap:wrap; gap:8px; margin:20px 0; }
-    button { border:1px solid color-mix(in srgb, CanvasText 18%, Canvas); background:Canvas; color:CanvasText; border-radius:10px; padding:9px 13px; cursor:pointer; }
-    button[aria-selected="true"],.primary { border-color:CanvasText; font-weight:700; }
-    .stage { border:1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius:18px; padding:24px; min-height:700px; }
-    .phone { width:min(420px,100%); min-height:740px; margin:auto; border:1px solid color-mix(in srgb, CanvasText 25%, Canvas); border-radius:28px; overflow:hidden; }
-    .appbar { min-height:64px; padding:10px 16px; display:flex; align-items:center; gap:10px; border-bottom:1px solid color-mix(in srgb, CanvasText 12%, Canvas); }
-    .grow { flex:1; }.title { font-weight:750; }.sub { font-size:12px; opacity:.62; }
-    .content { padding:16px; }.card,.panel { border:1px solid color-mix(in srgb, CanvasText 15%, Canvas); border-radius:16px; padding:14px; margin-bottom:12px; }
-    .row { display:flex; gap:10px; align-items:center; }.avatar { width:42px;height:42px;border-radius:50%;display:grid;place-items:center;border:1px solid color-mix(in srgb, CanvasText 20%, Canvas);font-weight:700; }
-    .actions { display:flex; gap:8px; margin-top:12px; flex-wrap:wrap; }.actions .primary { margin-left:auto; }
-    .check { display:flex; align-items:flex-start; gap:10px; padding:12px 0; border-bottom:1px solid color-mix(in srgb, CanvasText 10%, Canvas); }
-    .box { width:18px;height:18px;border:1px solid CanvasText;border-radius:4px;flex:0 0 auto;margin-top:2px; }.box.on::after { content:'✓';display:grid;place-items:center;font-size:13px; }
-    .warning { border-style:dashed; }.file { padding:10px;border-radius:10px;border:1px solid color-mix(in srgb, CanvasText 14%, Canvas);font-family:ui-monospace,monospace;font-size:12px; }
-    .badge { display:inline-block;margin:5px 5px 0 0;padding:3px 7px;border:1px solid color-mix(in srgb, CanvasText 16%, Canvas);border-radius:999px;font-size:11px; }
-    .center { min-height:560px;display:grid;place-items:center;text-align:center;padding:26px; }
-    [hidden]{display:none!important;}
+    header { margin-bottom: 20px; }
+    .meta, .muted { opacity: .65; }
+    .tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 20px 0; }
+    button { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); background: Canvas; color: CanvasText; border-radius: 10px; padding: 8px 12px; cursor: pointer; font: inherit; font-size: 14px; }
+    button[aria-selected="true"], .primary { border-color: CanvasText; font-weight: 700; }
+    button:disabled, .off { opacity: .38; }
+    .stage { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 18px; padding: 24px; }
+    .phones { display: flex; flex-wrap: wrap; gap: 24px; justify-content: center; }
+    .phone { position: relative; width: min(390px, 100%); min-height: 720px; border: 1px solid color-mix(in srgb, CanvasText 25%, Canvas); border-radius: 28px; overflow: hidden; display: flex; flex-direction: column; }
+    .cap { text-align: center; font-size: 13px; opacity: .7; margin: 8px 0 0; }
+    .appbar { min-height: 64px; padding: 10px 14px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid color-mix(in srgb, CanvasText 12%, Canvas); }
+    .grow { flex: 1; min-width: 0; }
+    .title { font-weight: 700; }
+    .sub { font-size: 12px; opacity: .62; }
+    .content { padding: 14px; flex: 1; }
+    .card, .panel { border: 1px solid color-mix(in srgb, CanvasText 15%, Canvas); border-radius: 16px; padding: 13px; margin-bottom: 10px; }
+    .card.active { border-color: CanvasText; }
+    .row { display: flex; gap: 10px; align-items: center; }
+    .avatar { width: 42px; height: 42px; border-radius: 50%; display: grid; place-items: center; border: 1px solid color-mix(in srgb, CanvasText 20%, Canvas); font-weight: 700; flex: 0 0 auto; }
+    .badge { display: inline-block; margin: 5px 5px 0 0; padding: 2px 7px; border: 1px solid color-mix(in srgb, CanvasText 16%, Canvas); border-radius: 999px; font-size: 11px; }
+    .badge.strong { border-color: CanvasText; font-weight: 700; }
+    .actions { display: flex; gap: 8px; margin-top: 10px; flex-wrap: wrap; }
+    .actions .primary { margin-left: auto; }
+    .bottom { padding: 12px 14px; border-top: 1px solid color-mix(in srgb, CanvasText 12%, Canvas); display: flex; gap: 8px; }
+    .bottom .primary { flex: 1; }
+    .menu { position: absolute; right: 18px; top: 150px; width: 180px; background: Canvas; border: 1px solid color-mix(in srgb, CanvasText 20%, Canvas); border-radius: 12px; padding: 6px; box-shadow: 0 6px 20px color-mix(in srgb, CanvasText 18%, transparent); }
+    .menu div { padding: 9px 10px; font-size: 14px; border-radius: 8px; }
+    .menu .new { border: 1px dashed CanvasText; }
+    .sect { font-size: 12px; font-weight: 700; opacity: .7; margin: 14px 2px 4px; }
+    .check { display: flex; align-items: flex-start; gap: 10px; padding: 11px 2px; border-bottom: 1px solid color-mix(in srgb, CanvasText 10%, Canvas); }
+    .box { width: 20px; height: 20px; border: 1.5px solid CanvasText; border-radius: 5px; flex: 0 0 auto; margin-top: 1px; display: grid; place-items: center; font-size: 13px; }
+    .box.on::after { content: '✓'; }
+    .check.off .box { border-style: dotted; }
+    .warning { border-style: dashed; }
+    .file { padding: 9px 10px; border-radius: 10px; border: 1px solid color-mix(in srgb, CanvasText 14%, Canvas); font-family: ui-monospace, monospace; font-size: 12px; margin: 10px 0; }
+    .center { flex: 1; display: grid; place-items: center; text-align: center; padding: 26px; }
+    .snack { position: absolute; left: 12px; right: 12px; bottom: 82px; padding: 12px 14px; border-radius: 10px; background: CanvasText; color: Canvas; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+    .snack b { margin-left: auto; }
+    .note { font-size: 13px; line-height: 1.55; }
+    .spin { width: 28px; height: 28px; border-radius: 50%; border: 3px solid color-mix(in srgb, CanvasText 20%, Canvas); border-top-color: CanvasText; margin: 0 auto 12px; }
+    ul.flat { margin: 6px 0 0; padding-left: 18px; font-size: 13px; line-height: 1.6; }
+    .spec { max-width: 820px; margin: 18px auto 0; font-size: 14px; line-height: 1.6; }
+    [hidden] { display: none !important; }
   </style>
 </head>
 <body>
 <main>
-  <div class="meta">seok-jun/my-honey-chat · Issue #101</div>
-  <h1>.mhpersona 가져오기 · 내보내기 · 공유</h1>
-  <p>공유 대상은 Persona Definition과 사용자가 선택한 외형 자산이다. 개인 Runtime 데이터는 공유하지 않는다.</p>
+  <header>
+    <div class="meta">seok-jun/my-honey-chat · Issue #101 · [Persona][Share] .mhpersona import·export·Android 공유 패키지</div>
+    <h1>Persona 가져오기 · 내보내기 · 공유</h1>
+    <p>대상 화면: Persona Library(목록·⋮ 메뉴), 내보내기 확인 화면, 가져오기 확인 화면, 가져오기 오류 화면. 공유 대상은 Persona 정의와 사용자가 고른 외형 자산뿐이며 대화·기억·관계·기분 같은 개인 기록은 담지 않는다.</p>
+    <p class="muted">이 HTML은 화면 배치·정보 계층·UI 상태의 구현 기준이다. 기능 동작·검증·오류 정책은 Issue 본문을 따른다. 인물 이름은 합성 예시다.</p>
+  </header>
 
-  <div class="tabs" role="tablist">
-    <button role="tab" aria-selected="true" data-target="library">Library Actions</button>
-    <button role="tab" aria-selected="false" data-target="export">Export / Share</button>
-    <button role="tab" aria-selected="false" data-target="import">Import Preview</button>
-    <button role="tab" aria-selected="false" data-target="error">Invalid Package</button>
+  <div class="tabs" role="tablist" aria-label="Visual spec state">
+    <button type="button" role="tab" aria-selected="true" data-target="current">Current</button>
+    <button type="button" role="tab" aria-selected="false" data-target="library">Library</button>
+    <button type="button" role="tab" aria-selected="false" data-target="export">내보내기</button>
+    <button type="button" role="tab" aria-selected="false" data-target="export-states">내보내기 상태</button>
+    <button type="button" role="tab" aria-selected="false" data-target="import">가져오기 확인</button>
+    <button type="button" role="tab" aria-selected="false" data-target="import-states">가져오기 상태</button>
+    <button type="button" role="tab" aria-selected="false" data-target="error">가져오기 오류</button>
   </div>
 
-  <section id="library" class="stage">
-    <div class="phone">
-      <div class="appbar"><button>←</button><div class="grow"><div class="title">Persona Library</div><div class="sub">보유 Persona</div></div><button class="primary">가져오기</button></div>
-      <div class="content">
-        <div class="card"><div class="row"><div class="avatar">유</div><div class="grow"><div class="title">유란</div><div class="sub">현재 사용 중</div><span class="badge">FACE</span><span class="badge">BODY</span><span class="badge">외형 텍스트</span></div><button>⋮</button></div><div class="actions"><button>편집</button><button>내보내기</button><button>공유</button></div></div>
-        <div class="panel muted">가져오기 → 시스템 파일 Picker. 내보내기 → 포함 데이터 확인 후 Save Picker. 공유 → 포함 데이터 확인 후 Android Sharesheet.</div>
+  <!-- Current -->
+  <section class="stage" id="current">
+    <div class="phones">
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona</div><div class="sub">2개</div></div></div>
+          <div class="content">
+            <div class="card active"><div class="row"><div class="avatar">하</div><div class="grow"><div class="title">하린</div><div class="sub">오래 알고 지낸 친구 · 카페 사장</div><span class="badge strong">대화 중</span><span class="badge">외형 준비됨</span></div><button type="button" aria-label="더보기">⋮</button></div></div>
+            <div class="card"><div class="row"><div class="avatar">서</div><div class="grow"><div class="title">서연</div><div class="sub">같은 팀 동료 · 마케터</div></div><button type="button" aria-label="더보기">⋮</button></div><div class="actions"><button type="button" class="primary">이 Persona로 대화</button></div></div>
+          </div>
+          <div class="menu"><div>상세 설정</div><div>외형 사진</div><div>복제</div><div>삭제</div></div>
+          <div class="bottom"><button type="button" class="primary">＋ 새 Persona 만들기</button></div>
+        </div>
+        <p class="cap">현재 · 가져오기/내보내기/공유 진입점 없음</p>
       </div>
     </div>
   </section>
 
-  <section id="export" class="stage" hidden>
-    <div class="phone">
-      <div class="appbar"><button>←</button><div class="grow"><div class="title">유란 내보내기</div><div class="sub">외부로 보낼 데이터를 확인하세요</div></div></div>
-      <div class="content">
-        <div class="panel"><div class="title">항상 포함</div><p class="muted">이름, 나이대, 역할, 관계 설정, 기본 화법, 추가 배경, 사용자가 직접 입력한 외형 설명, Tunable Persona</p></div>
-        <div class="check"><div class="box on"></div><div><div class="title">추출된 외형 텍스트 포함</div><div class="sub">기본값 ON · FACE/BODY 원본 없이도 언리밋 외형을 유지하는 파생 정보</div></div></div>
-        <div class="check"><div class="box on"></div><div><div class="title">프로필 이미지 포함</div><div class="sub">선택 해제 가능 · 생성 reference와는 별도</div></div></div>
-        <div class="check"><div class="box"></div><div><div class="title">FACE 원본 포함</div><div class="sub">기본값 OFF · 명시적으로 선택한 경우에만 공유</div></div></div>
-        <div class="check"><div class="box"></div><div><div class="title">BODY 원본 포함</div><div class="sub">기본값 OFF · FACE 원본 포함을 켠 경우에만 선택 가능</div></div></div>
-        <div class="panel warning"><div class="title">원본 reference 주의</div><p class="muted">FACE/BODY를 켜면 실제 이미지 파일이 패키지에 들어갑니다. BODY 원본은 FACE 원본 없이 단독으로 공유할 수 없습니다.</p></div>
-        <div class="panel warning"><div class="title">절대 포함되지 않는 데이터</div><p class="muted">대화, Memory, Relationship, 현재 Mood, 생성 미디어 기록, API key/token, 모델 호출 로그, 로컬 절대 경로</p></div>
-        <div class="file">yuran.mhpersona</div>
-        <div class="actions"><button>취소</button><button>파일로 저장</button><button class="primary">공유</button></div>
+  <!-- Library proposed -->
+  <section class="stage" id="library" hidden>
+    <div class="phones">
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona</div><div class="sub">2개</div></div><button type="button">가져오기</button></div>
+          <div class="content">
+            <div class="card active"><div class="row"><div class="avatar">하</div><div class="grow"><div class="title">하린</div><div class="sub">오래 알고 지낸 친구 · 카페 사장</div><span class="badge strong">대화 중</span><span class="badge">외형 준비됨</span></div><button type="button" aria-label="더보기">⋮</button></div></div>
+            <div class="card"><div class="row"><div class="avatar">서</div><div class="grow"><div class="title">서연</div><div class="sub">같은 팀 동료 · 마케터</div></div><button type="button" aria-label="더보기">⋮</button></div><div class="actions"><button type="button" class="primary">이 Persona로 대화</button></div></div>
+          </div>
+          <div class="menu"><div>상세 설정</div><div>외형 사진</div><div>복제</div><div class="new">내보내기·공유</div><div>삭제</div></div>
+          <div class="bottom"><button type="button" class="primary">＋ 새 Persona 만들기</button></div>
+        </div>
+        <p class="cap">상단 "가져오기" → 시스템 파일 선택 · ⋮ "내보내기·공유" → 내보내기 확인 화면</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona</div><div class="sub">처리 중…</div></div><button type="button" disabled>가져오기</button></div>
+          <div class="content">
+            <div class="card active"><div class="row"><div class="avatar">하</div><div class="grow"><div class="title">하린</div><div class="sub">오래 알고 지낸 친구 · 카페 사장</div><span class="badge">삭제 정리 중</span></div><button type="button" aria-label="더보기">⋮</button></div></div>
+          </div>
+          <div class="menu"><div>다시 삭제</div></div>
+          <div class="bottom"><button type="button" class="primary" disabled>＋ 새 Persona 만들기</button></div>
+        </div>
+        <p class="cap">처리 중에는 가져오기 비활성 · 삭제 정리 중 Persona 메뉴에는 내보내기·공유 없음</p>
       </div>
     </div>
   </section>
 
-  <section id="import" class="stage" hidden>
-    <div class="phone">
-      <div class="appbar"><button>←</button><div class="grow"><div class="title">Persona 가져오기</div><div class="sub">검증 완료 · schema v1</div></div></div>
-      <div class="content">
-        <div class="file">shared-character.mhpersona</div>
-        <div class="card"><div class="row"><div class="avatar">서</div><div class="grow"><div class="title">서연</div><div class="sub">20대 후반 · 직장 동료</div><span class="badge">외형 텍스트</span><span class="badge">FACE 포함</span><span class="badge">BODY 없음</span></div></div></div>
-        <div class="panel"><div class="title">가져온 외형 상태</div><p class="muted">추출 외형 텍스트가 있으면 언리밋 준비 상태로 가져올 수 있다. FACE/BODY 원본이 포함되면 노말 reference로 저장한다. 원본만 있고 추출 텍스트가 없으면 가져온 뒤 분석이 필요할 수 있다.</p></div>
-        <div class="panel"><div class="title">새 Persona로 추가됩니다</div><p class="muted">같은 이름이 있어도 덮어쓰지 않는다. 새 local ID를 만들고 Relationship/Mood는 초기값, 대화/Memory는 빈 상태로 시작한다.</p></div>
-        <div class="actions"><button>취소</button><button class="primary">가져오기</button></div>
+  <!-- Export default -->
+  <section class="stage" id="export" hidden>
+    <div class="phones">
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">하린 내보내기</div><div class="sub">밖으로 보낼 내용을 확인해 주세요</div></div></div>
+          <div class="content">
+            <div class="panel"><div class="title">항상 포함</div>
+              <div class="note muted">이름 · 나이대 · 직업 또는 역할 · 관계 설정 · 기본 화법 · 추가 배경 · 직접 입력한 외형 설명 · 나를 부르는 호칭 · 관계 시작 · 성격·가치관 · 좋아하는 것 · 싫어하는 것 · 대화 성향 9개</div>
+              <div class="sub" style="margin-top:6px">비어 있는 선택 항목은 넣지 않아요.</div>
+            </div>
+            <div class="sect">선택해서 포함</div>
+            <div class="check"><div class="box on"></div><div><div class="title">추출된 외형 텍스트</div><div class="sub">기본 포함 · 얼굴·체형 사진에서 뽑은 설명. 받는 쪽은 같은 사진 원본이 함께 있을 때만 이 설명을 가져와요.</div></div></div>
+            <div class="check"><div class="box"></div><div><div class="title">프로필 사진</div><div class="sub">기본 제외 · 목록과 채팅 상단에 보이는 사진</div></div></div>
+            <div class="check"><div class="box"></div><div><div class="title">얼굴 사진 원본</div><div class="sub">기본 제외 · 직접 켤 때만 보내요</div></div></div>
+            <div class="check off"><div class="box"></div><div><div class="title">체형 사진 원본</div><div class="sub">얼굴 사진 원본을 켜야 고를 수 있어요</div></div></div>
+            <div class="panel warning" style="margin-top:12px"><div class="title">넣지 않는 것</div><div class="note muted">대화, 기억, 관계, 지금 기분, 조정 기록, 만든 사진·영상 기록, API key, 모델 호출 기록, 기기 안 파일 위치</div></div>
+            <div class="file">하린.mhpersona</div>
+          </div>
+          <div class="bottom"><button type="button">파일로 저장</button><button type="button" class="primary">공유</button></div>
+        </div>
+        <p class="cap">기본 상태 · 외형 텍스트만 켜짐, 사진은 모두 꺼짐</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">하린 내보내기</div><div class="sub">밖으로 보낼 내용을 확인해 주세요</div></div></div>
+          <div class="content">
+            <div class="sect">선택해서 포함</div>
+            <div class="check"><div class="box on"></div><div><div class="title">추출된 외형 텍스트</div><div class="sub">기본 포함 · 얼굴·체형 사진에서 뽑은 설명</div></div></div>
+            <div class="check"><div class="box on"></div><div><div class="title">프로필 사진</div><div class="sub">목록과 채팅 상단에 보이는 사진</div></div></div>
+            <div class="check"><div class="box on"></div><div><div class="title">얼굴 사진 원본</div><div class="sub">직접 켤 때만 보내요</div></div></div>
+            <div class="check"><div class="box on"></div><div><div class="title">체형 사진 원본</div><div class="sub">얼굴 사진 원본과 함께만 보내요</div></div></div>
+            <div class="panel warning" style="margin-top:12px"><div class="title">실제 사진 파일이 들어가요</div><div class="note">켠 사진은 받는 사람이 그대로 볼 수 있어요. 사진 속 촬영 정보(기기·시각·위치 등)는 지운 사본을 넣고, 이 기기에 저장된 사진은 바꾸지 않아요. 체형 사진은 얼굴 사진 없이 보낼 수 없어요.</div></div>
+            <div class="file">하린.mhpersona</div>
+          </div>
+          <div class="bottom"><button type="button">파일로 저장</button><button type="button" class="primary">공유</button></div>
+        </div>
+        <p class="cap">사진을 하나라도 켜면 경고 표시 · 얼굴 원본을 끄면 체형 원본도 꺼지고 비활성</p>
+      </div>
+    </div>
+    <div class="spec">
+      <ul class="flat">
+        <li>"파일로 저장" → 시스템 저장 위치 선택. "공유" → Android 공유 시트. 두 action 모두 위 선택을 그대로 쓴다.</li>
+        <li>뒤로·저장 위치 선택 취소·공유 시트 닫기는 Persona와 현재 대화 상대를 바꾸지 않는다.</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- Export states -->
+  <section class="stage" id="export-states" hidden>
+    <div class="phones">
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">도윤 내보내기</div><div class="sub">밖으로 보낼 내용을 확인해 주세요</div></div></div>
+          <div class="content">
+            <div class="sect">선택해서 포함</div>
+            <div class="check off"><div class="box"></div><div><div class="title">추출된 외형 텍스트</div><div class="sub">추출된 외형 텍스트가 없어요</div></div></div>
+            <div class="check off"><div class="box"></div><div><div class="title">프로필 사진</div><div class="sub">등록된 사진이 없어요</div></div></div>
+            <div class="check off"><div class="box"></div><div><div class="title">얼굴 사진 원본</div><div class="sub">등록된 사진이 없어요</div></div></div>
+            <div class="check off"><div class="box"></div><div><div class="title">체형 사진 원본</div><div class="sub">등록된 사진이 없어요</div></div></div>
+            <div class="file">도윤.mhpersona</div>
+          </div>
+          <div class="bottom"><button type="button">파일로 저장</button><button type="button" class="primary">공유</button></div>
+        </div>
+        <p class="cap">외형 자산이 없는 Persona · 해당 항목 비활성</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">하린 내보내기</div><div class="sub">파일 만드는 중…</div></div></div>
+          <div class="center"><div><div class="spin"></div><div class="muted">파일 만드는 중</div></div></div>
+          <div class="bottom"><button type="button" disabled>파일로 저장</button><button type="button" class="primary" disabled>공유</button></div>
+        </div>
+        <p class="cap">만드는 중 · 두 action 비활성</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona</div><div class="sub">2개</div></div><button type="button">가져오기</button></div>
+          <div class="content">
+            <div class="card active"><div class="row"><div class="avatar">하</div><div class="grow"><div class="title">하린</div><div class="sub">오래 알고 지낸 친구 · 카페 사장</div><span class="badge strong">대화 중</span></div><button type="button">⋮</button></div></div>
+          </div>
+          <div class="snack">하린을 파일로 저장했어</div>
+          <div class="bottom"><button type="button" class="primary">＋ 새 Persona 만들기</button></div>
+        </div>
+        <p class="cap">저장 완료 → 목록으로 돌아와 안내. 실패하면 "내보내지 못했어. 다시 시도해줘."</p>
       </div>
     </div>
   </section>
 
-  <section id="error" class="stage" hidden>
-    <div class="phone">
-      <div class="appbar"><button>←</button><div class="grow"><div class="title">Persona 가져오기</div></div></div>
-      <div class="center"><div><h2>이 Persona 파일을 열 수 없습니다</h2><p class="muted">지원하지 않는 버전, 잘못된 FACE/BODY 자산 구조, 또는 안전하지 않은 archive 경로일 수 있습니다. 기존 Persona와 현재 선택 상태는 변경되지 않습니다.</p><button class="primary">다른 파일 선택</button></div></div>
+  <!-- Import preview -->
+  <section class="stage" id="import" hidden>
+    <div class="phones">
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona 가져오기</div><div class="sub">확인 완료</div></div></div>
+          <div class="content">
+            <div class="file">seoyeon.mhpersona</div>
+            <div class="card"><div class="row"><div class="avatar">서</div><div class="grow"><div class="title">서연</div><div class="sub">20대 후반 · 같은 팀 동료</div><span class="badge">외형 텍스트</span><span class="badge">얼굴 사진</span><span class="badge">체형 사진 없음</span><span class="badge">프로필 사진 없음</span></div></div></div>
+            <div class="panel"><div class="title">외형</div><div class="note muted">얼굴 사진과 그 외형 텍스트를 함께 가져와요. 다시 분석하지 않아도 돼요.</div></div>
+            <div class="panel"><div class="title">새 Persona로 추가돼요</div><div class="note muted">같은 이름이 있어도 덮어쓰지 않아요. 관계와 기분은 처음 상태, 대화와 기억은 빈 상태로 시작해요. 지금 대화 상대는 바뀌지 않아요.</div></div>
+          </div>
+          <div class="bottom"><button type="button">취소</button><button type="button" class="primary">가져오기</button></div>
+        </div>
+        <p class="cap">원본 + 외형 텍스트</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona 가져오기</div><div class="sub">확인 완료</div></div></div>
+          <div class="content">
+            <div class="file">doyun.mhpersona</div>
+            <div class="card"><div class="row"><div class="avatar">도</div><div class="grow"><div class="title">도윤</div><div class="sub">20대 초반 · 동네 형</div><span class="badge">외형 텍스트 제외</span></div></div></div>
+            <div class="panel warning"><div class="title">외형 텍스트는 가져오지 않아요</div><div class="note">얼굴·체형 사진 원본 없이 온 외형 텍스트는 이 앱에서 쓸 수 없어서 빼고 가져와요. 직접 입력한 외형 설명은 그대로 가져와요.</div></div>
+            <div class="panel"><div class="title">새 Persona로 추가돼요</div><div class="note muted">같은 이름이 있어도 덮어쓰지 않아요. 관계와 기분은 처음 상태, 대화와 기억은 빈 상태로 시작해요. 지금 대화 상대는 바뀌지 않아요.</div></div>
+          </div>
+          <div class="bottom"><button type="button">취소</button><button type="button" class="primary">가져오기</button></div>
+        </div>
+        <p class="cap">원본 없는 외형 텍스트 · 빼고 가져온다고 안내</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona 가져오기</div><div class="sub">확인 완료</div></div></div>
+          <div class="content">
+            <div class="file">harin-copy.mhpersona</div>
+            <div class="card"><div class="row"><div class="avatar">하</div><div class="grow"><div class="title">하린</div><div class="sub">20대 중반 · 오래 알고 지낸 친구</div><span class="badge">얼굴 사진</span><span class="badge">체형 사진</span><span class="badge">외형 텍스트 없음</span></div></div></div>
+            <div class="panel"><div class="title">외형 분석이 필요해요</div><div class="note muted">사진만 들어 있어요. 가져온 뒤 외형 사진 화면에서 분석할 수 있어요.</div></div>
+            <div class="panel"><div class="title">같은 이름의 Persona가 있어요</div><div class="note muted">기존 하린은 그대로 두고 새 Persona로 추가해요.</div></div>
+          </div>
+          <div class="bottom"><button type="button">취소</button><button type="button" class="primary">가져오기</button></div>
+        </div>
+        <p class="cap">사진만 있음 · 분석 필요 안내 · 같은 이름 안내</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Import states -->
+  <section class="stage" id="import-states" hidden>
+    <div class="phones">
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona 가져오기</div></div></div>
+          <div class="center"><div><div class="spin"></div><div class="muted">파일 확인 중</div></div></div>
+        </div>
+        <p class="cap">파일 선택 직후 검증 중</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona</div><div class="sub">3개</div></div><button type="button">가져오기</button></div>
+          <div class="content">
+            <div class="card active"><div class="row"><div class="avatar">하</div><div class="grow"><div class="title">하린</div><div class="sub">오래 알고 지낸 친구 · 카페 사장</div><span class="badge strong">대화 중</span></div><button type="button">⋮</button></div></div>
+            <div class="card"><div class="row"><div class="avatar">서</div><div class="grow"><div class="title">서연</div><div class="sub">같은 팀 동료 · 마케터</div></div><button type="button">⋮</button></div><div class="actions"><button type="button" class="primary">이 Persona로 대화</button></div></div>
+            <div class="card"><div class="row"><div class="avatar">도</div><div class="grow"><div class="title">도윤</div><div class="sub">동네 형</div><span class="badge">분석 대기</span></div><button type="button">⋮</button></div><div class="actions"><button type="button" class="primary">이 Persona로 대화</button></div></div>
+          </div>
+          <div class="snack">도윤을 가져왔어<b>대화하기</b></div>
+          <div class="bottom"><button type="button" class="primary">＋ 새 Persona 만들기</button></div>
+        </div>
+        <p class="cap">가져오기 완료 → 목록에 새 Persona, 현재 대화 상대 유지 · "대화하기"로 전환</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona</div><div class="sub">2개</div></div><button type="button">가져오기</button></div>
+          <div class="content">
+            <div class="card active"><div class="row"><div class="avatar">하</div><div class="grow"><div class="title">하린</div><div class="sub">오래 알고 지낸 친구 · 카페 사장</div><span class="badge strong">대화 중</span></div><button type="button">⋮</button></div></div>
+            <div class="card"><div class="row"><div class="avatar">서</div><div class="grow"><div class="title">서연</div><div class="sub">같은 팀 동료 · 마케터</div></div><button type="button">⋮</button></div></div>
+          </div>
+          <div class="snack">가져오지 못했어. 기존 Persona는 그대로야.</div>
+          <div class="bottom"><button type="button" class="primary">＋ 새 Persona 만들기</button></div>
+        </div>
+        <p class="cap">확인 뒤 저장 중 실패 · 만들던 Persona를 남기지 않음</p>
+      </div>
+    </div>
+  </section>
+
+  <!-- Error -->
+  <section class="stage" id="error" hidden>
+    <div class="phones">
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona 가져오기</div></div></div>
+          <div class="center"><div>
+            <div class="title" style="font-size:18px;margin-bottom:8px">이 Persona 파일을 열 수 없어요</div>
+            <div class="note muted" style="margin-bottom:6px">이 앱이 아직 모르는 새 버전의 파일이에요. 앱을 업데이트한 뒤 다시 시도해 주세요.</div>
+            <div class="note muted" style="margin-bottom:16px">기존 Persona와 지금 대화 상대는 바뀌지 않았어요.</div>
+            <div class="actions" style="justify-content:center"><button type="button">닫기</button><button type="button" class="primary" style="margin-left:0">다른 파일 선택</button></div>
+          </div></div>
+        </div>
+        <p class="cap">지원하지 않는 버전</p>
+      </div>
+      <div>
+        <div class="phone">
+          <div class="appbar"><button type="button">←</button><div class="grow"><div class="title">Persona 가져오기</div></div></div>
+          <div class="center"><div>
+            <div class="title" style="font-size:18px;margin-bottom:8px">이 Persona 파일을 열 수 없어요</div>
+            <div class="note muted" style="margin-bottom:6px">파일이 손상됐거나 형식이 맞지 않아요.</div>
+            <ul class="flat muted" style="text-align:left;margin-bottom:10px">
+              <li>Persona 파일이 아님 · 내용이 깨짐</li>
+              <li>필수 항목 누락 · 길이·범위 초과</li>
+              <li>체형 사진만 있고 얼굴 사진이 없음</li>
+              <li>지원하지 않는 사진 형식·크기, 너무 큰 파일, 안전하지 않은 파일 구성</li>
+            </ul>
+            <div class="note muted" style="margin-bottom:16px">기존 Persona와 지금 대화 상대는 바뀌지 않았어요.</div>
+            <div class="actions" style="justify-content:center"><button type="button">닫기</button><button type="button" class="primary" style="margin-left:0">다른 파일 선택</button></div>
+          </div></div>
+        </div>
+        <p class="cap">잘못된 파일 · 원인 범주는 한 줄로 표시(위 목록은 범주 예시)</p>
+      </div>
     </div>
   </section>
 </main>
 <script>
-  const tabs=document.querySelectorAll('[role="tab"]');
-  const stages=document.querySelectorAll('.stage');
-  tabs.forEach(tab=>tab.addEventListener('click',()=>{tabs.forEach(x=>x.setAttribute('aria-selected',String(x===tab)));stages.forEach(s=>s.hidden=s.id!==tab.dataset.target);}));
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const stages = document.querySelectorAll('.stage');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
+    stages.forEach(stage => stage.hidden = stage.id !== tab.dataset.target);
+  }));
 </script>
 </body>
 </html>
