@@ -1,0 +1,266 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #446 — 설정 화면 재편 Visual Spec</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; padding: 32px 20px 72px; }
+    main { max-width: 1240px; margin: 0 auto; }
+    header { margin-bottom: 28px; }
+    .meta { opacity: .65; }
+    .draft { display: inline-block; border: 1px solid CanvasText; border-radius: 8px; padding: 2px 10px; font-size: 13px; margin-left: 8px; }
+    .tabs { display: flex; gap: 8px; margin: 20px 0; }
+    button { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); background: Canvas; color: CanvasText; border-radius: 10px; padding: 9px 14px; cursor: pointer; }
+    button[aria-selected="true"] { font-weight: 700; border-color: CanvasText; }
+    .stage { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 18px; padding: 24px; min-height: 520px; }
+    [hidden] { display: none !important; }
+
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 28px 20px; align-items: start; }
+    figure { margin: 0; }
+    figcaption { font-size: 14px; margin-bottom: 8px; }
+    figcaption b { font-weight: 700; }
+    figcaption span { opacity: .7; display: block; font-size: 13px; }
+    .legend { font-size: 14px; line-height: 1.6; margin: 0 0 20px; padding-left: 20px; }
+
+    .phone { width: 330px; max-width: 100%; box-sizing: border-box; background: #171317; color: #F3EDEF; border-radius: 28px; padding: 14px 16px 22px; font-size: 14px; line-height: 1.45; border: 1px solid #3a3238; }
+    .bar { display: flex; align-items: center; gap: 10px; padding: 6px 0 14px; font-size: 18px; font-weight: 600; }
+    .bar .back { font-size: 20px; }
+    .sec { font-size: 12px; color: #B9ADB1; margin: 16px 4px 6px; }
+    .sec.first { margin-top: 0; }
+    .grp { background: #2A2429; border-radius: 14px; overflow: hidden; }
+    .grp.danger { border: 1px solid #b0545a; }
+    .row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid #3a3238; }
+    .row:first-child { border-top: 0; }
+    .tx { flex: 1; min-width: 0; }
+    .sub { font-size: 12px; color: #B9ADB1; }
+    .chev { color: #7d7177; font-size: 18px; }
+    .sw { width: 38px; height: 22px; border-radius: 11px; background: #4a4046; position: relative; flex: none; cursor: pointer; }
+    .sw::after { content: ""; position: absolute; top: 3px; left: 3px; width: 16px; height: 16px; border-radius: 50%; background: #F3EDEF; }
+    .sw.on { background: #8E4E61; }
+    .sw.on::after { left: 19px; }
+    .radio { width: 16px; height: 16px; border-radius: 50%; border: 2px solid #7d7177; box-sizing: border-box; flex: none; }
+    .radio.on { border-color: #F0A8B7; background: radial-gradient(#F0A8B7 0 4px, transparent 5px); }
+    .note { font-size: 12px; color: #B9ADB1; margin: 10px 4px 0; }
+    .pbtn { text-align: center; padding: 9px 0; border-radius: 20px; background: #8E4E61; font-size: 13px; margin-top: 10px; }
+    .obtn { display: inline-block; padding: 6px 12px; border-radius: 16px; border: 1px solid #6b5f65; font-size: 12px; margin-top: 6px; }
+    .fld { border: 1px solid #6b5f65; border-radius: 10px; padding: 10px 12px; color: #7d7177; font-size: 13px; }
+    .red { color: #f09595; }
+    .avatar { width: 52px; height: 52px; border-radius: 50%; background: #4a4046; flex: none; }
+    .thumb { width: 52px; height: 68px; border-radius: 8px; background: #4a4046; flex: none; }
+    .cur .row { padding: 9px 14px; }
+    .cur .save { background: #8E4E61; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="meta">seok-jun/my-honey-chat · Issue #446</div>
+    <h1>설정 화면을 홈 + 하위 화면 구조로 재편 <span class="draft">초안 v1 · 미승인</span></h1>
+    <p>대상 화면: 설정(<code>SettingsScreenContent</code>)과 Persona 편집의 이미지 영역. 이 HTML은 화면 배치, 정보 계층, UI 상태의 구현 기준이다. 아직 다듬는 중인 초안이며 앱 설계 승인을 뜻하지 않는다.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Visual spec state">
+    <button type="button" role="tab" aria-selected="false" data-target="current">Current</button>
+    <button type="button" role="tab" aria-selected="true" data-target="proposed">Proposed</button>
+  </div>
+
+  <section class="stage" id="current" hidden>
+    <ul class="legend">
+      <li>스크롤 한 장에 모든 항목이 아래 순서로 나열된다(각 행은 실제 영역 하나를 요약).</li>
+      <li>분홍색 "저장" 버튼 위쪽의 토글·key·모델만 저장 버튼을 눌러야 반영된다. 나머지는 누르는 즉시 실행된다.</li>
+    </ul>
+    <div class="grid">
+      <figure>
+        <figcaption><b>설정 (현재)</b><span>한 화면, 위에서 아래 순서</span></figcaption>
+        <div class="phone cur">
+          <div class="bar"><span class="back">←</span>설정</div>
+          <div class="sec first">Persona</div>
+          <div class="grp"><div class="row"><div class="tx">페르소나 관리 진입</div></div></div>
+          <div class="sec">교체 복원</div>
+          <div class="grp"><div class="row"><div class="tx">스냅샷 복원 · 스냅샷 내보내기<div class="sub">즉시 실행</div></div></div></div>
+          <div class="sec">프로필</div>
+          <div class="grp"><div class="row"><div class="tx">프로필 사진 선택/기본으로<div class="sub">즉시 실행</div></div></div></div>
+          <div class="sec">AI 연결</div>
+          <div class="grp">
+            <div class="row"><div class="tx">내 서버 상태 · 주소 · 토큰<div class="sub">현재 대화에 사용하지 않음</div></div></div>
+            <div class="row"><div class="tx">xAI key 상태 · key 입력</div></div>
+            <div class="row"><div class="tx">xAI 모델 선택 · ZDR 안내</div></div>
+          </div>
+          <div class="sec">대화 미디어</div>
+          <div class="grp">
+            <div class="row"><div class="tx">외형 참고 이미지<div class="sub">즉시 실행</div></div></div>
+            <div class="row"><div class="tx">이미지 토글 · 음성 토글</div></div>
+            <div class="row"><div class="tx">음성 선택 라디오 3행 + 샘플</div></div>
+            <div class="row"><div class="tx">영상 토글 · 안내문 2개</div></div>
+          </div>
+          <div class="sec">(헤더 없음)</div>
+          <div class="grp">
+            <div class="row"><div class="tx">선톡 토글</div></div>
+            <div class="row"><div class="tx">모델 평가 로그 토글</div></div>
+            <div class="row save"><div class="tx">저장</div></div>
+            <div class="row"><div class="tx">저장된 key 삭제</div></div>
+          </div>
+          <div class="sec">대화 백업</div>
+          <div class="grp"><div class="row"><div class="tx">파일 가져오기 · 파일 내보내기 · 안내문 2개<div class="sub">즉시 실행</div></div></div></div>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section class="stage" id="proposed">
+    <ul class="legend">
+      <li>설정 진입 시 <b>01 설정 홈</b>이 열린다. 각 행은 하위 화면으로 이동하고, 하위 화면의 뒤로 가기는 홈으로 돌아온다.</li>
+      <li>토글·목소리·모델은 조작 즉시 저장한다. 저장 버튼은 <b>05 AI 연결</b>의 key 입력에만 있다.</li>
+      <li>key 누락으로 설정이 자동으로 열릴 때는 <b>05 AI 연결</b>로 바로 들어간다.</li>
+      <li>하루 한도 숫자는 현재 상수 그대로 표시한다. 토글은 눌러볼 수 있지만 표시용이다.</li>
+    </ul>
+    <div class="grid">
+
+      <figure>
+        <figcaption><b>01 설정 홈</b><span>기본 상태 · key 저장됨</span></figcaption>
+        <div class="phone">
+          <div class="bar"><span class="back">←</span>설정</div>
+          <div class="grp">
+            <div class="row"><div class="tx">페르소나 관리<div class="sub">대화 중: 유나 · 사진과 외형 이미지 포함</div></div><span class="chev">›</span></div>
+          </div>
+          <div class="sec">앱</div>
+          <div class="grp">
+            <div class="row"><div class="tx">대화<div class="sub">선톡 켬 · 이미지 켬 · 음성 끔 · 영상 끔</div></div><span class="chev">›</span></div>
+            <div class="row"><div class="tx">AI 연결<div class="sub">xAI Grok key 저장됨</div></div><span class="chev">›</span></div>
+            <div class="row"><div class="tx">데이터<div class="sub">백업 · 스냅샷</div></div><span class="chev">›</span></div>
+            <div class="row"><div class="tx">고급<div class="sub">모델 · 평가 로그</div></div><span class="chev">›</span></div>
+          </div>
+          <div class="note">대화 원문은 이 폰의 앱 전용 저장소에만 있어.</div>
+        </div>
+      </figure>
+
+      <figure>
+        <figcaption><b>02 설정 홈 · key 없음</b><span>AI 연결 행만 경고 표현으로 바뀐다</span></figcaption>
+        <div class="phone">
+          <div class="bar"><span class="back">←</span>설정</div>
+          <div class="grp">
+            <div class="row"><div class="tx">페르소나 관리<div class="sub">대화 중: 유나 · 사진과 외형 이미지 포함</div></div><span class="chev">›</span></div>
+          </div>
+          <div class="sec">앱</div>
+          <div class="grp">
+            <div class="row"><div class="tx">대화<div class="sub">선톡 켬 · 이미지 끔 · 음성 끔 · 영상 끔</div></div><span class="chev">›</span></div>
+            <div class="row"><div class="tx">AI 연결<div class="sub red">xAI Grok key가 필요해</div></div><span class="red">!</span></div>
+            <div class="row"><div class="tx">데이터<div class="sub">백업 · 스냅샷</div></div><span class="chev">›</span></div>
+            <div class="row"><div class="tx">고급<div class="sub">모델 · 평가 로그</div></div><span class="chev">›</span></div>
+          </div>
+          <div class="note">대화 원문은 이 폰의 앱 전용 저장소에만 있어.</div>
+        </div>
+      </figure>
+
+      <figure>
+        <figcaption><b>03 대화</b><span>토글은 즉시 저장 · 저장 버튼 없음</span></figcaption>
+        <div class="phone">
+          <div class="bar"><span class="back">←</span>대화</div>
+          <div class="grp">
+            <div class="row"><div class="tx">유나의 선톡<div class="sub">마지막 대화 2~5시간 뒤 · 하루 최대 2번</div></div><div class="sw on"></div></div>
+          </div>
+          <div class="sec">자동 생성 · 대화에 필요할 때만</div>
+          <div class="grp">
+            <div class="row"><div class="tx">이미지<div class="sub">하루 20회</div></div><div class="sw on"></div></div>
+            <div class="row"><div class="tx">음성 답장<div class="sub">하루 50회</div></div><div class="sw"></div></div>
+            <div class="row"><div class="tx">목소리<div class="sub">Ara</div></div><span class="chev">›</span></div>
+            <div class="row"><div class="tx">5초 영상<div class="sub">세로형 480p · 하루 5회</div></div><div class="sw"></div></div>
+          </div>
+          <div class="note">생성할 때마다 xAI 유료 API 비용이 발생해. 결과는 이 폰에 저장돼.</div>
+        </div>
+      </figure>
+
+      <figure>
+        <figcaption><b>04 목소리</b><span>선택 즉시 저장 · key 없으면 샘플 비활성</span></figcaption>
+        <div class="phone">
+          <div class="bar"><span class="back">←</span>목소리</div>
+          <div class="grp">
+            <div class="row"><div class="radio on"></div><div class="tx">Ara<div class="sub">따뜻하고 친근한 목소리</div></div><span class="sub">샘플</span></div>
+            <div class="row"><div class="radio"></div><div class="tx">Eve<div class="sub">활기차고 밝은 목소리</div></div><span class="sub">샘플</span></div>
+            <div class="row"><div class="radio"></div><div class="tx">Rex<div class="sub">자신감 있고 또렷한 목소리</div></div><span class="sub">샘플</span></div>
+          </div>
+          <div class="note">샘플 재생도 xAI 유료 API를 호출해.</div>
+        </div>
+      </figure>
+
+      <figure>
+        <figcaption><b>05 AI 연결</b><span>유일하게 명시적 저장이 있는 화면</span></figcaption>
+        <div class="phone">
+          <div class="bar"><span class="back">←</span>AI 연결</div>
+          <div class="grp">
+            <div class="row"><div class="tx">xAI Grok key 저장됨<div class="sub">Android Keystore로 암호화돼</div></div></div>
+          </div>
+          <div class="sec">key 바꾸기</div>
+          <div class="fld">새 key로 바꿀 때만 입력</div>
+          <div class="pbtn">key 저장</div>
+          <div class="note">대화와 사진·영상 생성은 모두 xAI Grok으로 가.</div>
+          <div class="sec">&nbsp;</div>
+          <div class="grp"><div class="row"><div class="tx red">저장된 key 삭제</div></div></div>
+        </div>
+      </figure>
+
+      <figure>
+        <figcaption><b>06 데이터</b><span>합치기와 교체를 구분 · 교체 복원은 맨 아래</span></figcaption>
+        <div class="phone">
+          <div class="bar"><span class="back">←</span>데이터</div>
+          <div class="sec first">백업 · 기존 대화에 합치기</div>
+          <div class="grp">
+            <div class="row"><div class="tx">백업 내보내기<div class="sub">대화 텍스트와 시간만 · 암호화 안 됨</div></div></div>
+            <div class="row"><div class="tx">백업 가져오기<div class="sub">중복 없이 합쳐</div></div></div>
+          </div>
+          <div class="sec">스냅샷 · 대화 통째로 교체</div>
+          <div class="grp">
+            <div class="row"><div class="tx">스냅샷 내보내기<div class="sub">지금 대화 상태를 파일로</div></div></div>
+          </div>
+          <div class="sec">위험 구역</div>
+          <div class="grp danger">
+            <div class="row"><div class="tx red">스냅샷으로 교체 복원<div class="sub">현재 대화가 남지 않아 · 끝날 때까지 전송 잠금</div></div></div>
+          </div>
+          <div class="note">API key·설정·사진·음성·영상은 파일에 들어가지 않아.</div>
+        </div>
+      </figure>
+
+      <figure>
+        <figcaption><b>07 고급</b><span>개발자용 항목과 이전 버전 호환</span></figcaption>
+        <div class="phone">
+          <div class="bar"><span class="back">←</span>고급</div>
+          <div class="grp">
+            <div class="row"><div class="tx">xAI Grok 모델<div class="sub">grok-4.7</div></div><span class="chev">⌄</span></div>
+            <div class="row"><div class="tx">모델 평가 로그<div class="sub">상태·오류 코드·토큰·지연시간을 이 폰에만 저장</div></div><div class="sw on"></div></div>
+          </div>
+          <div class="sec">이전 버전 호환</div>
+          <div class="grp">
+            <div class="row"><div class="tx">내 서버<div class="sub">현재 대화에 사용하지 않아</div></div><span class="chev">›</span></div>
+          </div>
+        </div>
+      </figure>
+
+      <figure>
+        <figcaption><b>08 Persona 편집 · 이미지 영역</b><span>설정에서 옮겨오는 두 영역. 편집 화면 안 위치는 미정</span></figcaption>
+        <div class="phone">
+          <div class="bar"><span class="back">←</span>Persona 편집</div>
+          <div class="sec first">이미지</div>
+          <div class="grp">
+            <div class="row"><div class="avatar"></div><div class="tx">프로필 사진<div class="sub">JPEG, PNG 또는 WebP · 최대 5MB</div><span class="obtn">사진 변경</span></div></div>
+            <div class="row"><div class="thumb"></div><div class="tx">외형 참고 이미지<div class="sub">이미지·영상 생성에 자동 사용</div><span class="obtn">이미지 변경</span></div></div>
+          </div>
+          <div class="note">이 폰에만 보관되고, 참고 이미지는 실제 생성 요청 때만 xAI로 전송돼. 직접 사용할 권리가 있는 이미지만 등록해줘.</div>
+        </div>
+      </figure>
+
+    </div>
+  </section>
+</main>
+<script>
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const stages = document.querySelectorAll('.stage');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
+    stages.forEach(stage => stage.hidden = stage.id !== tab.dataset.target);
+  }));
+  document.querySelectorAll('.sw').forEach(sw => sw.addEventListener('click', () => sw.classList.toggle('on')));
+</script>
+</body>
+</html>
