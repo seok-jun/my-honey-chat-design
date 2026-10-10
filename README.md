@@ -18,6 +18,8 @@ main은 초안/설계 시안도 보관하며 해당 상태를 HTML 또는 앱 Is
 
 현재 branch tip의 병합·고정 링크 접근·미커밋/미게시 변경과 다른 active 작업 부재를 확인한 branch만 정리한다. 검증·병합·배포·정리 실패는 마지막 성공 단계와 남은 작업을 기록하고, 미병합 branch나 다른 작업 공간을 강제 삭제하지 않는다. 기존 공개·승인 제한을 우회하지 않는다.
 
+과거 squash/rebase 병합 branch의 commit ancestry가 없으면 canonical 절차의 PR head·전체 변경/병합본 대조를 모두 통과해야 정리할 수 있다. 새 시안은 계속 고정 commit을 main 이력에 보존한다.
+
 ## HTML 미리보기
 
 `main`에 `issues/*.html` 변경이 반영되면 GitHub Actions가 미리보기 사이트를 자동 생성하고 GitHub Pages로 배포한다.
