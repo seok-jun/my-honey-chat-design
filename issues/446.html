@@ -57,7 +57,7 @@
 <main>
   <header>
     <div class="meta">seok-jun/my-honey-chat · Issue #446</div>
-    <h1>설정 화면을 홈 + 하위 화면 구조로 재편 <span class="draft">초안 v1 · 미승인</span></h1>
+    <h1>설정 화면을 홈 + 하위 화면 구조로 재편 <span class="draft">초안 v2 · 미승인</span></h1>
     <p>대상 화면: 설정(<code>SettingsScreenContent</code>)과 Persona 편집의 이미지 영역. 이 HTML은 화면 배치, 정보 계층, UI 상태의 구현 기준이다. 아직 다듬는 중인 초안이며 앱 설계 승인을 뜻하지 않는다.</p>
   </header>
 
@@ -113,13 +113,15 @@
     <ul class="legend">
       <li>설정 진입 시 <b>01 설정 홈</b>이 열린다. 각 행은 하위 화면으로 이동하고, 하위 화면의 뒤로 가기는 홈으로 돌아온다.</li>
       <li>토글·목소리·모델은 조작 즉시 저장한다. 저장 버튼은 <b>05 AI 연결</b>의 key 입력에만 있다.</li>
+      <li>key·모델·내 서버는 <b>05 AI 연결</b> 한 화면에만 둔다. 관리자 모드 전용 노출은 이 Issue 범위 밖이며, 나중에 홈의 AI 연결 행 하나만 가리면 되도록 맨 아래에 둔다.</li>
+      <li>모델 평가 로그는 on/off 토글이 없다. 항상 켜져 있고 읽기 전용 행으로만 표시한다.</li>
       <li>key 누락으로 설정이 자동으로 열릴 때는 <b>05 AI 연결</b>로 바로 들어간다.</li>
       <li>하루 한도 숫자는 현재 상수 그대로 표시한다. 토글은 눌러볼 수 있지만 표시용이다.</li>
     </ul>
     <div class="grid">
 
       <figure>
-        <figcaption><b>01 설정 홈</b><span>기본 상태 · key 저장됨</span></figcaption>
+        <figcaption><b>01 설정 홈</b><span>기본 상태 · key 저장됨 · AI 연결은 맨 아래 행</span></figcaption>
         <div class="phone">
           <div class="bar"><span class="back">←</span>설정</div>
           <div class="grp">
@@ -128,9 +130,8 @@
           <div class="sec">앱</div>
           <div class="grp">
             <div class="row"><div class="tx">대화<div class="sub">선톡 켬 · 이미지 켬 · 음성 끔 · 영상 끔</div></div><span class="chev">›</span></div>
-            <div class="row"><div class="tx">AI 연결<div class="sub">xAI Grok key 저장됨</div></div><span class="chev">›</span></div>
             <div class="row"><div class="tx">데이터<div class="sub">백업 · 스냅샷</div></div><span class="chev">›</span></div>
-            <div class="row"><div class="tx">고급<div class="sub">모델 · 평가 로그</div></div><span class="chev">›</span></div>
+            <div class="row"><div class="tx">AI 연결<div class="sub">xAI Grok key 저장됨 · grok-4.7</div></div><span class="chev">›</span></div>
           </div>
           <div class="note">대화 원문은 이 폰의 앱 전용 저장소에만 있어.</div>
         </div>
@@ -146,9 +147,8 @@
           <div class="sec">앱</div>
           <div class="grp">
             <div class="row"><div class="tx">대화<div class="sub">선톡 켬 · 이미지 끔 · 음성 끔 · 영상 끔</div></div><span class="chev">›</span></div>
-            <div class="row"><div class="tx">AI 연결<div class="sub red">xAI Grok key가 필요해</div></div><span class="red">!</span></div>
             <div class="row"><div class="tx">데이터<div class="sub">백업 · 스냅샷</div></div><span class="chev">›</span></div>
-            <div class="row"><div class="tx">고급<div class="sub">모델 · 평가 로그</div></div><span class="chev">›</span></div>
+            <div class="row"><div class="tx">AI 연결<div class="sub red">xAI Grok key가 필요해</div></div><span class="red">!</span></div>
           </div>
           <div class="note">대화 원문은 이 폰의 앱 전용 저장소에만 있어.</div>
         </div>
@@ -186,7 +186,7 @@
       </figure>
 
       <figure>
-        <figcaption><b>05 AI 연결</b><span>유일하게 명시적 저장이 있는 화면</span></figcaption>
+        <figcaption><b>05 AI 연결</b><span>key · 모델 · 내 서버를 한곳에. 추후 관리자 모드 전용으로 숨길 단위</span></figcaption>
         <div class="phone">
           <div class="bar"><span class="back">←</span>AI 연결</div>
           <div class="grp">
@@ -195,9 +195,21 @@
           <div class="sec">key 바꾸기</div>
           <div class="fld">새 key로 바꿀 때만 입력</div>
           <div class="pbtn">key 저장</div>
-          <div class="note">대화와 사진·영상 생성은 모두 xAI Grok으로 가.</div>
+          <div class="sec">모델</div>
+          <div class="grp">
+            <div class="row"><div class="tx">xAI Grok 모델<div class="sub">grok-4.7 · 고르면 바로 적용</div></div><span class="chev">⌄</span></div>
+          </div>
+          <div class="sec">이전 버전 호환</div>
+          <div class="grp">
+            <div class="row"><div class="tx">내 서버<div class="sub">현재 대화에 사용하지 않아</div></div><span class="chev">›</span></div>
+          </div>
+          <div class="sec">진단</div>
+          <div class="grp">
+            <div class="row"><div class="tx">모델 평가 로그<div class="sub">상태·오류 코드·토큰·지연시간을 이 폰에만 저장</div></div><span class="sub">항상 켜짐</span></div>
+          </div>
           <div class="sec">&nbsp;</div>
           <div class="grp"><div class="row"><div class="tx red">저장된 key 삭제</div></div></div>
+          <div class="note">대화와 사진·영상 생성은 모두 xAI Grok으로 가.</div>
         </div>
       </figure>
 
@@ -223,22 +235,7 @@
       </figure>
 
       <figure>
-        <figcaption><b>07 고급</b><span>개발자용 항목과 이전 버전 호환</span></figcaption>
-        <div class="phone">
-          <div class="bar"><span class="back">←</span>고급</div>
-          <div class="grp">
-            <div class="row"><div class="tx">xAI Grok 모델<div class="sub">grok-4.7</div></div><span class="chev">⌄</span></div>
-            <div class="row"><div class="tx">모델 평가 로그<div class="sub">상태·오류 코드·토큰·지연시간을 이 폰에만 저장</div></div><div class="sw on"></div></div>
-          </div>
-          <div class="sec">이전 버전 호환</div>
-          <div class="grp">
-            <div class="row"><div class="tx">내 서버<div class="sub">현재 대화에 사용하지 않아</div></div><span class="chev">›</span></div>
-          </div>
-        </div>
-      </figure>
-
-      <figure>
-        <figcaption><b>08 Persona 편집 · 이미지 영역</b><span>설정에서 옮겨오는 두 영역. 편집 화면 안 위치는 미정</span></figcaption>
+        <figcaption><b>07 Persona 편집 · 이미지 영역</b><span>설정에서 옮겨오는 두 영역. 편집 화면 안 위치는 미정</span></figcaption>
         <div class="phone">
           <div class="bar"><span class="back">←</span>Persona 편집</div>
           <div class="sec first">이미지</div>
