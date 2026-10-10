@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #437 — Persona 관리와 대화 상대 분리</title>
+  <style>
+:root{color-scheme:dark;font-family:system-ui,"Segoe UI",sans-serif;background:#141115;color:#f5edf2}
+body{margin:0;padding:40px 20px 72px}main{max-width:1220px;margin:auto}h1{font-size:clamp(26px,4vw,40px);letter-spacing:-1px}p{line-height:1.65}.meta,.muted{color:#b9adb1}.tabs{display:flex;flex-wrap:wrap;gap:8px;margin:24px 0}button{font:inherit;cursor:pointer;border:1px solid #655560;border-radius:12px;background:#2a2429;color:inherit;padding:12px 16px}button:hover{border-color:#f0a8b7}button[aria-selected=true],.primary{background:#f0a8b7;color:#25151e;border-color:#f0a8b7}.stage{padding:0;min-height:0}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(285px,1fr));gap:20px;align-items:start}.phone{width:100%;max-width:390px;min-height:650px;border:1px solid #574652;border-radius:28px;background:#1c171c;padding:20px;box-sizing:border-box;margin:0 auto}.top{display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:44px;margin-bottom:22px}.top h2{font-size:19px;margin:0}.card{padding:16px;border:1px solid #51424b;background:#2a2429;border-radius:16px;margin:12px 0}.row{display:flex;align-items:center;gap:12px}.row .grow{flex:1}.avatar{width:42px;height:42px;border-radius:15px;background:#56404e;display:grid;place-items:center;font-weight:bold}.badge{display:inline-block;font-size:12px;padding:4px 8px;background:#513342;color:#ffd3e4;border-radius:7px;margin-left:6px}.wide{width:100%;margin-top:12px}.quiet{background:transparent}.caption{font-size:13px;color:#b9adb1;line-height:1.6}.note{border-left:3px solid #f0a8b7;padding:12px 18px;background:#251d24;margin:24px 0}.field{border:1px solid #70606a;border-radius:10px;padding:12px;margin:8px 0 18px;background:#211b20}.actions{display:flex;flex-wrap:wrap;gap:8px}.actions button{padding:9px 12px;font-size:13px}.danger{color:#ffb5b5}.bottom{margin-top:36px;border-top:1px solid #51424b;padding-top:16px}.overlay{background:#302530;border-radius:22px;padding:20px;margin-top:40px}.error{border-color:#bb7a7a}.states .card h3{margin:0 0 8px}.legend{font-size:13px;line-height:1.7;color:#b9adb1}.step{font-size:12px;letter-spacing:.08em;color:#f0a8b7}.small{font-size:13px}a{color:#f0a8b7}[hidden]{display:none!important}
+</style>
+</head>
+<body>
+<main>
+<header><div class="meta">MY HONEY CHAT · ISSUE #437 · UI/UX VISUAL SPEC</div>
+<h1>관리할 상대와 대화할 상대를 분리</h1>
+<p>설정과 채팅에서 하나의 Persona 관리 화면에 접근합니다. 상세 열람·편집은 대화 상대를 바꾸지 않습니다.</p>
+<div class="legend">합성 식별자 A / B로 화면 구조를 표현합니다. 실제 대화·프로필 데이터는 사용하지 않습니다.<br>이 시안은 화면 배치와 상태 표현의 기준입니다. 저장·전환·provider 동작은 실행하지 않습니다.</div></header>
+<nav class="tabs" role="tablist" aria-label="화면 시안">
+<button role="tab" aria-selected="true" data-target="proposed">Proposed · 진입과 관리</button>
+<button role="tab" aria-selected="false" data-target="detail">상세와 돌아가기</button>
+<button role="tab" aria-selected="false" data-target="states">로딩·실패·제한</button>
+<button role="tab" aria-selected="false" data-target="current">Current · 현재 구조</button>
+</nav>
+<section class="stage" id="proposed">
+<div class="grid">
+<article class="phone"><div class="step">01 / 설정에서 진입</div><div class="top"><span>‹</span><h2>설정</h2><span></span></div>
+<div class="card"><h3>Persona</h3><p class="muted small">등록한 상대를 한곳에서 관리해요.</p><button class="wide primary" data-focus="management">페르소나 관리 →</button></div>
+<div class="card"><h3>모델·연결 설정</h3><p class="muted">기존 설정 영역 유지</p></div><div class="card"><h3>미디어·기타 설정</h3><p class="muted">기존 설정 영역 유지</p></div>
+<p class="caption">현재 상대 한 명의 편집 폼으로 바로 들어가던 진입을 전체 관리로 연결합니다.</p></article>
+<article class="phone"><div class="step">02 / 채팅에서 빠른 전환</div><div class="top"><h2>Persona A ▾</h2><span class="badge">대화 중</span></div>
+<div class="card"><p class="muted">기존 채팅 영역</p><p class="caption">대화 내용은 시안에 표시하지 않습니다.</p></div>
+<div class="overlay"><h3>대화 상대</h3><div class="card row"><span class="avatar">A</span><span class="grow">Persona A</span><span class="badge">현재</span></div>
+<div class="card row"><span class="avatar">B</span><span class="grow">Persona B</span><span>선택 →</span></div>
+<button class="wide quiet" data-tab="detail">현재 상대 상세</button><button class="wide primary" data-focus="management">페르소나 관리</button>
+<p class="caption">다른 상대를 선택하면 전환하고 목록을 닫습니다. 목록 닫기·관리 진입은 전환하지 않습니다.</p></div>
+<p class="caption">현재 상대 상세는 같은 상세 화면을 A 대상으로 엽니다.</p></article>
+<article class="phone" id="management" tabindex="-1"><div class="step">03 / 공통 관리 화면</div><div class="top"><span>‹</span><h2>페르소나 관리</h2><span></span></div>
+<div class="actions"><button class="primary">＋ 새 Persona</button><button>가져오기</button></div>
+<div class="card"><div class="row"><span class="avatar">A</span><strong class="grow">Persona A</strong><span class="badge">대화 중</span></div><div class="actions bottom"><button data-tab="detail">상세 설정</button><button>더보기 ⋯</button></div></div>
+<div class="card"><div class="row"><span class="avatar">B</span><strong class="grow">Persona B</strong></div><div class="actions bottom"><button data-tab="detail">상세 설정</button><button>대화하기</button><button>더보기 ⋯</button></div></div>
+<p class="caption">더보기: 외형 사진 · 복제 · 내보내기·공유 · 삭제. 삭제 확인과 마지막 Persona 제한은 유지합니다.</p>
+<p class="caption">신규 생성 화면은 생성 뒤 대화 상대가 바뀜을 알립니다. 현재 상대 삭제 확인은 전환될 fallback을 표시합니다.</p>
+<p class="caption">뒤로: 설정에서 왔으면 설정으로, 채팅에서 왔으면 채팅으로.</p></article>
+</div><div class="note"><strong>일반 전환은 명시적 선택으로.</strong> 빠른 목록에서 상대 선택 또는 관리 화면의 ‘대화하기’로 전환합니다. 기존 생성 후 자동 선택·현재 상대 삭제 후 fallback은 별도 lifecycle 예외로 유지합니다.</div></section>
+<section class="stage" id="detail" hidden><div class="grid">
+<article class="phone"><div class="step">04 / 비활성 대상의 상세</div><div class="top"><span>‹</span><h2>Persona B · 상세</h2><span></span></div>
+<p class="caption">대화 중: Persona A</p><div class="card"><strong>Persona B를 편집하고 있어요</strong><p class="caption">저장해도 대화 상대는 바뀌지 않아요.</p></div>
+<label>이름</label><div class="field">Persona B</div><label>기본 정보·성향</label><div class="field muted">기존 상세 폼과 validation 유지</div>
+<div class="actions"><button class="quiet">외형 사진</button><button class="quiet">대화로 조정</button></div><p class="caption">사진과 조정도 B를 대상으로 합니다. A로 재지정하거나 편집 진입을 위해 B로 전환하지 않습니다.</p>
+<div class="bottom actions"><button>취소</button><button class="primary">변경 저장</button></div><p class="caption">저장 완료: ‘Persona B를 저장했어요’. 실패·충돌 시 이 화면에 머물러 이유를 표시합니다.</p></article>
+<article class="phone"><div class="step">05 / 복귀 경로</div><h2>들어온 곳으로 돌아가기</h2>
+<div class="card"><h3>설정에서 진입</h3><p>상세 → 관리 → 설정</p><p class="caption">관리 내에서 대상을 살펴봐도 원래 대화 상대를 유지합니다.</p></div>
+<div class="card"><h3>채팅에서 관리 진입</h3><p>상세 → 관리 → 원래 채팅</p></div>
+<div class="card"><h3>채팅에서 현재 상대 상세</h3><p>현재 상대 상세 → 원래 채팅</p></div>
+<div class="card"><h3>명시적 대화 전환</h3><p>대화하기 → 선택한 상대의 채팅</p><p class="caption">이 동작은 관리 화면을 닫습니다.</p></div>
+<p class="caption">시안의 버튼은 화면 표본 이동만 합니다. 앱의 실제 저장·취소 후 내부 navigation은 이 경로를 따릅니다.</p></article>
+</div></section>
+<section class="stage states" id="states" hidden><div class="grid">
+<article class="phone"><div class="step">06 / 관리 목록 상태</div><div class="top"><span>‹</span><h2>페르소나 관리</h2><span></span></div>
+<div class="card"><h3>조회 중</h3><p>목록을 불러오는 중…</p><p class="caption">중복 작업 진입을 잠그고 뒤로 가기는 유지합니다.</p></div>
+<div class="card error"><h3>목록을 불러오지 못했어요</h3><p>현재 대화 상대는 바뀌지 않았어요.</p><button>다시 시도</button></div>
+<div class="card"><h3>Persona B <span class="badge">삭제 정리 중</span></h3><p class="caption">사용할 수 없는 대상은 전환·편집을 막고 기존 정리/재시도 동작만 제공합니다.</p></div>
+<div class="card"><h3>응답 처리 중</h3><p class="caption">기존 제한 대상 action은 비활성화하고 제한 이유를 함께 표시합니다. 이 이슈에서 허용 범위를 넓히지 않습니다.</p></div></article>
+<article class="phone"><div class="step">07 / 상세 저장 상태</div><div class="top"><span>‹</span><h2>Persona B · 상세</h2><span></span></div>
+<div class="card"><h3>저장 중…</h3><p class="caption">중복 저장·취소와 화면 이탈을 기존 저장 제한에 따라 막습니다.</p></div>
+<div class="card error"><h3>설정이 변경됐어요</h3><p>이 화면을 연 뒤 내용이 바뀌어 저장하지 않았어요.</p><button>최신 내용 다시 열기</button><p class="caption">revision 충돌. 자동 덮어쓰기나 대상 변경을 하지 않습니다.</p></div>
+<div class="card error"><h3>이 Persona를 사용할 수 없어요</h3><p>삭제됐거나 정리 중일 수 있어요. 변경 내용은 저장되지 않았어요.</p><button>목록으로</button></div>
+<div class="card error"><h3>저장하지 못했어요</h3><p class="caption">편집 대상을 유지하고 실패 이유를 표시합니다. 저장 성공으로 안내하지 않습니다.</p></div></article>
+</div><p class="legend">첫 설치의 Persona 설정과 마지막 Persona 삭제 제한은 기존 경로를 유지합니다. 이 변경은 빈 catalog나 새 복구 정책을 만들지 않습니다.</p></section>
+<section class="stage" id="current" hidden><div class="grid">
+<article class="phone"><div class="step">CURRENT / 설정</div><h2>설정</h2><div class="card"><h3>Persona 설정</h3><p>현재 대화 중인 Persona의 상세로 진입</p></div><div class="note">다른 Persona를 관리하려면 채팅 상단 목록으로 이동해야 합니다.</div></article>
+<article class="phone"><div class="step">CURRENT / 채팅 상단</div><h2>Persona A ▾</h2><div class="card"><h3>Persona Library</h3><p>생성 · 전환 · 상세 · 복제 · 삭제 · 공유</p></div><div class="card"><h3>B 상세 열기</h3><p>대화 상대를 B로 전환 → B 편집</p></div><div class="note">상세 열람과 대화 상대 전환이 결합돼 있습니다.</div><p class="caption">기존 구현의 정보 구조를 단순화한 비교도입니다.</p></article>
+</div></section>
+<footer class="legend">관련 이슈: <a href="https://github.com/seok-jun/my-honey-chat/issues/437">#437</a> · 동작·데이터·오류 정책은 이슈 본문, 주요 배치·정보 계층·상태 표현은 이 HTML을 기준으로 합니다.</footer>
+</main>
+<script>
+const tabs=document.querySelectorAll('[role="tab"]');const stages=document.querySelectorAll('.stage');
+function show(id){tabs.forEach(t=>t.setAttribute('aria-selected',String(t.dataset.target===id)));stages.forEach(s=>s.hidden=s.id!==id);}
+tabs.forEach(t=>t.addEventListener('click',()=>show(t.dataset.target)));
+document.querySelectorAll('[data-tab]').forEach(b=>b.addEventListener('click',()=>{show(b.dataset.tab);window.scrollTo({top:0,behavior:'smooth'});}));
+document.querySelectorAll('[data-focus]').forEach(b=>b.addEventListener('click',()=>{show('proposed');const panel=document.getElementById(b.dataset.focus);panel.focus();panel.scrollIntoView({behavior:'smooth',block:'center'});}));
+</script></body>
+</html>
