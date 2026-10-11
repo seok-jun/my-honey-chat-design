@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Issue #465 — 이미지·동영상·음성 수동 생성</title>
+<style>
+:root{font-family:system-ui,-apple-system,"Segoe UI",sans-serif;color:#eae5f5;background:#100f16;color-scheme:dark;--accent:#c9b4ff;--muted:#b6b0c6;--line:#3c374c}
+*{box-sizing:border-box}body{margin:0;padding:36px 24px 60px}main{max-width:1180px;margin:auto}header{margin-bottom:25px}h1{font-size:30px;letter-spacing:-1px;line-height:1.3;margin:10px 0}h2{margin:0;font-size:20px}p{line-height:1.6}a{color:var(--accent)}.meta,.muted{color:var(--muted);font-size:13px}.badge{display:inline-block;background:#312842;color:#deceff;border:1px solid #605173;border-radius:30px;padding:5px 11px;font-size:12px}button,input,textarea,select{font:inherit}button{min-height:48px;border:1px solid var(--line);background:#262330;color:inherit;padding:10px 14px;border-radius:14px;cursor:pointer}button:focus-visible,input:focus-visible,textarea:focus-visible{outline:3px solid #f3cf86;outline-offset:2px}button:hover:not(:disabled){border-color:var(--accent)}button:disabled{opacity:.48;cursor:default}.primary{background:var(--accent);color:#25133d;border-color:var(--accent);font-weight:750}.wide{width:100%}.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin:20px 0}.toolbar button{font-size:13px;min-height:44px;padding:8px 12px}.toolbar [aria-pressed=true]{background:#493569;border-color:#b79adf}
+.layout{display:grid;grid-template-columns:minmax(340px,460px) 1fr;gap:44px;align-items:start}.phone{position:relative;max-width:420px;width:100%;min-height:730px;border:1px solid #565062;border-radius:30px;overflow:hidden;box-shadow:0 20px 60px #0005;background:#19171f;margin:auto}.topbar{display:flex;align-items:center;gap:12px;border-bottom:1px solid #302a3c;padding:20px}.avatar{width:43px;height:43px;border-radius:50%;background:#493667;display:grid;place-items:center;color:#e3d2ff;font-size:20px}.thread{padding:22px 17px 165px;min-height:652px}.placeholder{height:8px;border-radius:6px;background:#a597bc42;margin:9px 0;width:85%}.placeholder.short{width:48%}.bubble{border:1px solid #3f364f;background:#2a2334;border-radius:18px 18px 18px 5px;padding:13px;max-width:86%;margin:15px 0}.bubble-label{font-size:12px;color:#c2b8d1}.voice-inline{font-size:13px;margin-top:10px;background:transparent}.notice{border:1px solid #655087;background:#30243f;border-radius:15px;padding:15px;margin-top:22px;font-size:14px}.error{background:#392527;border-color:#825358}.result{border:1px solid #60517d;border-radius:17px;background:linear-gradient(145deg,#312941,#202c36);padding:26px 14px;text-align:center;margin-top:18px}.result .graphic{font-size:38px;margin:14px}.composer{position:absolute;bottom:0;left:0;right:0;padding:12px;background:#201c28;border-top:1px solid #3a3249}.actions{display:flex;gap:7px;margin-bottom:8px}.actions button{padding:6px 10px;font-size:13px}.input-row{display:flex;gap:8px;align-items:center}.draft{border:1px solid #4b435a;border-radius:20px;min-width:0;width:100%;padding:13px;background:#17141e;color:#d8cce7}.backdrop{position:absolute;inset:0;background:#0008;display:flex;align-items:flex-end}.sheet{width:100%;background:#26212f;padding:12px 18px 22px;border:1px solid #544661;border-radius:26px 26px 0 0;max-height:92%;overflow:auto}.handle{height:4px;width:35px;margin:0 auto 18px;border-radius:10px;background:#776b88}.sheet-head{display:flex;align-items:center;justify-content:space-between;gap:8px}.sheet-head button{padding:8px 12px;background:transparent}.choices{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:18px 0}.choices button{padding:12px 5px;line-height:1.8}.choices [aria-pressed=true]{background:#46325f;border-color:#c9b4ff}.symbol{display:block;font-size:22px}label{display:block;margin:14px 0 8px;font-size:14px}.optional{color:#c1b7cc;font-size:12px}textarea{resize:vertical;width:100%;min-height:95px;background:#19161f;border:1px solid #51455f;color:inherit;border-radius:14px;padding:12px;font-size:14px}.source{border:1px solid #534660;border-radius:13px;padding:12px;background:#1e1a25;margin:15px 0}.source strong{display:block;font-size:14px}.hint{font-size:12px;color:#c6bdcf;line-height:1.6;margin:12px 0}.notes{padding:8px 0}.notes h2{margin:0 0 15px}.notes section{margin:22px 0;border-top:1px solid #393240;padding-top:18px}.notes ul{padding-left:20px;line-height:1.9;color:#d2cadc}.notes p{color:#d2cadc}.state-title{color:var(--accent);font-size:23px!important}.check{color:#d3e8b0}.subtitle{max-width:760px;color:#bcb3ca}.foot{margin-top:25px;color:#b8adc7;font-size:13px}[hidden]{display:none!important}
+@media(max-width:800px){body{padding:24px 14px}.layout{grid-template-columns:1fr;gap:25px}.phone{max-width:420px}.notes{max-width:600px;margin:auto}h1{font-size:25px}}
+@media(max-width:375px){.phone{border-radius:20px}.sheet{padding-left:12px;padding-right:12px}.actions{gap:4px}.actions button{font-size:12px;padding:6px 8px}}
+</style>
+</head>
+<body><main>
+<header><span class="badge">설계 초안 · 앱 구현 전</span><p class="meta">MY HONEY CHAT / ISSUE #465 / 채팅 화면</p><h1>원하는 순간에, 원하는 미디어로</h1><p class="subtitle">입력창의 생성 메뉴에서 이미지·동영상·음성을 선택합니다. 음성은 답변에서도 바로 실행합니다. 이 시안은 배치와 상태 전환만 표현하며 실제 생성·저장·네트워크 요청은 수행하지 않습니다.</p></header>
+<nav class="toolbar" aria-label="검토할 화면 상태">
+<button data-state="current">Current</button><button data-state="default">기본 화면</button><button data-state="image">이미지 메뉴</button><button data-state="video">동영상 메뉴</button><button data-state="voice">음성 메뉴</button><button data-state="generating">생성 중</button><button data-state="success">이미지 완료</button><button data-state="videoSuccess">영상 완료</button><button data-state="audioSuccess">음성 완료</button><button data-state="error">실패</button><button data-state="empty">대상 없음</button><button data-state="sceneEmpty">장면 부족</button><button data-state="quota">한도 소진</button><button data-state="connection">연결 미설정</button><button data-state="locked">대화 잠금</button>
+</nav>
+<div class="layout">
+<div class="phone" aria-label="채팅 화면 시안">
+<div class="topbar"><div class="avatar" aria-hidden="true">✦</div><div><strong>현재 캐릭터</strong><div class="meta">프로필 · 합성 레이아웃</div></div></div>
+<div class="thread">
+<p class="meta">대화 내용은 시안에 포함하지 않습니다.</p>
+<div class="bubble"><span class="bubble-label">이전 assistant 답변 영역</span><div class="placeholder"></div><div class="placeholder short"></div><button class="voice-inline" data-action="voice" aria-label="이 답변 음성 생성">♬ 이 답변 듣기</button></div>
+<div class="bubble"><span class="bubble-label">최신 assistant 답변 영역</span><div class="placeholder"></div><div class="placeholder"></div><button class="voice-inline" data-action="voice" aria-label="최신 답변 음성 생성">♬ 이 답변 듣기</button></div>
+<div id="status" role="status" aria-live="polite"></div>
+</div>
+<div class="composer">
+<div class="actions"><button aria-label="파일 첨부">＋ 첨부</button><button aria-label="행동 묘사">✧ 행동</button><button id="entry" data-action="menu">▧ 생성</button></div>
+<div class="input-row"><input class="draft" aria-label="메시지 초안" placeholder="메시지"><button aria-label="메시지 전송">↑</button></div>
+</div>
+<div class="backdrop" id="overlay" hidden>
+<section class="sheet" role="dialog" aria-modal="true" aria-labelledby="sheet-title"><div class="handle"></div><div class="sheet-head"><h2 id="sheet-title">미디어 만들기</h2><button data-action="close" aria-label="생성 메뉴 닫기">닫기</button></div>
+<div class="choices" aria-label="생성 종류"><button data-kind="image"><span class="symbol">▧</span>이미지</button><button data-kind="video"><span class="symbol">▷</span>동영상</button><button data-kind="voice"><span class="symbol">♬</span>음성</button></div>
+<div id="visual-options"><div class="source"><strong id="context-label">현재 대화의 장면</strong><p class="hint" id="context-hint">현재 캐릭터와 대화의 장면을 바탕으로 만들어요.</p></div><label for="scene">더 원하는 장면 <span class="optional">선택</span></label><textarea id="scene" placeholder="장소나 구도 등을 덧붙일 수 있어요."></textarea></div>
+<div id="voice-options" hidden><div class="source"><strong id="voice-source">최신 답변을 읽어요</strong><p class="hint" id="voice-hint">선택한 답변의 대사만 음성으로 만들어요. 행동 묘사는 읽지 않아요.</p><div class="placeholder"></div></div><p class="hint">다른 답변을 들으려면 해당 말풍선의 ‘이 답변 듣기’를 사용하세요.</p></div>
+<p id="restriction" class="hint"></p><button class="primary wide" id="generate">이미지 생성</button><p class="hint">생성을 누르면 실행돼요. 작성 중인 메시지는 그대로 남아요.</p>
+</section></div>
+</div>
+<aside class="notes"><h2 class="state-title" id="state-title"></h2><p id="state-note"></p>
+<section><h2>배치와 조작</h2><ul><li>입력칸 위 보조 버튼 줄에 생성 진입점 하나를 추가합니다.</li><li>종류를 선택한 뒤 생성 버튼으로 실행합니다.</li><li>말풍선의 듣기는 해당 답변을 대상으로 합니다.</li><li>최소 48dp 터치 영역과 화면 낭독기 이름을 제공합니다.</li></ul></section>
+<section><h2>결과를 다루는 기준</h2><ul><li>실행 시점의 캐릭터·장면 또는 답변을 고정합니다.</li><li>유효한 기존 음성은 재생하고 다시 생성하지 않습니다.</li><li>기존 답변·이미지·영상은 덮어쓰지 않습니다.</li><li>실패 재시도는 같은 입력을 사용하고 조건을 다시 확인합니다.</li></ul></section>
+<section><h2>시안 검토 안내</h2><p>위 상태 버튼으로 완료·실패·비활성 화면을 직접 확인합니다. 메뉴의 생성 버튼은 ‘생성 중’ 배치로만 전환하며 가짜 진행률이나 자동 완료를 제공하지 않습니다.</p><p>Current는 기존 첨부·행동·입력·전송 구조의 도식이며 실제 앱 캡처가 아닙니다. 모든 대화 영역은 빈 자리 표시자입니다.</p></section>
+</aside></div>
+<footer class="foot">Issue #465 · 공개용 합성 화면 · 외부 asset/API 없음 · 디자인 게시가 앱 설계 승인이나 구현 완료를 의미하지 않습니다.</footer>
+</main>
+<script>
+const $=id=>document.getElementById(id);
+const descriptions={
+ current:['Current · 기존 구조','생성 진입점 없이 첨부·행동·메시지 전송을 사용합니다.'],
+ default:['Proposed · 기본 화면','생성 메뉴 또는 답변별 듣기로 원하는 출력을 지정합니다.'],
+ image:['이미지 · 현재 장면','종류 선택만으로 호출하지 않습니다. 장면 요청을 선택적으로 덧붙인 뒤 생성합니다.'],
+ video:['동영상 · 현재 장면','기존 영상 길이와 공급사 제한을 유지합니다. 이 화면에서 새로운 길이 설정은 추가하지 않습니다.'],
+ voice:['음성 · 지정한 답변','메뉴에서는 최신의 읽을 수 있는 답변이 기본 대상입니다. 말풍선 버튼은 그 답변을 지정합니다.'],
+ generating:['생성 중','기존 전송 잠금과 연동합니다. 추가 생성은 비활성화하고 현재 작업의 종류를 표시합니다.'],
+ success:['이미지 완료','기존 이미지 카드로 표시하고 원래 답변은 그대로 보존합니다.'],
+ videoSuccess:['영상 완료','기존 영상 카드와 플레이어를 사용합니다.'],
+ audioSuccess:['음성 완료','기존 음성 재생 UI를 사용합니다. 유효한 결과를 다시 누르면 API 없이 재생합니다.'],
+ error:['실패 · 수동 재시도','입력과 대상을 보존합니다. 다시 시도할 때 한도·잠금·대상 유효성을 재검사합니다.'],
+ empty:['음성 대상 없음','대사가 있는 assistant 답변이 없거나 Action-only이면 호출하지 않습니다.'],
+ sceneEmpty:['현재 장면 정보 부족','현재 장면과 추가 요청이 모두 비어 있으면 안내하고 호출하지 않습니다. 실제 앱에서는 장면 입력 후 조건을 다시 판단합니다.'],
+ quota:['한도 소진','기존 quota/budget 차단 안내를 사용하며 수동 버튼으로 우회하지 않습니다.'],
+ connection:['연결 미설정','연결 설정 안내를 표시하고 생성하지 않습니다.'],
+ locked:['대화 쓰기 잠금','기존 rollback·복원 등 쓰기 잠금을 따릅니다. 입력과 생성 버튼이 비활성화됩니다.']
+};
+let selected='image',state='default',fromBubble=false;
+function show(next){
+ state=next;const d=descriptions[next];$('state-title').textContent=d[0];$('state-note').textContent=d[1];
+ document.querySelectorAll('[data-state]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.state===next)));
+ const menu=['image','video','voice','empty','sceneEmpty','quota','connection'].includes(next);
+ $('overlay').hidden=!menu;
+ if(['image','video','voice'].includes(next))selected=next;
+ if(next==='empty')selected='voice';if(next==='sceneEmpty')selected='image';
+ document.querySelectorAll('[data-kind]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.kind===selected)));
+ $('visual-options').hidden=selected==='voice';$('voice-options').hidden=selected!=='voice';
+ $('generate').textContent=({image:'이미지 생성',video:'동영상 생성',voice:'음성 생성'})[selected];
+ $('generate').disabled=['empty','sceneEmpty','quota','connection'].includes(next);
+ $('restriction').textContent=({empty:'읽을 수 있는 답변이 아직 없어요.',sceneEmpty:'어떤 장면을 만들지 알려 주세요.',quota:'현재 생성 한도를 모두 사용했어요.',connection:'생성하려면 연결 설정이 필요해요.'})[next]||'';
+ $('context-label').textContent=next==='sceneEmpty'?'장면 정보가 부족해요':'현재 대화의 장면';
+ $('context-hint').textContent=next==='sceneEmpty'?'아래에 원하는 장면을 입력해 주세요.':'현재 캐릭터와 대화의 장면을 바탕으로 만들어요.';
+ $('voice-source').textContent=next==='empty'?'읽을 답변이 없어요':fromBubble?'선택한 답변을 읽어요':'최신 답변을 읽어요';
+ $('entry').hidden=next==='current';
+ const busy=['generating','locked'].includes(next);
+ $('entry').disabled=busy;document.querySelectorAll('.voice-inline').forEach(b=>{b.hidden=next==='current';b.disabled=busy||next==='empty'});
+ document.querySelectorAll('.composer button,.draft').forEach(b=>b.disabled=busy);
+ let content='';
+ if(next==='generating')content='<div class="notice"><strong>'+({image:'이미지',video:'동영상',voice:'음성'})[selected]+' 생성 중</strong><p class="hint">완료되면 이 대화에 표시돼요.</p></div>';
+ if(next==='error')content='<div class="notice error"><strong>미디어를 만들지 못했어요</strong><p class="hint">요청 내용은 보관돼 있어요.</p><button data-action="retry">다시 시도</button></div>';
+ if(next==='locked')content='<div class="notice">대화를 정리하는 동안 잠시 기다려 주세요.</div>';
+ if(next==='success')content='<div class="result"><span class="check">이미지 생성 완료</span><div class="graphic">▧</div><p class="hint">이미지 표시 영역</p></div>';
+ if(next==='videoSuccess')content='<div class="result"><span class="check">동영상 생성 완료</span><div class="graphic">▷</div><button data-action="play">동영상 재생</button></div>';
+ if(next==='audioSuccess')content='<div class="result"><span class="check">음성 생성 완료</span><p><button data-action="play">▶ 음성 재생</button></p></div>';
+ $('status').innerHTML=content;
+}
+document.addEventListener('click',e=>{const b=e.target.closest('button');if(!b||b.disabled)return;
+ if(b.dataset.state){fromBubble=false;show(b.dataset.state)}
+ if(b.dataset.kind)show(b.dataset.kind);
+ if(b.dataset.action==='menu'){fromBubble=false;show(selected)}
+ if(b.dataset.action==='voice'){fromBubble=true;show('voice')}
+ if(b.dataset.action==='close')show('default');
+ if(b.id==='generate'||b.dataset.action==='retry')show('generating');
+ if(b.dataset.action==='play')$('status').insertAdjacentHTML('beforeend','<p class="hint" role="status">시안에는 실제 미디어가 없습니다. 앱에서는 기존 플레이어로 재생합니다.</p>');
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!$('overlay').hidden){show('default');$('entry').focus()}});
+show('default');
+</script>
+</body></html>
