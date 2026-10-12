@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #504 — 프로필 리디자인 (사진 헤더·카드 묶음)</title>
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --page: #f4f2fa; --page-ink: #1b1733; --page-muted: #5f5880; --page-line: #ddd7ef; --page-card: #ffffff;
+      --bg: #0E0B1F; --surface: #1E1838; --surfaceVariant: #262046; --outline: #3A3260;
+      --onSurface: #ECE8FF; --onSurfaceVariant: #A9A2C9; --primary: #9C8FFF; --onPrimary: #120E2A;
+      --userBubble: #5B4BD0; --onUserBubble: #FFFFFF; --star: #FFD27A; --onStar: #2B1A0E;
+    }
+    .phone[data-theme="light"] {
+      --bg: #F5F3FC; --surface: #FFFFFF; --surfaceVariant: #ECE8F8; --outline: #DCD5F2;
+      --onSurface: #1C1733; --onSurfaceVariant: #5F5880; --primary: #4F3FC4; --onPrimary: #FFFFFF;
+      --userBubble: #4F3FC4; --onUserBubble: #FFFFFF; --star: #F2B544; --onStar: #2B1A0E;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 36px 20px 80px; background: var(--page); color: var(--page-ink); line-height: 1.55; }
+    main { max-width: 1120px; margin: 0 auto; }
+    .eyebrow { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--page-muted); font-weight: 700; }
+    h1 { margin: 10px 0 8px; font-size: clamp(1.5rem, 4vw, 2.1rem); }
+    .lede { margin: 0 0 6px; max-width: 72ch; }
+    .badge { display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 999px; background: #efe9ff; color: #4F3FC4; font-size: .8rem; font-weight: 700; }
+    .notice { margin: 16px 0 0; padding: 12px 14px; border: 1px solid var(--page-line); border-left: 3px solid #4F3FC4; border-radius: 10px; background: var(--page-card); font-size: .9rem; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 8px; }
+    button { font: inherit; border: 1px solid var(--page-line); background: var(--page-card); color: inherit; border-radius: 10px; padding: 9px 13px; cursor: pointer; min-height: 40px; }
+    button[aria-selected="true"] { border-color: #4F3FC4; background: #4F3FC4; color: #fff; font-weight: 700; }
+    .themebar { display: flex; gap: 8px; margin: 4px 0 20px; align-items: center; font-size: .88rem; color: var(--page-muted); flex-wrap: wrap; }
+    .stage { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; align-items: start; }
+    .frame { border: 1px solid var(--page-line); border-radius: 18px; padding: 16px; background: var(--page-card); }
+    .frame > h3 { margin: 0 0 12px; font-size: .95rem; }
+    .phone { width: 100%; max-width: 360px; margin: 0 auto; border-radius: 26px; overflow: hidden; background: var(--bg); color: var(--onSurface); border: 1px solid var(--outline); }
+    .topbar { display: flex; align-items: center; gap: 10px; padding: 14px 16px; border-bottom: 1px solid var(--outline); }
+    .topbar .t { font-size: 18px; font-weight: 600; flex: 1; }
+    .icon { width: 40px; height: 40px; border-radius: 999px; display: grid; place-items: center; color: var(--onSurfaceVariant); font-size: 15px; flex: 0 0 auto; }
+    .pad { padding: 16px; display: grid; gap: 12px; }
+    .hero { display: flex; gap: 14px; align-items: center; }
+    .photo { width: 96px; height: 96px; border-radius: 16px; background: var(--primary); color: var(--onPrimary); display: grid; place-items: center; font-size: 34px; font-weight: 700; flex: 0 0 auto; }
+    .photo.empty { background: var(--surfaceVariant); color: var(--onSurfaceVariant); font-size: 12px; font-weight: 400; text-align: center; padding: 8px; }
+    .hname { font-size: 18px; font-weight: 600; }
+    .hmeta { font-size: 13px; color: var(--onSurfaceVariant); margin-top: 4px; }
+    .card { background: var(--surface); border: 1px solid var(--outline); border-radius: 16px; overflow: hidden; }
+    .card h4 { margin: 0; padding: 12px 14px 8px; font-size: 12px; font-weight: 500; color: var(--onSurfaceVariant); letter-spacing: .02em; }
+    .crow { display: flex; align-items: center; gap: 10px; min-height: 48px; padding: 10px 14px; font-size: 16px; }
+    .crow + .crow { border-top: 1px solid var(--outline); }
+    .crow .k { color: var(--onSurfaceVariant); font-size: 13px; flex: 0 0 76px; }
+    .crow .v { flex: 1; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .crow .go { color: var(--onSurfaceVariant); font-size: 13px; }
+    .banner { border-radius: 16px; padding: 12px 14px; font-size: 13px; background: var(--surfaceVariant); border: 1px solid var(--outline); color: var(--onSurfaceVariant); }
+    .banner b { color: var(--onSurface); display: block; font-size: 14px; margin-bottom: 2px; }
+    .banner.err { border-style: dashed; }
+    .actions { display: flex; gap: 10px; }
+    .btn { flex: 1; min-height: 48px; border-radius: 999px; display: grid; place-items: center; font-size: 15px; font-weight: 700; }
+    .btn.ghost { border: 1px solid var(--outline); color: var(--onSurfaceVariant); }
+    .btn.fill { background: var(--primary); color: var(--onPrimary); }
+    .btn.busy { background: var(--surfaceVariant); color: var(--onSurfaceVariant); }
+    .legend { margin-top: 10px; font-size: .86rem; color: var(--page-muted); }
+    ul.rules { margin: 26px 0 0; padding-left: 20px; }
+    ul.rules li { margin-bottom: 6px; }
+    .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 10px; }
+    .cols section { border: 1px solid var(--page-line); border-radius: 14px; padding: 14px 16px; }
+    .cols h4 { margin: 0 0 6px; font-size: .92rem; }
+    .cols p { margin: 0; font-size: .88rem; }
+    footer { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--page-line); color: var(--page-muted); font-size: .84rem; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">some:You · Issue #504 · Persona 상세</div>
+    <h1>프로필 헤더와 카드 묶음</h1>
+    <p class="lede">상세 화면 위에 큰 사진과 이름·나이·직업·관계를 모은 헤더를 둔다. 아래 편집 폼은 <code>surface</code> + <code>outline</code> 카드 묶음으로 묶어 읽는 영역과 고치는 영역을 구분한다.</p>
+    <span class="badge">설계 초안 · 앱 구현 전</span>
+    <p class="notice">이 시안은 화면 배치, 정보 계층, UI 상태의 구현 기준이다. 저장·추출·provider 동작은 실행하지 않는다. <strong>모든 이름과 문장은 합성 예시다.</strong> 색·글자·간격 값은 <code>foundation/tokens.json</code>을 따른다.</p>
+    <p class="notice"><strong>기존 배치를 유지하는 부분.</strong> 섹션별 편집 구성, <code>대화로 조정</code> 진입, 저장·취소 동작과 validation은 <a href="105.html">#105</a> 기준이다. 비활성 대상 편집 배너는 <a href="437.html">#437</a>, 외형 설명 영역은 <a href="81.html">#81</a> 기준이다. 이 시안은 헤더 추가와 카드 묶음, 색·치수만 바꾼다.</p>
+    <p class="notice"><strong>넣지 않는 것.</strong> foundation 5절의 "우리의 추억" 카드는 장기 기억을 UI에 노출하는 경로가 앱에 없어 제외한다. 기억 조회 경로 신설은 별도 기능 이슈가 필요하다. 상단바 아바타 탭의 목적지도 바꾸지 않는다. 지금은 Persona 전환 진입점이다.</p>
+  </header>
+
+  <div class="controls" role="tablist" aria-label="화면 상태">
+    <button type="button" role="tab" aria-selected="true" data-target="s-current">Current</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-default">Proposed · 기본</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-nophoto">사진 없음 · 빈 값</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-saving">저장 중</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-notice">안내 · 오류</button>
+  </div>
+  <div class="themebar">
+    <span>테마</span>
+    <button type="button" id="t-dark" aria-selected="true">다크 (기본)</button>
+    <button type="button" id="t-light" aria-selected="false">라이트</button>
+  </div>
+
+  <section id="s-current">
+    <div class="stage">
+      <div class="frame">
+        <h3>현재 구조</h3>
+        <div class="phone">
+          <div class="topbar" style="border-color:#2A2429"><div class="icon">←</div><div class="t">Persona A · 상세</div></div>
+          <div class="pad">
+            <div style="font-size:13px;color:#B9ADB1">이름</div>
+            <div style="background:#2A2429;border-radius:12px;padding:12px 14px;font-size:16px">합성 이름</div>
+            <div style="font-size:13px;color:#B9ADB1">기본 정보·성향</div>
+            <div style="background:#2A2429;border-radius:12px;padding:12px 14px;font-size:13px;color:#B9ADB1">기존 상세 폼과 validation 유지</div>
+            <div style="font-size:13px;color:#B9ADB1">외형 사진</div>
+            <div style="background:#2A2429;border-radius:12px;padding:12px 14px;font-size:13px;color:#B9ADB1">사진 관리로 이동</div>
+            <div class="actions"><div class="btn ghost" style="border-color:#2A2429">취소</div><div class="btn fill" style="background:#8E4E61;color:#F0A8B7">변경 저장</div></div>
+          </div>
+        </div>
+        <p class="legend">사진 헤더가 없고 이름·나이·직업이 폼 입력란으로만 존재한다. 프로필을 "보는" 영역과 "고치는" 영역이 구분되지 않는다. 색은 구 팔레트다.</p>
+      </div>
+      <div class="frame">
+        <h3>바꾸는 것 / 두는 것</h3>
+        <div class="cols" style="grid-template-columns:1fr">
+          <section><h4>바꾼다</h4><p>상단에 사진 헤더(사진 96 + 이름 + 나이·직업·관계 한 줄) 추가. 폼을 카드 묶음으로 묶고 <code>outline</code> 테두리를 준다. 색·모서리·행 높이를 토큰에 맞춘다.</p></section>
+          <section><h4>두다</h4><p>섹션 구성과 순서, 저장·취소 동작, validation, <code>대화로 조정</code>·사진 관리·외형 추출 진입점의 목적지, 비활성 대상 배너 문구 기준.</p></section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-default" hidden>
+    <div class="stage">
+      <div class="frame">
+        <h3>Proposed · 기본</h3>
+        <div class="phone">
+          <div class="topbar"><div class="icon">←</div><div class="t">Persona A</div><div class="icon">⋯</div></div>
+          <div class="pad">
+            <div class="hero">
+              <div class="photo">A</div>
+              <div>
+                <div class="hname">Persona A</div>
+                <div class="hmeta">20대 후반 · 합성 직업 · 오래 알고 지낸 친구</div>
+              </div>
+            </div>
+            <div class="card">
+              <h4>기본 정보</h4>
+              <div class="crow"><span class="k">이름</span><span class="v">Persona A</span><span class="go">›</span></div>
+              <div class="crow"><span class="k">나이대</span><span class="v">20대 후반</span><span class="go">›</span></div>
+              <div class="crow"><span class="k">직업</span><span class="v">합성 직업</span><span class="go">›</span></div>
+              <div class="crow"><span class="k">관계</span><span class="v">오래 알고 지낸 친구</span><span class="go">›</span></div>
+            </div>
+            <div class="card">
+              <h4>성향과 화법</h4>
+              <div class="crow"><span class="k">기본 화법</span><span class="v">합성 화법 설명</span><span class="go">›</span></div>
+              <div class="crow"><span class="k">추가 배경</span><span class="v">합성 배경 설명 자리 표시자</span><span class="go">›</span></div>
+              <div class="crow"><span class="v">대화로 조정</span><span class="go">›</span></div>
+            </div>
+            <div class="card">
+              <h4>외형</h4>
+              <div class="crow"><span class="k">외형 사진</span><span class="v">등록됨</span><span class="go">›</span></div>
+              <div class="crow"><span class="k">외형 설명</span><span class="v">저장된 외형 설명 자리 표시자</span><span class="go">›</span></div>
+            </div>
+            <div class="actions"><div class="btn ghost">취소</div><div class="btn fill">변경 저장</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="frame">
+        <h3>값</h3>
+        <div class="cols" style="grid-template-columns:1fr">
+          <section><h4>헤더</h4><p>사진 96 × 96, 모서리 <code>shape.image</code> 16. 이름 18sp SemiBold(<code>characterName</code>). 아래 한 줄은 13sp <code>onSurfaceVariant</code>(<code>status</code>)로 나이대 · 직업 · 관계를 <code>·</code>로 잇는다. 한 줄을 넘으면 말줄임.</p></section>
+          <section><h4>카드</h4><p><code>surface</code> 배경 + <code>outline</code> 1dp, 모서리 16. 섹션 제목은 12sp Medium(<code>dateDivider</code>) <code>onSurfaceVariant</code>. 행 사이 구분선도 <code>outline</code>.</p></section>
+          <section><h4>행</h4><p>최소 높이 <code>size.minTouchTarget</code> 48. 왼쪽 라벨 13sp <code>onSurfaceVariant</code>, 값 16sp <code>onSurface</code>, 오른쪽 이동 표시. 값이 길면 한 줄 말줄임.</p></section>
+          <section><h4>버튼</h4><p>저장은 <code>primary</code> / <code>onPrimary</code>, 취소는 <code>outline</code> 테두리 + <code>onSurfaceVariant</code>. 둘 다 높이 48, 모서리 <code>shape.chip</code>.</p></section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-nophoto" hidden>
+    <div class="stage">
+      <div class="frame">
+        <h3>사진 없음 · 나이·직업 비었음</h3>
+        <div class="phone">
+          <div class="topbar"><div class="icon">←</div><div class="t">Persona B</div><div class="icon">⋯</div></div>
+          <div class="pad">
+            <div class="hero">
+              <div class="photo">B</div>
+              <div>
+                <div class="hname">Persona B</div>
+                <div class="hmeta">오래 알고 지낸 친구</div>
+              </div>
+            </div>
+            <div class="card">
+              <h4>기본 정보</h4>
+              <div class="crow"><span class="k">이름</span><span class="v">Persona B</span><span class="go">›</span></div>
+              <div class="crow"><span class="k">나이대</span><span class="v" style="color:var(--onSurfaceVariant)">입력하지 않음</span><span class="go">›</span></div>
+              <div class="crow"><span class="k">직업</span><span class="v" style="color:var(--onSurfaceVariant)">입력하지 않음</span><span class="go">›</span></div>
+            </div>
+            <div class="card">
+              <h4>외형</h4>
+              <div class="crow"><span class="k">외형 사진</span><span class="v" style="color:var(--onSurfaceVariant)">등록되지 않음</span><span class="go">›</span></div>
+            </div>
+          </div>
+        </div>
+        <p class="legend">사진이 없으면 기존 이니셜 대체 표현을 그대로 쓴다. 배경은 <code>primary</code>, 글자는 <code>onPrimary</code>다.</p>
+      </div>
+      <div class="frame">
+        <h3>빈 값 규칙</h3>
+        <ul class="rules" style="margin-top:0">
+          <li>헤더 한 줄에서 <strong>비어 있는 항목은 생략</strong>하고 <code>·</code> 구분자도 같이 뺀다. 전부 비었으면 한 줄 자체를 숨긴다.</li>
+          <li>카드 행의 빈 값은 <code>입력하지 않음</code>을 <code>onSurfaceVariant</code>로 표시한다. 행 자체는 숨기지 않는다.</li>
+          <li>이름은 비울 수 없다. 기존 validation을 그대로 쓴다.</li>
+          <li>사진 자리는 비어도 96 × 96을 유지해 헤더 높이가 흔들리지 않게 한다.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-saving" hidden>
+    <div class="stage">
+      <div class="frame">
+        <h3>저장 중</h3>
+        <div class="phone">
+          <div class="topbar"><div class="icon">←</div><div class="t">Persona A</div><div class="icon">⋯</div></div>
+          <div class="pad">
+            <div class="hero"><div class="photo">A</div><div><div class="hname">Persona A</div><div class="hmeta">20대 후반 · 합성 직업 · 오래 알고 지낸 친구</div></div></div>
+            <div class="card" style="opacity:.55">
+              <h4>기본 정보</h4>
+              <div class="crow"><span class="k">이름</span><span class="v">Persona A</span></div>
+              <div class="crow"><span class="k">나이대</span><span class="v">20대 후반</span></div>
+            </div>
+            <div class="actions"><div class="btn ghost" style="opacity:.5">취소</div><div class="btn busy">저장 중…</div></div>
+          </div>
+        </div>
+        <p class="legend">저장 중에는 카드와 취소를 비활성으로 보이고 저장 버튼에 진행 상태를 표시한다. 진행률이나 자동 완료를 흉내 내지 않는다. 중복 저장을 막는다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-notice" hidden>
+    <div class="stage">
+      <div class="frame">
+        <h3>비활성 대상 편집 안내</h3>
+        <div class="phone">
+          <div class="topbar"><div class="icon">←</div><div class="t">Persona B</div><div class="icon">⋯</div></div>
+          <div class="pad">
+            <div class="banner"><b>Persona B를 편집하고 있어요</b>저장해도 대화 상대는 바뀌지 않아요. 지금 대화 중: Persona A</div>
+            <div class="hero"><div class="photo">B</div><div><div class="hname">Persona B</div><div class="hmeta">합성 직업 · 오래 알고 지낸 친구</div></div></div>
+            <div class="card"><h4>기본 정보</h4><div class="crow"><span class="k">이름</span><span class="v">Persona B</span><span class="go">›</span></div></div>
+          </div>
+        </div>
+        <p class="legend">배너는 헤더 위에 둔다. 문구와 동작 기준은 <a href="437.html">#437</a>이다. 사진·조정·추출은 모두 이 대상을 향한다.</p>
+      </div>
+      <div class="frame">
+        <h3>오류</h3>
+        <div class="phone">
+          <div class="topbar"><div class="icon">←</div><div class="t">Persona A</div><div class="icon">⋯</div></div>
+          <div class="pad">
+            <div class="banner err"><b>저장하지 못했어요</b>이 화면에 머물러 이유를 표시한다. 입력한 값은 그대로 남는다.</div>
+            <div class="hero"><div class="photo">A</div><div><div class="hname">Persona A</div><div class="hmeta">20대 후반 · 합성 직업 · 오래 알고 지낸 친구</div></div></div>
+            <div class="actions"><div class="btn ghost">취소</div><div class="btn fill">다시 저장</div></div>
+          </div>
+        </div>
+        <p class="legend"><strong>오류 색 토큰이 아직 없다.</strong> <code>tokens.json</code>의 <code>color.dark</code>/<code>color.light</code>에는 12개 키만 있고 <code>error</code>가 없다. 이 시안은 임의의 빨강을 넣지 않고 점선 테두리로 자리만 표시한다. foundation에 <code>error</code>/<code>onError</code> 추가를 제안 중이며, 추가되기 전에는 이 배너의 색을 확정하지 않는다. 본문은 <code>onSurfaceVariant</code>, <code>star</code> 색은 쓰지 않는다. 실패 시 화면을 떠나지 않는 동작은 <a href="105.html">#105</a> 기준이다.</p>
+      </div>
+    </div>
+  </section>
+
+  <h2 style="margin-top:34px;font-size:1.1rem">구현 기준 요약</h2>
+  <ul class="rules">
+    <li>헤더는 읽는 영역이다. 값을 고치는 것은 아래 카드 행에서 한다. 헤더에 입력란을 두지 않는다.</li>
+    <li>카드에는 <code>outline</code> 1dp 테두리를 반드시 준다. <code>surface</code>와 <code>background</code>의 대비가 1.1~1.2:1이다.</li>
+    <li><code>star</code> 색은 이 화면에서 쓰지 않는다. 온라인 점·안 읽은 배지·선톡 칩 전용이다.</li>
+    <li>오류·위험 표현의 색은 <code>tokens.json</code>에 토큰이 추가된 뒤에 확정한다. 그 전까지 임의의 빨강을 쓰지 않는다.</li>
+    <li>"우리의 추억" 카드는 넣지 않는다. 장기 기억 조회 경로가 없다.</li>
+    <li>모든 행과 버튼의 터치 영역은 48dp 이상이다. 본문 20sp에서도 행이 깨지지 않아야 한다.</li>
+    <li>섹션 구성·저장·validation·진입점 목적지는 기존 시안이 기준이다. 이 시안이 그것을 바꾸지 않는다.</li>
+  </ul>
+
+  <footer>
+    Issue #504 · 공개용 합성 화면 · 외부 asset/API 없음 · 디자인 게시가 앱 설계 승인이나 구현 완료를 의미하지 않습니다.
+  </footer>
+</main>
+<script>
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const sections = document.querySelectorAll('main > section');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
+    sections.forEach(s => { s.hidden = s.id !== tab.dataset.target; });
+  }));
+  const dark = document.getElementById('t-dark');
+  const light = document.getElementById('t-light');
+  function setTheme(mode) {
+    document.querySelectorAll('.phone').forEach(p => {
+      if (mode === 'light') { p.dataset.theme = 'light'; } else { delete p.dataset.theme; }
+    });
+    dark.setAttribute('aria-selected', String(mode !== 'light'));
+    light.setAttribute('aria-selected', String(mode === 'light'));
+  }
+  dark.addEventListener('click', () => setTheme('dark'));
+  light.addEventListener('click', () => setTheme('light'));
+</script>
+</body>
+</html>
