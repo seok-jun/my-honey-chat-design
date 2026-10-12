@@ -8,6 +8,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 ISSUES_DIR = ROOT / "issues"
+FOUNDATION_DIR = ROOT / "foundation"
 DIST_DIR = ROOT / "dist"
 TITLE_PATTERN = re.compile(r"<title[^>]*>(.*?)</title>", re.IGNORECASE | re.DOTALL)
 TAG_PATTERN = re.compile(r"<[^>]+>")
@@ -34,12 +35,18 @@ def visual_specs() -> list[tuple[int, Path, str]]:
     return sorted(specs, key=lambda item: item[0], reverse=True)
 
 
-def render_index(specs: list[tuple[int, Path, str]]) -> str:
+def render_index(specs: list[tuple[int, Path, str]], has_foundation: bool = False) -> str:
     cards = []
     for issue_number, path, title in specs:
         cards.append(
             f'''\n      <article class="card">\n        <div class="issue">Issue #{issue_number}</div>\n        <h2>{html.escape(title)}</h2>\n        <div class="actions">\n          <a class="primary" href="issues/{path.name}">Visual Spec 열기</a>\n          <a href="https://github.com/seok-jun/my-honey-chat/issues/{issue_number}">앱 이슈 보기</a>\n        </div>\n      </article>'''
         )
+
+    foundation_link = (
+        '<a class="primary" href="foundation/">Foundation — 브랜드·디자인 기준</a>'
+        if has_foundation
+        else ""
+    )
 
     empty = '<p class="empty">아직 등록된 Visual Spec이 없습니다.</p>'
     content = "".join(cards) if cards else empty
@@ -85,6 +92,7 @@ def render_index(specs: list[tuple[int, Path, str]]) -> str:
       <span>{len(specs)}개 Visual Spec</span>
       <span>issues/*.html 자동 수집</span>
     </div>
+    <div class="actions" style="margin-top:18px">{foundation_link}</div>
   </header>
   <main class="grid">{content}
   </main>
@@ -104,7 +112,11 @@ def build() -> None:
     for _, path, _ in specs:
         shutil.copy2(path, DIST_DIR / "issues" / path.name)
 
-    (DIST_DIR / "index.html").write_text(render_index(specs), encoding="utf-8")
+    has_foundation = (FOUNDATION_DIR / "index.html").is_file()
+    if has_foundation:
+        shutil.copytree(FOUNDATION_DIR, DIST_DIR / "foundation")
+
+    (DIST_DIR / "index.html").write_text(render_index(specs, has_foundation), encoding="utf-8")
     (DIST_DIR / ".nojekyll").touch()
 
     print(f"Built {len(specs)} visual specs into {DIST_DIR}")
