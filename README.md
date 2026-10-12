@@ -2,6 +2,15 @@
 
 My Honey Chat UI/UX Visual Spec 전용 저장소.
 
+## Foundation (브랜드·디자인 기준)
+
+앱 이름 **some:You**의 공통 디자인 기준은 [`foundation/`](foundation/README.md)에 있다. 이슈별 Visual Spec은 이 기준(색·글자·간격·모서리·모션·아이콘) 위에서 화면 배치와 상태만 다룬다.
+
+- 가이드: `foundation/README.md` (원칙, 컴포넌트, 구현 에이전트 규칙, 리뷰 체크리스트)
+- 토큰 원본: `foundation/tokens.json` — 값은 여기서 먼저 고치고 가이드 표와 `foundation/compose/*.kt`를 같은 커밋에서 맞춘다.
+- 견본 페이지: `https://seok-jun.github.io/my-honey-chat-design/foundation/`
+- 앱 아이콘: `foundation/icon/` (SVG 원본, Android `res/` 내보내기)
+
 ## Visual Spec 규칙
 
 - 앱 이슈 번호를 파일명으로 사용한다: `issues/57.html`

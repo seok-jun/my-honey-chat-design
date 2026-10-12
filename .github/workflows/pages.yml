@@ -4,6 +4,7 @@ on:
   pull_request:
     paths:
       - "issues/**"
+      - "foundation/**"
       - "scripts/build_site.py"
       - ".github/workflows/pages.yml"
   push:
@@ -11,6 +12,7 @@ on:
       - main
     paths:
       - "issues/**"
+      - "foundation/**"
       - "scripts/build_site.py"
       - ".github/workflows/pages.yml"
   workflow_dispatch:
