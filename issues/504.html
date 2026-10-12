@@ -11,11 +11,13 @@
       --bg: #0E0B1F; --surface: #1E1838; --surfaceVariant: #262046; --outline: #3A3260;
       --onSurface: #ECE8FF; --onSurfaceVariant: #A9A2C9; --primary: #9C8FFF; --onPrimary: #120E2A;
       --userBubble: #5B4BD0; --onUserBubble: #FFFFFF; --star: #FFD27A; --onStar: #2B1A0E;
+      --error: #FFB4AB; --onError: #4A0F0C;
     }
     .phone[data-theme="light"] {
       --bg: #F5F3FC; --surface: #FFFFFF; --surfaceVariant: #ECE8F8; --outline: #DCD5F2;
       --onSurface: #1C1733; --onSurfaceVariant: #5F5880; --primary: #4F3FC4; --onPrimary: #FFFFFF;
       --userBubble: #4F3FC4; --onUserBubble: #FFFFFF; --star: #F2B544; --onStar: #2B1A0E;
+      --error: #A82018; --onError: #FFFFFF;
     }
     * { box-sizing: border-box; }
     body { margin: 0; padding: 36px 20px 80px; background: var(--page); color: var(--page-ink); line-height: 1.55; }
@@ -51,7 +53,8 @@
     .crow .go { color: var(--onSurfaceVariant); font-size: 13px; }
     .banner { border-radius: 16px; padding: 12px 14px; font-size: 13px; background: var(--surfaceVariant); border: 1px solid var(--outline); color: var(--onSurfaceVariant); }
     .banner b { color: var(--onSurface); display: block; font-size: 14px; margin-bottom: 2px; }
-    .banner.err { border-style: dashed; }
+    .banner.err { border-color: var(--error); }
+    .banner.err b { color: var(--error); }
     .actions { display: flex; gap: 10px; }
     .btn { flex: 1; min-height: 48px; border-radius: 999px; display: grid; place-items: center; font-size: 15px; font-weight: 700; }
     .btn.ghost { border: 1px solid var(--outline); color: var(--onSurfaceVariant); }
@@ -254,7 +257,7 @@
             <div class="actions"><div class="btn ghost">취소</div><div class="btn fill">다시 저장</div></div>
           </div>
         </div>
-        <p class="legend"><strong>오류 색 토큰이 아직 없다.</strong> <code>tokens.json</code>의 <code>color.dark</code>/<code>color.light</code>에는 12개 키만 있고 <code>error</code>가 없다. 이 시안은 임의의 빨강을 넣지 않고 점선 테두리로 자리만 표시한다. foundation에 <code>error</code>/<code>onError</code> 추가를 제안 중이며, 추가되기 전에는 이 배너의 색을 확정하지 않는다. 본문은 <code>onSurfaceVariant</code>, <code>star</code> 색은 쓰지 않는다. 실패 시 화면을 떠나지 않는 동작은 <a href="105.html">#105</a> 기준이다.</p>
+        <p class="legend">오류 배너는 <code>error</code> 테두리와 제목을 쓴다. 다크 <code>#FFB4AB</code>, 라이트 <code>#A82018</code>이며 말풍선·카드 위 대비는 다크 9.95:1, 라이트 7.28:1이다. 본문은 <code>onSurfaceVariant</code>, <code>star</code> 색은 쓰지 않는다. 실패 시 화면을 떠나지 않는 동작은 <a href="105.html">#105</a> 기준이다.</p>
       </div>
     </div>
   </section>
@@ -264,7 +267,7 @@
     <li>헤더는 읽는 영역이다. 값을 고치는 것은 아래 카드 행에서 한다. 헤더에 입력란을 두지 않는다.</li>
     <li>카드에는 <code>outline</code> 1dp 테두리를 반드시 준다. <code>surface</code>와 <code>background</code>의 대비가 1.1~1.2:1이다.</li>
     <li><code>star</code> 색은 이 화면에서 쓰지 않는다. 온라인 점·안 읽은 배지·선톡 칩 전용이다.</li>
-    <li>오류·위험 표현의 색은 <code>tokens.json</code>에 토큰이 추가된 뒤에 확정한다. 그 전까지 임의의 빨강을 쓰지 않는다.</li>
+    <li>오류·위험 표현은 <code>error</code>/<code>onError</code> 토큰만 쓴다. 이 색은 오류 안내와 되돌릴 수 없는 동작 전용이고 장식·강조에 쓰지 않는다.</li>
     <li>"우리의 추억" 카드는 넣지 않는다. 장기 기억 조회 경로가 없다.</li>
     <li>모든 행과 버튼의 터치 영역은 48dp 이상이다. 본문 20sp에서도 행이 깨지지 않아야 한다.</li>
     <li>섹션 구성·저장·validation·진입점 목적지는 기존 시안이 기준이다. 이 시안이 그것을 바꾸지 않는다.</li>

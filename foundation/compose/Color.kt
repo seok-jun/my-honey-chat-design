@@ -19,6 +19,8 @@ private val DarkPrimary = Color(0xFF9C8FFF)
 private val DarkOnPrimary = Color(0xFF120E2A)
 private val DarkUserBubble = Color(0xFF5B4BD0)
 private val DarkStar = Color(0xFFFFD27A)
+private val DarkError = Color(0xFFFFB4AB)
+private val DarkOnError = Color(0xFF4A0F0C)
 
 // ── Light ──────────────────────────────────────────────────
 private val LightBackground = Color(0xFFF5F3FC)
@@ -31,6 +33,8 @@ private val LightPrimary = Color(0xFF4F3FC4)
 private val LightOnPrimary = Color(0xFFFFFFFF)
 private val LightUserBubble = Color(0xFF4F3FC4)
 private val LightStar = Color(0xFFF2B544)
+private val LightError = Color(0xFFA82018)
+private val LightOnError = Color(0xFFFFFFFF)
 
 private val OnUserBubble = Color(0xFFFFFFFF)
 private val OnStar = Color(0xFF2B1A0E)
@@ -48,6 +52,8 @@ internal val SomeYouDarkColorScheme = darkColorScheme(
     onSecondary = DarkOnPrimary,
     tertiary = DarkStar,
     onTertiary = OnStar,
+    error = DarkError,
+    onError = DarkOnError,
     background = DarkBackground,
     onBackground = DarkOnSurface,
     surface = DarkBackground,
@@ -72,6 +78,8 @@ internal val SomeYouLightColorScheme = lightColorScheme(
     onSecondary = LightOnPrimary,
     tertiary = LightStar,
     onTertiary = OnStar,
+    error = LightError,
+    onError = LightOnError,
     background = LightBackground,
     onBackground = LightOnSurface,
     surface = LightBackground,
