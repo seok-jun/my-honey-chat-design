@@ -1,0 +1,299 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #500 — Persona별 대화 목록 홈</title>
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --page: #f4f2fa; --page-ink: #1b1733; --page-muted: #5f5880; --page-line: #ddd7ef; --page-card: #ffffff;
+      /* some:You dark tokens */
+      --bg: #0E0B1F; --surface: #1E1838; --surfaceVariant: #262046; --outline: #3A3260;
+      --onSurface: #ECE8FF; --onSurfaceVariant: #A9A2C9; --primary: #9C8FFF; --onPrimary: #120E2A;
+      --userBubble: #5B4BD0; --onUserBubble: #FFFFFF; --star: #FFD27A; --onStar: #2B1A0E;
+    }
+    .phone[data-theme="light"] {
+      --bg: #F5F3FC; --surface: #FFFFFF; --surfaceVariant: #ECE8F8; --outline: #DCD5F2;
+      --onSurface: #1C1733; --onSurfaceVariant: #5F5880; --primary: #4F3FC4; --onPrimary: #FFFFFF;
+      --userBubble: #4F3FC4; --onUserBubble: #FFFFFF; --star: #F2B544; --onStar: #2B1A0E;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 36px 20px 80px; background: var(--page); color: var(--page-ink); line-height: 1.55; }
+    main { max-width: 1120px; margin: 0 auto; }
+    .eyebrow { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--page-muted); font-weight: 700; }
+    h1 { margin: 10px 0 8px; font-size: clamp(1.5rem, 4vw, 2.1rem); }
+    .lede { margin: 0 0 6px; max-width: 72ch; }
+    .badge { display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 999px; background: #efe9ff; color: #4F3FC4; font-size: .8rem; font-weight: 700; }
+    .notice { margin: 16px 0 0; padding: 12px 14px; border: 1px solid var(--page-line); border-left: 3px solid #4F3FC4; border-radius: 10px; background: var(--page-card); font-size: .9rem; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 8px; }
+    button { font: inherit; border: 1px solid var(--page-line); background: var(--page-card); color: inherit; border-radius: 10px; padding: 9px 13px; cursor: pointer; min-height: 40px; }
+    button[aria-selected="true"] { border-color: #4F3FC4; background: #4F3FC4; color: #fff; font-weight: 700; }
+    .themebar { display: flex; gap: 8px; margin: 4px 0 20px; align-items: center; font-size: .88rem; color: var(--page-muted); }
+    .stage { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; align-items: start; }
+    .frame { border: 1px solid var(--page-line); border-radius: 18px; padding: 16px; background: var(--page-card); }
+    .frame > h3 { margin: 0 0 12px; font-size: .95rem; }
+    .phone { width: 100%; max-width: 360px; margin: 0 auto; border-radius: 26px; overflow: hidden; background: var(--bg); color: var(--onSurface); border: 1px solid var(--outline); }
+    .pad { padding: 0 16px; }
+    .topbar { display: flex; align-items: center; gap: 12px; padding: 14px 16px; background: var(--bg); border-bottom: 1px solid var(--outline); }
+    .title { font-size: 18px; font-weight: 600; }
+    .sub { font-size: 13px; color: var(--onSurfaceVariant); }
+    .av { position: relative; border-radius: 999px; background: var(--primary); color: var(--onPrimary); display: grid; place-items: center; font-weight: 700; flex: 0 0 auto; }
+    .av-40 { width: 40px; height: 40px; font-size: 17px; }
+    .av-52 { width: 52px; height: 52px; font-size: 21px; }
+    .dot { position: absolute; right: -1px; bottom: -1px; width: 10px; height: 10px; border-radius: 999px; background: var(--star); border: 2px solid var(--bg); }
+    .row { display: flex; align-items: center; gap: 12px; min-height: 76px; padding: 12px 16px; }
+    .row + .row { border-top: 1px solid var(--outline); }
+    .row .body { flex: 1 1 auto; min-width: 0; }
+    .name { font-size: 16px; font-weight: 600; }
+    .last { font-size: 13px; color: var(--onSurfaceVariant); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .when { font-size: 11px; color: var(--onSurfaceVariant); flex: 0 0 auto; align-self: flex-start; padding-top: 4px; }
+    .bubble { max-width: 78%; padding: 10px 14px; border-radius: 20px; font-size: 16px; line-height: 23px; }
+    .b-them { background: var(--surface); border: 1px solid var(--outline); border-bottom-left-radius: 6px; }
+    .b-me { background: var(--userBubble); color: var(--onUserBubble); margin-left: auto; border-bottom-right-radius: 6px; }
+    .ph { border-radius: 8px; background: var(--surfaceVariant); color: var(--onSurfaceVariant); font-size: 12px; padding: 10px 12px; text-align: center; }
+    .skel { height: 12px; border-radius: 999px; background: var(--surfaceVariant); }
+    .state { padding: 28px 16px; text-align: center; color: var(--onSurfaceVariant); font-size: 13px; }
+    .btn { display: inline-block; min-height: 48px; padding: 0 18px; line-height: 48px; border-radius: 999px; background: var(--primary); color: var(--onPrimary); font-size: 14px; font-weight: 700; }
+    .legend { margin-top: 10px; font-size: .86rem; color: var(--page-muted); }
+    ul.rules { margin: 26px 0 0; padding-left: 20px; }
+    ul.rules li { margin-bottom: 6px; }
+    .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 18px; margin-top: 10px; }
+    .cols section { border: 1px solid var(--page-line); border-radius: 14px; padding: 14px 16px; background: var(--page-card); }
+    .cols h3 { margin: 0 0 8px; font-size: .95rem; }
+    footer { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--page-line); color: var(--page-muted); font-size: .84rem; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">some:You · Issue #500 · 대화 목록 홈</div>
+    <h1>Persona별 대화 목록이 홈이 된다</h1>
+    <p class="lede">Persona가 2명 이상이면 앱을 열었을 때 대화 목록이 먼저 보이고, 행을 누르면 그 Persona의 채팅방으로 들어간다. 1명이면 목록을 거치지 않는다.</p>
+    <span class="badge">설계 초안 · 앱 구현 전</span>
+    <p class="notice">이 시안은 화면 배치, 정보 계층, UI 상태의 구현 기준이다. 저장·전환·provider 동작은 실행하지 않는다. <strong>모든 이름과 문장은 합성 예시이며 실제 대화 내용을 담지 않는다.</strong> 색·글자·간격 값은 <code>foundation/tokens.json</code>을 따른다.</p>
+  </header>
+
+  <div class="controls" role="tablist" aria-label="화면 상태">
+    <button type="button" role="tab" aria-selected="true" data-target="s-current">Current · 현재 구조</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-default">Proposed · 기본</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-single">Persona 1명</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-edge">메시지 없음 · 미디어만</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-loading">로딩</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-failed">실패</button>
+  </div>
+  <div class="themebar">
+    <span>테마</span>
+    <button type="button" id="t-dark" aria-selected="true">다크 (기본)</button>
+    <button type="button" id="t-light" aria-selected="false">라이트</button>
+    <span>· foundation은 다크를 기본으로 하고 라이트는 시스템 설정을 따를 때 쓴다.</span>
+  </div>
+
+  <section id="s-current">
+    <div class="stage">
+      <div class="frame">
+        <h3>현재 · 앱을 열면 바로 채팅방</h3>
+        <div class="phone">
+          <div class="topbar">
+            <div class="av av-40">A</div>
+            <div class="body"><div class="title">Persona A ▾</div><div class="sub">탭해서 대화 상대 전환</div></div>
+          </div>
+          <div class="pad" style="padding-top:12px;padding-bottom:12px;display:grid;gap:12px">
+            <div class="bubble b-them">상대 메시지 자리 표시자</div>
+            <div class="bubble b-me">내 메시지 자리 표시자</div>
+            <div class="ph">대화 내용은 시안에 표시하지 않는다</div>
+          </div>
+        </div>
+        <p class="legend"><code>resolveChatSurface</code>의 기본값이 <code>CHAT</code>이라 다른 Persona의 최근 상태를 볼 수 있는 화면이 없다.</p>
+      </div>
+      <div class="frame">
+        <h3>현재 · 전환 시트와 관리 목록</h3>
+        <div class="phone">
+          <div class="topbar"><div class="body"><div class="title">대화 상대</div></div></div>
+          <div class="row"><div class="av av-40">A</div><div class="body"><div class="name">Persona A</div><div class="last">현재</div></div></div>
+          <div class="row"><div class="av av-40">B</div><div class="body"><div class="name">Persona B</div><div class="last">선택 →</div></div></div>
+          <div class="row"><div class="av av-40">C</div><div class="body"><div class="name">Persona C</div><div class="last">관계 · 직업</div></div><span class="when">대화하기</span></div>
+        </div>
+        <p class="legend">두 화면 모두 관리용이라 이름·관계·직업과 버튼만 있고 마지막 메시지와 시각이 없다. 배치 기준은 <a href="437.html">#437</a>이며 이 이슈에서 바꾸지 않는다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-default" hidden>
+    <div class="stage">
+      <div class="frame">
+        <h3>Proposed · 대화 목록 홈</h3>
+        <div class="phone">
+          <div class="topbar"><div class="body"><div class="title">대화</div></div><span class="when" style="padding-top:0">설정</span></div>
+          <div class="row">
+            <div class="av av-52">B<span class="dot"></span></div>
+            <div class="body"><div class="name">Persona B</div><div class="last">상대가 보낸 마지막 메시지 미리보기 한 줄</div></div>
+            <span class="when">오후 3:12</span>
+          </div>
+          <div class="row">
+            <div class="av av-52">A<span class="dot"></span></div>
+            <div class="body"><div class="name">Persona A</div><div class="last">나: 내가 보낸 마지막 메시지 미리보기 한 줄</div></div>
+            <span class="when">어제</span>
+          </div>
+          <div class="row">
+            <div class="av av-52">C<span class="dot"></span></div>
+            <div class="body"><div class="name">Persona C</div><div class="last">상대가 보낸 마지막 메시지 미리보기 한 줄로 길어지면 말줄임으로 자른다</div></div>
+            <span class="when">10월 3일</span>
+          </div>
+        </div>
+      </div>
+      <div class="frame">
+        <h3>행 구성 기준</h3>
+        <div class="cols" style="grid-template-columns:1fr">
+          <section>
+            <h3>왼쪽</h3>
+            <p style="margin:0;font-size:.9rem">아바타 <code>size.avatarList</code> 52. 온라인 점 <code>size.onlineDot</code> 10, 색은 <code>star</code>. 접속 상태 데이터가 없으므로 <strong>항상 켬</strong>이다.</p>
+          </section>
+          <section>
+            <h3>가운데</h3>
+            <p style="margin:0;font-size:.9rem">이름 16sp SemiBold. 아래 마지막 메시지 한 줄 13sp <code>onSurfaceVariant</code>, 한 줄을 넘으면 말줄임. 내가 보낸 메시지면 앞에 <code>나:</code> 를 붙인다.</p>
+          </section>
+          <section>
+            <h3>오른쪽</h3>
+            <p style="margin:0;font-size:.9rem">마지막 메시지 시각 <code>typography.scale.meta</code> 11sp <code>onSurfaceVariant</code>. 오늘은 시각, 어제는 <code>어제</code>, 그 이전은 날짜.</p>
+          </section>
+          <section>
+            <h3>정렬과 터치</h3>
+            <p style="margin:0;font-size:.9rem">마지막 메시지 시각 역순. 행 높이는 <code>size.minTouchTarget</code> 48 이상(아바타 52 기준 76). 행 전체가 채팅방 진입 대상이다.</p>
+          </section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-single" hidden>
+    <div class="stage">
+      <div class="frame">
+        <h3>Persona가 1명 · 홈을 건너뛴다</h3>
+        <div class="phone">
+          <div class="topbar">
+            <div class="av av-40">A<span class="dot"></span></div>
+            <div class="body"><div class="title">Persona A</div><div class="sub">탭해서 대화 상대 전환</div></div>
+          </div>
+          <div class="pad" style="padding-top:12px;padding-bottom:12px;display:grid;gap:12px">
+            <div class="bubble b-them">상대 메시지 자리 표시자</div>
+            <div class="bubble b-me">내 메시지 자리 표시자</div>
+          </div>
+        </div>
+        <p class="legend">목록이 1행뿐이면 매 실행마다 탭이 한 번 늘어난다. 앱 시작 시 바로 채팅방을 연다. 목록은 Persona가 2명 이상이 되면 나타난다.</p>
+      </div>
+      <div class="frame">
+        <h3>진입 분기</h3>
+        <ul class="rules" style="margin-top:0">
+          <li>Persona 1명 → 채팅방. 뒤로가기는 기존과 같다.</li>
+          <li>Persona 2명 이상 → 대화 목록 홈. 행 선택 시 채팅방.</li>
+          <li>채팅방에서 뒤로가기 → 대화 목록(2명 이상일 때만).</li>
+          <li>설정에서 들어가는 Persona 관리 목록(<a href="437.html">#437</a>)과 전환 시트는 그대로 남는다.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-edge" hidden>
+    <div class="stage">
+      <div class="frame">
+        <h3>메시지 없음 · 미디어만</h3>
+        <div class="phone">
+          <div class="topbar"><div class="body"><div class="title">대화</div></div></div>
+          <div class="row">
+            <div class="av av-52">D<span class="dot"></span></div>
+            <div class="body"><div class="name">Persona D</div><div class="last">아직 나눈 대화가 없어요</div></div>
+            <span class="when"></span>
+          </div>
+          <div class="row">
+            <div class="av av-52">E<span class="dot"></span></div>
+            <div class="body"><div class="name">Persona E</div><div class="last">사진</div></div>
+            <span class="when">오전 9:40</span>
+          </div>
+          <div class="row">
+            <div class="av av-52">F<span class="dot"></span></div>
+            <div class="body"><div class="name">Persona F</div><div class="last">나: 음성</div></div>
+            <span class="when">오전 9:38</span>
+          </div>
+        </div>
+      </div>
+      <div class="frame">
+        <h3>표현 기준</h3>
+        <ul class="rules" style="margin-top:0">
+          <li>메시지가 없으면 안내 문구 한 줄을 넣고 시각은 비운다. 정렬에서는 가장 아래로 둔다.</li>
+          <li>마지막 메시지에 글이 없고 미디어만 있으면 종류 이름(<code>사진</code>, <code>음성</code>, <code>동영상</code>)을 넣는다.</li>
+          <li>미디어 종류 이름에도 보낸 쪽 접두사 규칙을 그대로 적용한다.</li>
+          <li>마지막 메시지가 행동 묘사(<code>message_kind = action</code>)면 본문 대신 그 묘사를 한 줄로 쓴다. 라벨을 따로 붙이지 않는다.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-loading" hidden>
+    <div class="stage">
+      <div class="frame">
+        <h3>로딩</h3>
+        <div class="phone">
+          <div class="topbar"><div class="body"><div class="title">대화</div></div></div>
+          <div class="row"><div class="av av-52" style="background:var(--surfaceVariant)"></div><div class="body"><div class="skel" style="width:40%;margin-bottom:8px"></div><div class="skel" style="width:76%"></div></div></div>
+          <div class="row"><div class="av av-52" style="background:var(--surfaceVariant)"></div><div class="body"><div class="skel" style="width:32%;margin-bottom:8px"></div><div class="skel" style="width:64%"></div></div></div>
+          <div class="state">목록을 불러오는 중…</div>
+        </div>
+        <p class="legend">자리 표시자는 행 구조를 유지한다. 진행률이나 자동 완료를 흉내 내지 않는다. 뒤로가기는 유지한다.</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-failed" hidden>
+    <div class="stage">
+      <div class="frame">
+        <h3>실패</h3>
+        <div class="phone">
+          <div class="topbar"><div class="body"><div class="title">대화</div></div></div>
+          <div class="state" style="padding:40px 16px">
+            <div style="font-size:16px;font-weight:600;color:var(--onSurface);margin-bottom:8px">목록을 불러오지 못했어요</div>
+            <div style="margin-bottom:18px">현재 대화 상대는 바뀌지 않았어요.</div>
+            <span class="btn">다시 시도</span>
+          </div>
+        </div>
+        <p class="legend">문구와 복구 동작은 <a href="437.html">#437</a>의 관리 목록 실패 상태와 같은 기준을 쓴다. 실패해도 대화 상대는 바뀌지 않는다.</p>
+      </div>
+    </div>
+  </section>
+
+  <h2 style="margin-top:34px;font-size:1.1rem">구현 기준 요약</h2>
+  <ul class="rules">
+    <li>안 읽은 수 배지는 넣지 않는다. <code>message</code> 테이블에 읽음 상태 컬럼이 없어 schema 변경이 필요하다.</li>
+    <li>선톡 칩과 선톡 대화의 상단 고정은 이 이슈 범위가 아니다.</li>
+    <li>온라인 점은 항상 켬이다. 최근 대화량으로 구분하는 방안은 seok-jun/my-honey-chat#501에 기록했다.</li>
+    <li>캐릭터 말풍선과 카드에는 <code>outline</code> 1dp 테두리를 준다. <code>surface</code>와 <code>background</code>의 대비가 1.1~1.2:1이다.</li>
+    <li>본문 글자 크기를 20sp로 올려도 행이 깨지지 않아야 한다. 이름과 미리보기는 각각 한 줄을 유지하고 넘치면 말줄임으로 자른다.</li>
+    <li>기존 Persona 관리 목록과 전환 시트의 동작은 바꾸지 않는다.</li>
+  </ul>
+
+  <footer>
+    Issue #500 · 공개용 합성 화면 · 외부 asset/API 없음 · 디자인 게시가 앱 설계 승인이나 구현 완료를 의미하지 않습니다.
+  </footer>
+</main>
+<script>
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const sections = document.querySelectorAll('main > section');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
+    sections.forEach(s => { s.hidden = s.id !== tab.dataset.target; });
+  }));
+  const dark = document.getElementById('t-dark');
+  const light = document.getElementById('t-light');
+  function setTheme(mode) {
+    document.querySelectorAll('.phone').forEach(p => {
+      if (mode === 'light') { p.dataset.theme = 'light'; } else { delete p.dataset.theme; }
+    });
+    dark.setAttribute('aria-selected', String(mode !== 'light'));
+    light.setAttribute('aria-selected', String(mode === 'light'));
+  }
+  dark.addEventListener('click', () => setTheme('dark'));
+  light.addEventListener('click', () => setTheme('light'));
+</script>
+</body>
+</html>

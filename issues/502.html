@@ -1,0 +1,321 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #502 — 채팅방 리디자인 (말풍선·상단바·날짜 구분선)</title>
+  <style>
+    :root {
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --page: #f4f2fa; --page-ink: #1b1733; --page-muted: #5f5880; --page-line: #ddd7ef; --page-card: #ffffff;
+      --bg: #0E0B1F; --surface: #1E1838; --surfaceVariant: #262046; --outline: #3A3260;
+      --onSurface: #ECE8FF; --onSurfaceVariant: #A9A2C9; --primary: #9C8FFF; --onPrimary: #120E2A;
+      --userBubble: #5B4BD0; --onUserBubble: #FFFFFF; --star: #FFD27A; --onStar: #2B1A0E;
+    }
+    .phone[data-theme="light"] {
+      --bg: #F5F3FC; --surface: #FFFFFF; --surfaceVariant: #ECE8F8; --outline: #DCD5F2;
+      --onSurface: #1C1733; --onSurfaceVariant: #5F5880; --primary: #4F3FC4; --onPrimary: #FFFFFF;
+      --userBubble: #4F3FC4; --onUserBubble: #FFFFFF; --star: #F2B544; --onStar: #2B1A0E;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; padding: 36px 20px 80px; background: var(--page); color: var(--page-ink); line-height: 1.55; }
+    main { max-width: 1120px; margin: 0 auto; }
+    .eyebrow { font-size: .78rem; letter-spacing: .08em; text-transform: uppercase; color: var(--page-muted); font-weight: 700; }
+    h1 { margin: 10px 0 8px; font-size: clamp(1.5rem, 4vw, 2.1rem); }
+    .lede { margin: 0 0 6px; max-width: 72ch; }
+    .badge { display: inline-block; margin-top: 10px; padding: 4px 10px; border-radius: 999px; background: #efe9ff; color: #4F3FC4; font-size: .8rem; font-weight: 700; }
+    .notice { margin: 16px 0 0; padding: 12px 14px; border: 1px solid var(--page-line); border-left: 3px solid #4F3FC4; border-radius: 10px; background: var(--page-card); font-size: .9rem; }
+    .controls { display: flex; flex-wrap: wrap; gap: 8px; margin: 24px 0 8px; }
+    button { font: inherit; border: 1px solid var(--page-line); background: var(--page-card); color: inherit; border-radius: 10px; padding: 9px 13px; cursor: pointer; min-height: 40px; }
+    button[aria-selected="true"] { border-color: #4F3FC4; background: #4F3FC4; color: #fff; font-weight: 700; }
+    .themebar { display: flex; gap: 8px; margin: 4px 0 20px; align-items: center; font-size: .88rem; color: var(--page-muted); flex-wrap: wrap; }
+    .stage { display: grid; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); gap: 20px; align-items: start; }
+    .frame { border: 1px solid var(--page-line); border-radius: 18px; padding: 16px; background: var(--page-card); }
+    .frame > h3 { margin: 0 0 12px; font-size: .95rem; }
+    .phone { width: 100%; max-width: 360px; margin: 0 auto; border-radius: 26px; overflow: hidden; background: var(--bg); color: var(--onSurface); border: 1px solid var(--outline); }
+    .topbar { display: flex; align-items: center; gap: 10px; padding: 14px 16px; background: var(--bg); border-bottom: 1px solid var(--outline); }
+    .title { font-size: 18px; font-weight: 600; }
+    .sub { font-size: 13px; color: var(--onSurfaceVariant); }
+    .icon { width: 40px; height: 40px; border-radius: 999px; display: grid; place-items: center; color: var(--onSurfaceVariant); font-size: 15px; flex: 0 0 auto; }
+    .av { position: relative; border-radius: 999px; background: var(--primary); color: var(--onPrimary); display: grid; place-items: center; font-weight: 700; flex: 0 0 auto; }
+    .av-40 { width: 40px; height: 40px; font-size: 17px; }
+    .av-32 { width: 32px; height: 32px; font-size: 14px; }
+    .dot { position: absolute; right: -1px; bottom: -1px; width: 10px; height: 10px; border-radius: 999px; background: var(--star); border: 2px solid var(--bg); }
+    .thread { padding: 12px 16px 16px; display: flex; flex-direction: column; }
+    .divider { display: flex; justify-content: center; margin: 12px 0; }
+    .divider span { font-size: 12px; font-weight: 500; color: var(--onSurfaceVariant); background: var(--surfaceVariant); border-radius: 999px; padding: 4px 12px; }
+    .turn { display: flex; gap: 8px; align-items: flex-end; }
+    .turn.mine { justify-content: flex-end; }
+    .gap-same { margin-top: 4px; }
+    .gap-change { margin-top: 12px; }
+    .slot32 { width: 32px; flex: 0 0 auto; }
+    .bubble { max-width: 78%; padding: 10px 14px; border-radius: 20px; font-size: 16px; line-height: 23px; }
+    .b-them { background: var(--surface); border: 1px solid var(--outline); }
+    .b-them.tail { border-bottom-left-radius: 6px; }
+    .b-me { background: var(--userBubble); color: var(--onUserBubble); }
+    .b-me.tail { border-bottom-right-radius: 6px; }
+    .time { font-size: 11px; color: var(--onSurfaceVariant); margin-top: 4px; }
+    .time.mine { text-align: right; }
+    .actionlabel { font-size: 11px; font-weight: 700; letter-spacing: .06em; color: var(--onSurfaceVariant); margin-bottom: 4px; }
+    .photo { width: 100%; max-width: 240px; height: 132px; border-radius: 16px; background: var(--surfaceVariant); display: grid; place-items: center; color: var(--onSurfaceVariant); font-size: 12px; }
+    .dots { display: inline-flex; gap: 5px; align-items: center; height: 23px; }
+    .dots i { width: 7px; height: 7px; border-radius: 999px; background: var(--onSurfaceVariant); display: block; }
+    .composer { border-top: 1px solid var(--outline); padding: 10px 16px 14px; }
+    .aux { display: flex; gap: 14px; padding: 0 4px 8px; font-size: 13px; color: var(--onSurfaceVariant); }
+    .pill { display: flex; align-items: center; gap: 8px; min-height: 48px; border-radius: 24px; background: var(--surfaceVariant); padding: 0 6px 0 14px; }
+    .pill .input { flex: 1 1 auto; font-size: 16px; color: var(--onSurfaceVariant); }
+    .send { width: 48px; height: 48px; border-radius: 999px; display: grid; place-items: center; flex: 0 0 auto; font-size: 17px; }
+    .send.off { color: var(--onSurfaceVariant); }
+    .send.on { background: var(--primary); color: var(--onPrimary); }
+    .legend { margin-top: 10px; font-size: .86rem; color: var(--page-muted); }
+    ul.rules { margin: 26px 0 0; padding-left: 20px; }
+    ul.rules li { margin-bottom: 6px; }
+    .cols { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 14px; margin-top: 10px; }
+    .cols section { border: 1px solid var(--page-line); border-radius: 14px; padding: 14px 16px; }
+    .cols h4 { margin: 0 0 6px; font-size: .92rem; }
+    .cols p { margin: 0; font-size: .88rem; }
+    footer { margin-top: 36px; padding-top: 14px; border-top: 1px solid var(--page-line); color: var(--page-muted); font-size: .84rem; }
+    [hidden] { display: none !important; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="eyebrow">some:You · Issue #502 · 채팅방</div>
+    <h1>말풍선 묶음, 상단바, 날짜 구분선</h1>
+    <p class="lede">캐릭터 메시지는 왼쪽 <code>surface</code> + <code>outline</code> 테두리, 내 메시지는 오른쪽 <code>userBubble</code>. 연속 메시지는 아바타를 묶음 첫 메시지에만, 시간을 마지막 메시지에만 붙인다. 날짜가 바뀌는 지점에 구분선을 넣는다.</p>
+    <span class="badge">설계 초안 · 앱 구현 전</span>
+    <p class="notice">이 시안은 화면 배치, 정보 계층, UI 상태의 구현 기준이다. 전송·생성·provider 동작은 실행하지 않는다. <strong>모든 이름과 문장은 합성 예시이며 실제 대화 내용을 담지 않는다.</strong> 색·글자·간격 값은 <code>foundation/tokens.json</code>을 따른다.</p>
+    <p class="notice"><strong>기존 배치를 유지하는 부분.</strong> 상단바의 아바타·이름 영역은 Persona 전환 진입점이고 <code>✎ 조정</code>·갤러리·설정 버튼이 함께 있다(<a href="437.html">#437</a>, <a href="105.html">#105</a>). 입력칸 위 보조 버튼 줄 <code>＋ 첨부 / ✧ 행동 / ▧ 생성</code>과 <code>ACTION</code> 라벨은 그대로 둔다(<a href="198.html">#198</a>, <a href="213.html">#213</a>, <a href="465.html">#465</a>). 이 시안은 색·치수와 묶음·날짜 표현만 바꾼다.</p>
+  </header>
+
+  <div class="controls" role="tablist" aria-label="화면 상태">
+    <button type="button" role="tab" aria-selected="true" data-target="s-current">Current</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-default">Proposed · 기본</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-group">묶음 규칙</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-mixed">행동 묘사 · 사진</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-waiting">응답 대기</button>
+    <button type="button" role="tab" aria-selected="false" data-target="s-large">글자 20sp</button>
+  </div>
+  <div class="themebar">
+    <span>테마</span>
+    <button type="button" id="t-dark" aria-selected="true">다크 (기본)</button>
+    <button type="button" id="t-light" aria-selected="false">라이트</button>
+  </div>
+
+  <section id="s-current">
+    <div class="stage">
+      <div class="frame">
+        <h3>현재 구조</h3>
+        <div class="phone">
+          <div class="topbar">
+            <div class="av av-40" style="width:44px;height:44px">A</div>
+            <div style="flex:1"><div class="title">Persona A ▾</div><div class="sub">탭해서 대화 상대 전환</div></div>
+            <div class="icon">✎</div><div class="icon">▤</div><div class="icon">⋯</div>
+          </div>
+          <div class="thread">
+            <div class="turn"><div class="bubble b-them" style="border:none;background:var(--surfaceVariant)">상대 메시지 자리 표시자</div></div>
+            <div class="time">오후 3:10</div>
+            <div class="turn gap-same"><div class="bubble b-them" style="border:none;background:var(--surfaceVariant)">상대 메시지 자리 표시자</div></div>
+            <div class="time">오후 3:11</div>
+            <div class="turn mine gap-same"><div class="bubble b-me" style="background:#8E4E61">내 메시지 자리 표시자</div></div>
+            <div class="time mine">오후 3:12</div>
+          </div>
+        </div>
+        <p class="legend">아바타 44dp(토큰은 40), 온라인 점 없음, 말풍선 테두리 없음, 시간이 메시지마다 붙음, 날짜 구분선 없음. 색은 구 팔레트다.</p>
+      </div>
+      <div class="frame">
+        <h3>바꾸는 것 / 두는 것</h3>
+        <div class="cols" style="grid-template-columns:1fr">
+          <section><h4>바꾼다</h4><p>말풍선 색·테두리·모서리·여백·최대 너비, 아바타 크기와 온라인 점, 묶음별 아바타·시간 규칙, 날짜 구분선 추가, 간격 4/12.</p></section>
+          <section><h4>두다</h4><p>상단바 버튼 구성과 목적지, 보조 버튼 줄, <code>ACTION</code> 라벨, 사진 탭 동작, 롤백·장면 보정 진입점, 전송 조건.</p></section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-default" hidden>
+    <div class="stage">
+      <div class="frame">
+        <h3>Proposed · 기본</h3>
+        <div class="phone">
+          <div class="topbar">
+            <div class="av av-40">A<span class="dot"></span></div>
+            <div style="flex:1"><div class="title">Persona A ▾</div><div class="sub">탭해서 대화 상대 전환</div></div>
+            <div class="icon">✎</div><div class="icon">▤</div><div class="icon">⋯</div>
+          </div>
+          <div class="thread">
+            <div class="divider"><span>10월 11일 토요일</span></div>
+            <div class="turn"><div class="av av-32">A</div><div class="bubble b-them">상대 메시지 자리 표시자</div></div>
+            <div class="turn gap-same"><div class="slot32"></div><div class="bubble b-them tail">두 번째 연속 메시지 자리 표시자</div></div>
+            <div style="display:flex"><div class="slot32"></div><div class="time">오후 3:11</div></div>
+            <div class="turn mine gap-change"><div class="bubble b-me tail">내 메시지 자리 표시자</div></div>
+            <div class="time mine">오후 3:12</div>
+            <div class="divider"><span>오늘</span></div>
+            <div class="turn"><div class="av av-32">A</div><div class="bubble b-them tail">새 날짜의 첫 메시지 자리 표시자</div></div>
+            <div style="display:flex"><div class="slot32"></div><div class="time">오전 9:02</div></div>
+          </div>
+          <div class="composer">
+            <div class="aux"><span>＋ 첨부</span><span>✧ 행동</span><span>▧ 생성</span></div>
+            <div class="pill"><span class="input">메시지</span><span class="send off">➤</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="frame">
+        <h3>값</h3>
+        <div class="cols" style="grid-template-columns:1fr">
+          <section><h4>상단바</h4><p>아바타 <code>size.avatarTopBar</code> 40 + 온라인 점 <code>size.onlineDot</code> 10(<code>star</code>, 항상 켬). 이름 18sp SemiBold(<code>characterName</code>), 보조 문구 13sp(<code>status</code>). 아래 <code>outline</code> 구분선. 보조 문구는 기존 기능 안내를 유지한다. 캐릭터 상황 문구 데이터는 앱에 없다.</p></section>
+          <section><h4>말풍선</h4><p>캐릭터: <code>surface</code> + <code>outline</code> 1dp. 나: <code>userBubble</code> / <code>onUserBubble</code>. 모서리 <code>shape.bubble</code> 20, 꼬리 쪽만 <code>shape.bubbleTailCorner</code> 6. 여백 가로 14 / 세로 10. 최대 너비 화면의 78%.</p></section>
+          <section><h4>날짜 구분선</h4><p>12sp Medium(<code>dateDivider</code>) 알약 칩(<code>shape.chip</code>), <code>surfaceVariant</code> 배경, 가운데 정렬. 기준은 <code>message.created_at</code>의 날짜. 오늘은 <code>오늘</code>, 어제는 <code>어제</code>, 그 이전은 날짜와 요일.</p></section>
+          <section><h4>여백</h4><p>화면 좌우 <code>spacing.screenHorizontal</code> 16. 같은 사람 연속 4(<code>sameSenderGap</code>), 사람이 바뀔 때 12(<code>senderChangeGap</code>).</p></section>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-group" hidden>
+    <div class="stage">
+      <div class="frame">
+        <h3>묶음 규칙</h3>
+        <div class="phone">
+          <div class="thread" style="padding-top:16px">
+            <div class="turn"><div class="av av-32">A</div><div class="bubble b-them">묶음 첫 메시지 · 아바타 있음</div></div>
+            <div class="turn gap-same"><div class="slot32"></div><div class="bubble b-them">묶음 중간 · 아바타 없음 · 꼬리 없음</div></div>
+            <div class="turn gap-same"><div class="slot32"></div><div class="bubble b-them tail">묶음 마지막 · 꼬리 있음</div></div>
+            <div style="display:flex"><div class="slot32"></div><div class="time">오후 3:11 · 묶음 마지막에만</div></div>
+            <div class="turn mine gap-change"><div class="bubble b-me">내 묶음 첫 메시지</div></div>
+            <div class="turn mine gap-same"><div class="bubble b-me tail">내 묶음 마지막 · 꼬리 있음</div></div>
+            <div class="time mine">오후 3:12</div>
+            <div class="turn gap-change"><div class="av av-32">A</div><div class="bubble b-them tail">사람이 바뀌어 새 묶음 · 간격 12</div></div>
+            <div style="display:flex"><div class="slot32"></div><div class="time">오후 3:14</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="frame">
+        <h3>판정</h3>
+        <ul class="rules" style="margin-top:0">
+          <li>묶음은 <strong>같은 role이 연속</strong>이고 <strong>같은 날짜</strong>인 메시지의 연속 구간이다.</li>
+          <li>아바타 <code>size.avatarBubble</code> 32는 묶음 첫 메시지에만. 중간·마지막은 같은 폭의 빈 자리를 둬 왼쪽 정렬을 유지한다.</li>
+          <li>꼬리 모서리 6은 묶음 <strong>마지막</strong> 메시지에만. 나머지는 네 모서리 모두 20.</li>
+          <li>시간은 묶음 마지막 메시지 <strong>아래 바깥</strong>에 한 번만. 11sp <code>onSurfaceVariant</code>.</li>
+          <li>내 메시지는 아바타를 붙이지 않는다. 읽음 표시는 데이터가 없어 넣지 않는다.</li>
+          <li>날짜가 바뀌면 묶음도 끊긴다. 구분선 다음 메시지는 항상 묶음 첫 메시지다.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-mixed" hidden>
+    <div class="stage">
+      <div class="frame">
+        <h3>행동 묘사와 사진</h3>
+        <div class="phone">
+          <div class="thread" style="padding-top:16px">
+            <div class="turn mine"><div class="bubble b-me tail"><div class="actionlabel">ACTION</div>사용자가 보낸 행동·상황 묘사 자리 표시자</div></div>
+            <div class="time mine">오후 3:20</div>
+            <div class="turn gap-change"><div class="av av-32">A</div><div class="bubble b-them">상대 메시지 자리 표시자</div></div>
+            <div class="turn gap-same"><div class="slot32"></div><div class="bubble b-them tail" style="padding:10px"><div class="photo">사진 자리 표시자 · 모서리 16 · 최대 너비 240</div></div></div>
+            <div style="display:flex"><div class="slot32"></div><div class="time">오후 3:21</div></div>
+          </div>
+        </div>
+      </div>
+      <div class="frame">
+        <h3>유지 기준</h3>
+        <ul class="rules" style="margin-top:0">
+          <li><code>ACTION</code> 라벨과 행동 묘사의 식별 방식은 <a href="198.html">#198</a>·<a href="213.html">#213</a>의 기준을 그대로 쓴다. 라벨 글자는 11sp <code>onSurfaceVariant</code>로 맞춘다.</li>
+          <li>사진 모서리는 <code>shape.image</code> 16, 최대 너비는 <code>size.imageMaxWidth</code> 240. 탭하면 전체화면으로 가는 기존 동작을 유지한다.</li>
+          <li>사진이 들어간 말풍선도 같은 묶음 규칙을 따른다.</li>
+          <li>미디어 표시 자체는 <code>feature-ui-media</code>가 소유한다. 이 시안은 말풍선 쪽 배치만 정한다.</li>
+          <li>사진 로딩 스켈레톤 셔머는 이 이슈 범위가 아니다.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-waiting" hidden>
+    <div class="stage">
+      <div class="frame">
+        <h3>응답 대기</h3>
+        <div class="phone">
+          <div class="thread" style="padding-top:16px">
+            <div class="turn mine"><div class="bubble b-me tail">내 메시지 자리 표시자</div></div>
+            <div class="time mine">오후 3:12</div>
+            <div class="turn gap-change"><div class="av av-32">A</div><div class="bubble b-them tail"><span class="dots"><i></i><i></i><i></i></span></div></div>
+          </div>
+          <div class="composer">
+            <div class="aux"><span>＋ 첨부</span><span>✧ 행동</span><span>▧ 생성</span></div>
+            <div class="pill"><span class="input">메시지</span><span class="send off">➤</span></div>
+          </div>
+        </div>
+        <p class="legend">대기 말풍선은 캐릭터 말풍선과 같은 <code>surface</code> + <code>outline</code>이고 안에 점 3개를 둔다. 이 시안은 <strong>정지 상태의 배치</strong>만 정한다. 점이 차례로 움직이는 모션과 도착 전환은 seok-jun/my-honey-chat#505에서 다룬다.</p>
+      </div>
+      <div class="frame">
+        <h3>기준</h3>
+        <ul class="rules" style="margin-top:0">
+          <li>대기 말풍선은 아바타를 붙이고 꼬리를 가진다. 묶음 계산에는 넣지 않는다.</li>
+          <li>현재의 "답장과 필요한 미디어 만드는 중…" 문구는 점 3개로 바뀐다. 문구가 필요한 다른 상태(한도·연결·잠금)는 기존 표현을 유지한다.</li>
+          <li>대기 중 전송 버튼은 비활성이다. 정지(■) 버튼은 중단 기능이 없어 넣지 않는다.</li>
+          <li>점에는 화면 낭독기용 이름을 준다.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="s-large" hidden>
+    <div class="stage">
+      <div class="frame">
+        <h3>본문 20sp</h3>
+        <div class="phone" style="font-size:20px">
+          <div class="topbar">
+            <div class="av av-40">A<span class="dot"></span></div>
+            <div style="flex:1"><div class="title">Persona A ▾</div><div class="sub">탭해서 대화 상대 전환</div></div>
+            <div class="icon">✎</div>
+          </div>
+          <div class="thread">
+            <div class="divider"><span>오늘</span></div>
+            <div class="turn"><div class="av av-32">A</div><div class="bubble b-them" style="font-size:20px;line-height:29px">글자가 커져도 최대 너비 78%와 여백 14/10을 유지한다</div></div>
+            <div class="turn gap-same"><div class="slot32"></div><div class="bubble b-them tail" style="font-size:20px;line-height:29px">두 번째 연속 메시지</div></div>
+            <div style="display:flex"><div class="slot32"></div><div class="time">오후 3:11</div></div>
+            <div class="turn mine gap-change"><div class="bubble b-me tail" style="font-size:20px;line-height:29px">내 메시지</div></div>
+            <div class="time mine">오후 3:12</div>
+          </div>
+        </div>
+        <p class="legend">본문만 커진다. 시간·날짜 구분선·<code>ACTION</code> 라벨은 고정 크기를 유지한다. 상단바 이름과 보조 문구도 고정이다. 설정의 본문 크기 범위는 <code>typography.scale.body.userAdjustableRange</code> 14~20이다.</p>
+      </div>
+    </div>
+  </section>
+
+  <h2 style="margin-top:34px;font-size:1.1rem">구현 기준 요약</h2>
+  <ul class="rules">
+    <li>캐릭터 말풍선에는 <code>outline</code> 1dp 테두리를 반드시 준다. <code>surface</code>와 <code>background</code>의 대비가 1.1~1.2:1이다.</li>
+    <li><code>star</code> 색은 온라인 점에만 쓴다. 말풍선·버튼·본문에 쓰지 않는다.</li>
+    <li>읽음 표시, 리액션 바, 캐릭터 상황 문구는 데이터나 저장 경로가 없어 넣지 않는다.</li>
+    <li>터치 대상은 48dp 이상. 상단바 아이콘 버튼도 같다.</li>
+    <li>상단바·보조 버튼 줄·<code>ACTION</code> 라벨의 배치와 목적지는 기존 시안이 기준이다. 이 시안이 그것을 바꾸지 않는다.</li>
+  </ul>
+
+  <footer>
+    Issue #502 · 공개용 합성 화면 · 외부 asset/API 없음 · 디자인 게시가 앱 설계 승인이나 구현 완료를 의미하지 않습니다.
+  </footer>
+</main>
+<script>
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const sections = document.querySelectorAll('main > section');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
+    sections.forEach(s => { s.hidden = s.id !== tab.dataset.target; });
+  }));
+  const dark = document.getElementById('t-dark');
+  const light = document.getElementById('t-light');
+  function setTheme(mode) {
+    document.querySelectorAll('.phone').forEach(p => {
+      if (mode === 'light') { p.dataset.theme = 'light'; } else { delete p.dataset.theme; }
+    });
+    dark.setAttribute('aria-selected', String(mode !== 'light'));
+    light.setAttribute('aria-selected', String(mode === 'light'));
+  }
+  dark.addEventListener('click', () => setTheme('dark'));
+  light.addEventListener('click', () => setTheme('light'));
+</script>
+</body>
+</html>
