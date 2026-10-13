@@ -32,6 +32,7 @@ object SomeYouSize {
     val AvatarTopBar = 40.dp
     val AvatarBubble = 32.dp
     val AvatarList = 52.dp
+    val AvatarProfile = 96.dp
     val OnlineDot = 10.dp
     val MinTouchTarget = 48.dp
     val InputMinHeight = 48.dp
