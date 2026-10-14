@@ -1,0 +1,155 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #539 — 앱 테마 선택 Visual Spec</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; padding: 32px 20px 72px; }
+    main { max-width: 1100px; margin: 0 auto; }
+    header { margin-bottom: 28px; }
+    .meta { opacity: .65; }
+    .draft { display: inline-block; border: 1px solid CanvasText; border-radius: 8px; padding: 2px 10px; font-size: 13px; margin-left: 8px; }
+    .tabs { display: flex; gap: 8px; margin: 20px 0; flex-wrap: wrap; }
+    button { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); background: Canvas; color: CanvasText; border-radius: 10px; padding: 9px 14px; cursor: pointer; }
+    button[aria-selected="true"] { font-weight: 700; border-color: CanvasText; }
+    .stage { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 18px; padding: 24px; }
+    [hidden] { display: none !important; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 28px 20px; align-items: start; }
+    figure { margin: 0; }
+    figcaption { font-size: 14px; margin-bottom: 8px; }
+    figcaption span { opacity: .7; display: block; font-size: 13px; }
+    .legend { font-size: 14px; line-height: 1.6; margin: 0 0 20px; padding-left: 20px; }
+    .device { font-size: 13px; margin: 0 0 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+
+    /* foundation 토큰 */
+    .phone.dark  { --bg:#0E0B1F; --surface:#1E1838; --outline:#3A3260; --on:#ECE8FF; --onv:#A9A2C9; --primary:#9C8FFF; }
+    .phone.light { --bg:#F5F3FC; --surface:#FFFFFF; --outline:#DCD5F2; --on:#1C1733; --onv:#5F5880; --primary:#4F3FC4; }
+    .phone { width: 330px; max-width: 100%; box-sizing: border-box; background: var(--bg); color: var(--on); border-radius: 28px; padding: 14px 16px 22px; font-size: 14px; line-height: 1.45; border: 1px solid var(--outline); transition: background .2s, color .2s; }
+    .bar { display: flex; align-items: center; gap: 10px; padding: 6px 0 14px; font-size: 18px; font-weight: 600; }
+    .sec { font-size: 12px; color: var(--onv); margin: 16px 4px 6px; }
+    .grp { background: var(--surface); border: 1px solid var(--outline); border-radius: 14px; overflow: hidden; }
+    .row { display: flex; align-items: center; gap: 12px; padding: 12px 14px; border-top: 1px solid var(--outline); min-height: 24px; }
+    .row:first-child { border-top: 0; }
+    .row.pick { cursor: pointer; }
+    .row.new { box-shadow: inset 3px 0 0 var(--primary); }
+    .tx { flex: 1; min-width: 0; }
+    .sub { font-size: 12px; color: var(--onv); }
+    .chev { color: var(--onv); font-size: 18px; }
+    .radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--onv); box-sizing: border-box; flex: none; }
+    .radio.on { border-color: var(--primary); background: radial-gradient(var(--primary) 0 4px, transparent 5px); }
+    .note { font-size: 12px; color: var(--onv); margin: 10px 4px 0; }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="meta">seok-jun/my-honey-chat · Issue #539</div>
+    <h1>앱 안에서 테마 선택 <span class="draft">초안 · 미승인</span></h1>
+    <p>설정 홈에 <b>화면</b> 행을 추가하고, 화면 페이지에서 기기 설정 따름 / 라이트 / 다크 중 하나를 고른다. 이 HTML은 화면 배치, 정보 계층, 선택 상태의 기준이다. 색·글자·치수는 foundation 토큰을 쓴다.</p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Visual spec state">
+    <button type="button" role="tab" aria-selected="false" data-target="current">Current</button>
+    <button type="button" role="tab" aria-selected="true" data-target="proposed">Proposed</button>
+  </div>
+
+  <section class="stage" id="current" hidden>
+    <ul class="legend">
+      <li>테마를 고르는 항목이 없다. 앱은 기기 다크 모드 설정만 따른다.</li>
+    </ul>
+    <div class="grid">
+      <figure>
+        <figcaption><b>설정 홈 (현재)</b><span>기기 다크</span></figcaption>
+        <div class="phone dark">
+          <div class="bar"><span>←</span>설정</div>
+          <div class="grp"><div class="row"><div class="tx">페르소나 관리<div class="sub">대화 중: 유나 · 사진과 외형 이미지 포함</div></div><span class="chev">›</span></div></div>
+          <div class="sec">앱</div>
+          <div class="grp">
+            <div class="row"><div class="tx">대화<div class="sub">선톡 켬 · 이미지 켬 · 음성 끔 · 영상 끔</div></div><span class="chev">›</span></div>
+            <div class="row"><div class="tx">데이터<div class="sub">백업 · 스냅샷</div></div><span class="chev">›</span></div>
+            <div class="row"><div class="tx">AI 연결<div class="sub">xAI Grok key 저장됨 · grok-4.7</div></div><span class="chev">›</span></div>
+          </div>
+          <div class="note">대화 원문은 이 폰의 앱 전용 저장소에만 있어.</div>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <section class="stage" id="proposed">
+    <ul class="legend">
+      <li><b>01 설정 홈</b>: "앱" 묶음의 대화 바로 아래에 <b>화면</b> 행을 둔다(왼쪽 선은 시안 표시용 강조). AI 연결은 계속 맨 아래다. 요약 줄은 현재 선택 이름이다.</li>
+      <li><b>02 화면</b>: 세 선택지의 단일 선택 목록. 누르는 즉시 저장하고 앱 전체에 적용한다. 저장 버튼이 없다. 적용 뒤에도 이 페이지에 머문다.</li>
+      <li>처음이거나 값이 없으면 <b>기기 설정 따름</b>이 선택돼 있다.</li>
+      <li>아래 02에서 선택지를 눌러 보면 화면 색이 바로 바뀐다. "기기 설정 따름"일 때는 위의 기기 모드 버튼을 따른다.</li>
+    </ul>
+    <div class="device">기기 모드:
+      <button type="button" id="devDark" aria-selected="true">다크</button>
+      <button type="button" id="devLight" aria-selected="false">라이트</button>
+    </div>
+    <div class="grid">
+      <figure>
+        <figcaption><b>01 설정 홈</b><span>화면 행 추가 · 요약 = 현재 선택</span></figcaption>
+        <div class="phone themed">
+          <div class="bar"><span>←</span>설정</div>
+          <div class="grp"><div class="row"><div class="tx">페르소나 관리<div class="sub">대화 중: 유나 · 사진과 외형 이미지 포함</div></div><span class="chev">›</span></div></div>
+          <div class="sec">앱</div>
+          <div class="grp">
+            <div class="row"><div class="tx">대화<div class="sub">선톡 켬 · 이미지 켬 · 음성 끔 · 영상 끔</div></div><span class="chev">›</span></div>
+            <div class="row new"><div class="tx">화면<div class="sub summary">기기 설정 따름</div></div><span class="chev">›</span></div>
+            <div class="row"><div class="tx">데이터<div class="sub">백업 · 스냅샷</div></div><span class="chev">›</span></div>
+            <div class="row"><div class="tx">AI 연결<div class="sub">xAI Grok key 저장됨 · grok-4.7</div></div><span class="chev">›</span></div>
+          </div>
+          <div class="note">대화 원문은 이 폰의 앱 전용 저장소에만 있어.</div>
+        </div>
+      </figure>
+
+      <figure>
+        <figcaption><b>02 화면</b><span>단일 선택 · 즉시 적용</span></figcaption>
+        <div class="phone themed">
+          <div class="bar"><span>←</span>화면</div>
+          <div class="sec">테마</div>
+          <div class="grp" role="radiogroup" aria-label="테마">
+            <div class="row pick" data-mode="system" role="radio"><div class="tx">기기 설정 따름<div class="sub">폰의 다크 모드 설정을 따라가</div></div><span class="radio"></span></div>
+            <div class="row pick" data-mode="light" role="radio"><div class="tx">라이트</div><span class="radio"></span></div>
+            <div class="row pick" data-mode="dark" role="radio"><div class="tx">다크</div><span class="radio"></span></div>
+          </div>
+        </div>
+      </figure>
+    </div>
+  </section>
+</main>
+<script>
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const stages = document.querySelectorAll('.stage');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
+    stages.forEach(stage => stage.hidden = stage.id !== tab.dataset.target);
+  }));
+
+  const names = { system: '기기 설정 따름', light: '라이트', dark: '다크' };
+  let mode = 'system';
+  let device = 'dark';
+  function render() {
+    const effective = mode === 'system' ? device : mode;
+    document.querySelectorAll('.phone.themed').forEach(p => {
+      p.classList.toggle('dark', effective === 'dark');
+      p.classList.toggle('light', effective === 'light');
+    });
+    document.querySelectorAll('.row.pick').forEach(r => {
+      const on = r.dataset.mode === mode;
+      r.setAttribute('aria-checked', String(on));
+      r.querySelector('.radio').classList.toggle('on', on);
+    });
+    document.querySelector('.summary').textContent = names[mode];
+    document.getElementById('devDark').setAttribute('aria-selected', String(device === 'dark'));
+    document.getElementById('devLight').setAttribute('aria-selected', String(device === 'light'));
+  }
+  document.querySelectorAll('.row.pick').forEach(r => r.addEventListener('click', () => { mode = r.dataset.mode; render(); }));
+  document.getElementById('devDark').addEventListener('click', () => { device = 'dark'; render(); });
+  document.getElementById('devLight').addEventListener('click', () => { device = 'light'; render(); });
+  render();
+</script>
+</body>
+</html>
