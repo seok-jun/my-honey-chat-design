@@ -1,0 +1,439 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Issue #564 — 설정 화면 foundation 적용 Visual Spec</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; padding: 32px 16px 72px; }
+    main { max-width: 1240px; margin: 0 auto; }
+    header { margin-bottom: 28px; }
+    .meta { opacity: .65; }
+    .draft { display: inline-block; border: 1px solid CanvasText; border-radius: 8px; padding: 2px 10px; font-size: 13px; margin-left: 8px; vertical-align: middle; }
+    .notice { margin: 16px 0 0; padding: 12px 14px; border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-left: 3px solid #4F3FC4; border-radius: 10px; font-size: .92rem; line-height: 1.6; }
+    .tabs { display: flex; gap: 8px; margin: 20px 0; flex-wrap: wrap; }
+    button.page-btn { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); background: Canvas; color: CanvasText; border-radius: 10px; padding: 9px 14px; cursor: pointer; font: inherit; }
+    button.page-btn[aria-selected="true"] { font-weight: 700; border-color: CanvasText; }
+    .stage { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 18px; padding: 24px 16px; }
+    [hidden] { display: none !important; }
+    .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 28px 20px; align-items: start; }
+    figure { margin: 0; min-width: 0; }
+    figcaption { font-size: 14px; margin-bottom: 8px; }
+    figcaption span { opacity: .7; display: block; font-size: 13px; }
+    .legend { font-size: 14px; line-height: 1.6; margin: 0 0 20px; padding-left: 20px; }
+    .device { font-size: 13px; margin: 0 0 16px; display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+    .tablewrap { overflow-x: auto; margin: 8px 0 28px; }
+    table { border-collapse: collapse; width: 100%; min-width: 640px; font-size: 14px; }
+    th, td { text-align: left; vertical-align: top; padding: 9px 12px; border-bottom: 1px solid color-mix(in srgb, CanvasText 14%, Canvas); }
+    th { font-weight: 600; opacity: .8; }
+    h2 { font-size: 1.15rem; margin: 8px 0 6px; }
+    h2 + p { margin: 0 0 8px; font-size: 14px; opacity: .8; }
+    code { font-size: .88em; }
+
+    /* ───────── foundation 토큰 (tokens.json v1.0.0) ───────── */
+    .phone.dark  { --background:#0E0B1F; --surface:#1E1838; --surfaceVariant:#262046; --outline:#3A3260; --onSurface:#ECE8FF; --onSurfaceVariant:#A9A2C9; --primary:#9C8FFF; --onPrimary:#120E2A; --error:#FFB4AB; --onError:#4A0F0C; }
+    .phone.light { --background:#F5F3FC; --surface:#FFFFFF; --surfaceVariant:#ECE8F8; --outline:#DCD5F2; --onSurface:#1C1733; --onSurfaceVariant:#5F5880; --primary:#4F3FC4; --onPrimary:#FFFFFF; --error:#A82018; --onError:#FFFFFF; }
+
+    .phone { width: 360px; max-width: 100%; box-sizing: border-box; background: var(--background); color: var(--onSurface); border-radius: 28px; border: 1px solid var(--outline); overflow: hidden; font-family: Pretendard, system-ui, -apple-system, "Apple SD Gothic Neo", "Noto Sans KR", sans-serif; transition: background-color .2s, color .2s; }
+    .phone * { box-sizing: border-box; }
+
+    /* 상단바: 뒤로 48 터치 + 제목 characterName 18sp/600 */
+    .bar { display: flex; align-items: center; gap: 4px; height: 56px; padding: 0 4px; }
+    .back { width: 48px; height: 48px; display: grid; place-items: center; font-size: 20px; color: var(--onSurface); }
+    .title { font-size: 18px; font-weight: 600; line-height: 24px; }
+
+    /* 본문: 좌우 screenHorizontal 16, 요소 사이 8 */
+    .body { padding: 8px 16px 24px; display: flex; flex-direction: column; gap: 8px; }
+
+    /* 섹션 라벨: dateDivider 12sp/500, 위 16(8+8) · 아래 8 */
+    .sec { font-size: 12px; font-weight: 500; line-height: 16px; color: var(--onSurfaceVariant); margin: 8px 4px 0; }
+    .sec.first { margin-top: 0; }
+
+    /* 카드 묶음: surface + outline 1dp, 모서리 16 */
+    .card { background: var(--surface); border: 1px solid var(--outline); border-radius: 16px; overflow: hidden; }
+    .card.danger { border-color: var(--error); }
+
+    /* 행: 최소 48, 안쪽 14×12, 구분선 outline 1dp */
+    .row { display: flex; align-items: center; gap: 12px; min-height: 48px; padding: 12px 14px; }
+    .row + .row { border-top: 1px solid var(--outline); }
+    .row.tap { cursor: pointer; }
+    .row.off .t, .row.off .s { color: var(--onSurfaceVariant); }
+    .tx { flex: 1; min-width: 0; }
+    .t { font-size: 16px; line-height: 23px; }
+    .s { font-size: 13px; line-height: 18px; color: var(--onSurfaceVariant); }
+    .err { color: var(--error) !important; }
+    .chev { color: var(--onSurfaceVariant); font-size: 22px; line-height: 1; flex: none; }
+    .alert { color: var(--error); font-weight: 700; font-size: 16px; flex: none; width: 22px; text-align: center; }
+    .trail { font-size: 13px; color: var(--onSurfaceVariant); flex: none; }
+
+    .note { font-size: 13px; line-height: 18px; color: var(--onSurfaceVariant); margin: 0 4px; }
+
+    /* 스위치: 트랙 52×32, 터치 48. 켬 primary/onPrimary, 끔 surfaceVariant + outline */
+    .switch { flex: none; width: 52px; height: 48px; display: grid; place-items: center; background: none; border: 0; padding: 0; cursor: pointer; }
+    .switch i { position: relative; display: block; width: 52px; height: 32px; border-radius: 999px; background: var(--surfaceVariant); border: 2px solid var(--outline); transition: background-color .15s, border-color .15s; }
+    .switch i::after { content: ""; position: absolute; top: 50%; left: 6px; width: 16px; height: 16px; border-radius: 50%; background: var(--onSurfaceVariant); transform: translateY(-50%); transition: all .15s; }
+    .switch[aria-checked="true"] i { background: var(--primary); border-color: var(--primary); }
+    .switch[aria-checked="true"] i::after { left: 22px; width: 24px; height: 24px; background: var(--onPrimary); }
+
+    /* 라디오: 20, 켬 primary / 끔 onSurfaceVariant 테두리 */
+    .radio { width: 20px; height: 20px; border-radius: 50%; border: 2px solid var(--onSurfaceVariant); flex: none; }
+    .radio.on { border-color: var(--primary); background: radial-gradient(var(--primary) 0 4px, transparent 5px); }
+
+    /* 입력칸: input 모서리 24 알약, 최소 48, surfaceVariant (#503 알약과 같은 생김새) */
+    .field { display: flex; align-items: center; min-height: 48px; border-radius: 24px; background: var(--surfaceVariant); border: 1px solid transparent; padding: 0 16px; }
+    .field:focus-within { border-color: var(--primary); }
+    .field input { width: 100%; border: 0; outline: 0; background: transparent; color: var(--onSurface); font: inherit; font-size: 16px; }
+    .field input::placeholder { color: var(--onSurfaceVariant); }
+
+    /* 버튼: 높이 48, chip 999, primary/onPrimary. 비활성 surfaceVariant/onSurfaceVariant */
+    .btn { width: 100%; min-height: 48px; border-radius: 999px; border: 0; background: var(--primary); color: var(--onPrimary); font: inherit; font-size: 15px; font-weight: 700; cursor: pointer; transition: background-color .15s, color .15s; }
+    .btn:disabled { background: var(--surfaceVariant); color: var(--onSurfaceVariant); cursor: default; }
+    .textbtn { flex: none; min-width: 48px; min-height: 48px; padding: 0 8px; border: 0; background: none; color: var(--primary); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+    .textbtn:disabled { color: var(--onSurfaceVariant); opacity: .6; cursor: default; }
+
+    /* ───────── Current: 지금 앱 코드가 그리는 모습 ───────── */
+    .phone.cur .body { padding: 20px; }
+    .phone.cur .title { font-weight: 700; }
+    .phone.cur .s, .phone.cur .note { font-size: 12px; }
+    .phone.cur .ofield { position: relative; min-height: 56px; border: 1px solid var(--outline); border-radius: 4px; padding: 16px; font-size: 16px; color: var(--onSurfaceVariant); }
+    .phone.cur .ofield b { position: absolute; top: -8px; left: 10px; padding: 0 4px; background: var(--background); font-size: 12px; font-weight: 400; }
+    .phone.cur .mbtn { min-height: 40px; border-radius: 999px; display: grid; place-items: center; background: color-mix(in srgb, var(--onSurface) 12%, transparent); color: color-mix(in srgb, var(--onSurface) 38%, transparent); font-size: 12px; font-weight: 500; }
+    .mark { outline: 2px dashed #E0567A; outline-offset: 2px; border-radius: 6px; }
+
+    @media (prefers-reduced-motion: reduce) {
+      .phone, .switch i, .switch i::after, .btn { transition: none; }
+    }
+  </style>
+</head>
+<body>
+<main>
+  <header>
+    <div class="meta">seok-jun/my-honey-chat · Issue #564 · 이전 시안 <a href="446.html">#446</a> · <a href="539.html">#539</a></div>
+    <h1>설정 화면 foundation 적용 <span class="draft">초안 · 미승인</span></h1>
+    <p>설정 홈과 하위 화면의 <b>배치·정보 계층·상태는 #446·#539 그대로</b> 두고, 색·글자·간격·모서리만 <code>foundation/tokens.json</code> v1.0.0에 맞춘다. 새 화면·새 기능·새 문구는 없다.</p>
+    <p class="notice">
+      #446은 foundation(2026-10-12) 이전 구 팔레트로 그렸고, #539는 색만 토큰으로 바꿨다. 그래서 설정은 채팅방(#502)·입력창(#503)·프로필(#504)과 여백·제목 굵기·입력칸 모양이 다르다. 이 시안은 그 차이만 정리한다.<br />
+      #446의 <b>07 Persona 편집 · 이미지 영역</b>은 설정 화면이 아니라서 이 시안 범위에서 뺐다. #446에 그려지지 않은 <b>내 서버</b> 하위 화면도 그리지 않는다.
+    </p>
+  </header>
+
+  <div class="tabs" role="tablist" aria-label="Visual spec state">
+    <button type="button" class="page-btn" role="tab" aria-selected="false" data-target="current">Current</button>
+    <button type="button" class="page-btn" role="tab" aria-selected="true" data-target="proposed">Proposed</button>
+    <button type="button" class="page-btn" role="tab" aria-selected="false" data-target="spec">규격 · 차이</button>
+  </div>
+
+  <div class="device">기기 모드:
+    <button type="button" class="page-btn" id="devDark" aria-selected="true">다크</button>
+    <button type="button" class="page-btn" id="devLight" aria-selected="false">라이트</button>
+    <span style="opacity:.7">05 화면에서 라이트/다크를 고르면 모든 화면에 바로 적용된다(#539 동작).</span>
+  </div>
+
+  <!-- ───────────── Current ───────────── -->
+  <section class="stage" id="current" hidden>
+    <ul class="legend">
+      <li>지금 앱(<code>feature-ui-settings</code>, main <code>d50391d</code>)이 그리는 모습을 단순화했다. 점선은 foundation과 다른 곳이다.</li>
+      <li>본문 좌우 여백 20 (foundation <code>screenHorizontal</code> 16), 제목 Bold 700 (foundation <code>characterName</code> 600).</li>
+      <li>보조 글자 12sp (<code>dateDivider</code> 크기를 빌려 씀). 입력칸은 Material 기본 OutlinedTextField라 모서리 4.</li>
+    </ul>
+    <div class="grid">
+      <figure>
+        <figcaption><b>설정 홈 (현재)</b><span>여백 20 · 제목 700 · 보조 12sp</span></figcaption>
+        <div class="phone cur themed">
+          <div class="bar"><span class="back">←</span><span class="title mark">설정</span></div>
+          <div class="body mark">
+            <div class="card"><div class="row"><div class="tx"><div class="t">페르소나 관리</div><div class="s mark">대화 중: 유나 · 사진과 외형 이미지 포함</div></div><span class="chev">›</span></div></div>
+            <div class="sec">앱</div>
+            <div class="card">
+              <div class="row"><div class="tx"><div class="t">대화</div><div class="s">선톡 켬 · 이미지 켬 · 음성 끔 · 영상 끔</div></div><span class="chev">›</span></div>
+              <div class="row"><div class="tx"><div class="t">화면</div><div class="s">기기 설정 따름</div></div><span class="chev">›</span></div>
+              <div class="row"><div class="tx"><div class="t">데이터</div><div class="s">백업 · 스냅샷</div></div><span class="chev">›</span></div>
+              <div class="row"><div class="tx"><div class="t">AI 연결</div><div class="s">xAI Grok key 저장됨 · grok-4.7</div></div><span class="chev">›</span></div>
+            </div>
+            <div class="note">대화 원문은 이 폰의 앱 전용 저장소에만 있어.</div>
+          </div>
+        </div>
+      </figure>
+      <figure>
+        <figcaption><b>AI 연결 (현재)</b><span>입력칸 모서리 4 · 모델은 드롭다운 입력칸</span></figcaption>
+        <div class="phone cur themed">
+          <div class="bar"><span class="back">←</span><span class="title">AI 연결</span></div>
+          <div class="body">
+            <div class="card"><div class="row"><div class="tx"><div class="t">xAI Grok key 저장됨</div><div class="s">Android Keystore로 암호화돼</div></div></div></div>
+            <div class="sec">key 바꾸기</div>
+            <div class="ofield mark"><b>새 key로 바꿀 때만 입력</b>&nbsp;</div>
+            <div class="mbtn">key 저장</div>
+            <div class="sec">모델</div>
+            <div class="ofield mark"><b>xAI Grok model</b>grok-4.7 <span style="float:right">⌄</span></div>
+            <div class="sec">이전 버전 호환</div>
+            <div class="card"><div class="row"><div class="tx"><div class="t">내 서버</div><div class="s">현재 대화에 사용하지 않아</div></div><span class="chev">›</span></div></div>
+            <div class="card"><div class="row"><div class="tx"><div class="t err">저장된 key 삭제</div></div></div></div>
+            <div class="note">공급사를 고르지 않아도 돼. 대화와 사진·영상 생성은 모두 xAI Grok으로 가.</div>
+          </div>
+        </div>
+      </figure>
+    </div>
+  </section>
+
+  <!-- ───────────── Proposed ───────────── -->
+  <section class="stage" id="proposed">
+    <ul class="legend">
+      <li>화면 구성·순서·문구는 #446(01~06)과 #539(화면 행·화면 페이지) 그대로다.</li>
+      <li>스위치·라디오·key 입력은 눌러볼 수 있다. 03 대화의 스위치를 바꾸면 01 홈의 요약 줄이 같이 바뀐다.</li>
+      <li><code>star</code>는 설정 어디에도 쓰지 않는다. 경고·위험은 <code>error</code>만 쓴다.</li>
+    </ul>
+    <div class="grid">
+
+      <figure>
+        <figcaption><b>01 설정 홈</b><span>key 저장됨 · AI 연결은 맨 아래</span></figcaption>
+        <div class="phone themed">
+          <div class="bar"><span class="back">←</span><span class="title">설정</span></div>
+          <div class="body">
+            <div class="card"><div class="row tap"><div class="tx"><div class="t">페르소나 관리</div><div class="s">대화 중: 유나 · 사진과 외형 이미지 포함</div></div><span class="chev">›</span></div></div>
+            <div class="sec">앱</div>
+            <div class="card">
+              <div class="row tap"><div class="tx"><div class="t">대화</div><div class="s" data-summary="conversation"></div></div><span class="chev">›</span></div>
+              <div class="row tap"><div class="tx"><div class="t">화면</div><div class="s" data-summary="theme"></div></div><span class="chev">›</span></div>
+              <div class="row tap"><div class="tx"><div class="t">데이터</div><div class="s">백업 · 스냅샷</div></div><span class="chev">›</span></div>
+              <div class="row tap"><div class="tx"><div class="t">AI 연결</div><div class="s">xAI Grok key 저장됨 · grok-4.7</div></div><span class="chev">›</span></div>
+            </div>
+            <div class="note">대화 원문은 이 폰의 앱 전용 저장소에만 있어.</div>
+          </div>
+        </div>
+      </figure>
+
+      <figure>
+        <figcaption><b>02 설정 홈 · key 없음</b><span>AI 연결 행만 error로 바뀐다</span></figcaption>
+        <div class="phone themed">
+          <div class="bar"><span class="back">←</span><span class="title">설정</span></div>
+          <div class="body">
+            <div class="card"><div class="row tap"><div class="tx"><div class="t">페르소나 관리</div><div class="s">대화 중: 유나 · 사진과 외형 이미지 포함</div></div><span class="chev">›</span></div></div>
+            <div class="sec">앱</div>
+            <div class="card">
+              <div class="row tap"><div class="tx"><div class="t">대화</div><div class="s">선톡 켬 · 이미지 끔 · 음성 끔 · 영상 끔</div></div><span class="chev">›</span></div>
+              <div class="row tap"><div class="tx"><div class="t">화면</div><div class="s" data-summary="theme"></div></div><span class="chev">›</span></div>
+              <div class="row tap"><div class="tx"><div class="t">데이터</div><div class="s">백업 · 스냅샷</div></div><span class="chev">›</span></div>
+              <div class="row tap"><div class="tx"><div class="t">AI 연결</div><div class="s err">xAI Grok key가 필요해</div></div><span class="alert" aria-label="주의">!</span></div>
+            </div>
+            <div class="note">대화 원문은 이 폰의 앱 전용 저장소에만 있어.</div>
+          </div>
+        </div>
+      </figure>
+
+      <figure>
+        <figcaption><b>03 대화</b><span>스위치는 즉시 저장 · 저장 버튼 없음</span></figcaption>
+        <div class="phone themed">
+          <div class="bar"><span class="back">←</span><span class="title">대화</span></div>
+          <div class="body">
+            <div class="card">
+              <div class="row"><div class="tx"><div class="t">유나의 선톡</div><div class="s">마지막 대화 2~5시간 뒤 · 하루 최대 2번</div></div><button type="button" class="switch" role="switch" data-key="proactive" aria-label="유나의 선톡"><i></i></button></div>
+            </div>
+            <div class="sec">자동 생성 · 대화에 필요할 때만</div>
+            <div class="card">
+              <div class="row"><div class="tx"><div class="t">이미지</div><div class="s">하루 20회</div></div><button type="button" class="switch" role="switch" data-key="image" aria-label="이미지"><i></i></button></div>
+              <div class="row"><div class="tx"><div class="t">음성 답장</div><div class="s">하루 50회</div></div><button type="button" class="switch" role="switch" data-key="voice" aria-label="음성 답장"><i></i></button></div>
+              <div class="row tap"><div class="tx"><div class="t">목소리</div><div class="s" data-summary="voiceName"></div></div><span class="chev">›</span></div>
+              <div class="row"><div class="tx"><div class="t">5초 영상</div><div class="s">세로형 480p · 하루 5회</div></div><button type="button" class="switch" role="switch" data-key="video" aria-label="5초 영상"><i></i></button></div>
+            </div>
+            <div class="note">생성할 때마다 xAI 유료 API 비용이 발생해. 결과는 이 폰에 저장돼.</div>
+          </div>
+        </div>
+      </figure>
+
+      <figure>
+        <figcaption><b>04 목소리</b><span>선택 즉시 저장 · key 없으면 샘플 비활성</span></figcaption>
+        <div class="phone themed">
+          <div class="bar"><span class="back">←</span><span class="title">목소리</span></div>
+          <div class="body">
+            <div class="card" role="radiogroup" aria-label="목소리">
+              <div class="row tap" role="radio" data-voice="Ara"><span class="radio"></span><div class="tx"><div class="t">Ara</div><div class="s">따뜻하고 친근한 목소리</div></div><button type="button" class="textbtn">샘플</button></div>
+              <div class="row tap" role="radio" data-voice="Eve"><span class="radio"></span><div class="tx"><div class="t">Eve</div><div class="s">활기차고 밝은 목소리</div></div><button type="button" class="textbtn">샘플</button></div>
+              <div class="row tap" role="radio" data-voice="Rex"><span class="radio"></span><div class="tx"><div class="t">Rex</div><div class="s">자신감 있고 또렷한 목소리</div></div><button type="button" class="textbtn">샘플</button></div>
+            </div>
+            <div class="note">샘플 재생도 xAI 유료 API를 호출해.</div>
+          </div>
+        </div>
+      </figure>
+
+      <figure>
+        <figcaption><b>05 화면</b><span>#539 · 단일 선택 · 즉시 적용</span></figcaption>
+        <div class="phone themed">
+          <div class="bar"><span class="back">←</span><span class="title">화면</span></div>
+          <div class="body">
+            <div class="sec first">테마</div>
+            <div class="card" role="radiogroup" aria-label="테마">
+              <div class="row tap" role="radio" data-mode="system"><div class="tx"><div class="t">기기 설정 따름</div><div class="s">폰의 다크 모드 설정을 따라가</div></div><span class="radio"></span></div>
+              <div class="row tap" role="radio" data-mode="light"><div class="tx"><div class="t">라이트</div></div><span class="radio"></span></div>
+              <div class="row tap" role="radio" data-mode="dark"><div class="tx"><div class="t">다크</div></div><span class="radio"></span></div>
+            </div>
+          </div>
+        </div>
+      </figure>
+
+      <figure>
+        <figcaption><b>06 AI 연결</b><span>입력칸은 input 알약 · key가 비면 저장 비활성</span></figcaption>
+        <div class="phone themed">
+          <div class="bar"><span class="back">←</span><span class="title">AI 연결</span></div>
+          <div class="body">
+            <div class="card"><div class="row"><div class="tx"><div class="t">xAI Grok key 저장됨</div><div class="s">Android Keystore로 암호화돼</div></div></div></div>
+            <div class="sec">key 바꾸기</div>
+            <label class="field"><input type="password" id="keyInput" placeholder="새 key로 바꿀 때만 입력" autocomplete="off" /></label>
+            <button type="button" class="btn" id="keySave" disabled>key 저장</button>
+            <div class="sec">모델</div>
+            <div class="card"><div class="row tap"><div class="tx"><div class="t">xAI Grok 모델</div><div class="s">grok-4.7 · 고르면 바로 적용</div></div><span class="chev">⌄</span></div></div>
+            <div class="sec">이전 버전 호환</div>
+            <div class="card"><div class="row tap"><div class="tx"><div class="t">내 서버</div><div class="s">현재 대화에 사용하지 않아</div></div><span class="chev">›</span></div></div>
+            <div class="card" style="margin-top:8px"><div class="row tap"><div class="tx"><div class="t err">저장된 key 삭제</div></div></div></div>
+            <div class="note">대화와 사진·영상 생성은 모두 xAI Grok으로 가.</div>
+          </div>
+        </div>
+      </figure>
+
+      <figure>
+        <figcaption><b>07 데이터</b><span>#446 06 · 합치기와 교체 구분 · 위험 구역은 error 테두리</span></figcaption>
+        <div class="phone themed">
+          <div class="bar"><span class="back">←</span><span class="title">데이터</span></div>
+          <div class="body">
+            <div class="sec first">백업 · 기존 대화에 합치기</div>
+            <div class="card">
+              <div class="row tap"><div class="tx"><div class="t">백업 내보내기</div><div class="s">대화 텍스트와 시간만 · 암호화 안 됨</div></div></div>
+              <div class="row tap"><div class="tx"><div class="t">백업 가져오기</div><div class="s">중복 없이 합쳐</div></div></div>
+            </div>
+            <div class="sec">스냅샷 · 대화 통째로 교체</div>
+            <div class="card">
+              <div class="row tap"><div class="tx"><div class="t">스냅샷 내보내기</div><div class="s">지금 대화 상태를 파일로</div></div></div>
+            </div>
+            <div class="sec">진단 기록</div>
+            <div class="card">
+              <div class="row"><div class="tx"><div class="t">모델 평가 로그</div><div class="s">상태·오류 코드·토큰·지연시간을 이 폰에만 저장</div></div><span class="trail">항상 켜짐</span></div>
+            </div>
+            <div class="sec">위험 구역</div>
+            <div class="card danger">
+              <div class="row tap"><div class="tx"><div class="t err">스냅샷으로 교체 복원</div><div class="s">현재 대화가 남지 않아 · 끝날 때까지 전송 잠금</div></div></div>
+            </div>
+            <div class="note">API key·설정·사진·음성·영상은 파일에 들어가지 않아.</div>
+          </div>
+        </div>
+      </figure>
+
+    </div>
+  </section>
+
+  <!-- ───────────── 규격 · 차이 ───────────── -->
+  <section class="stage" id="spec" hidden>
+    <h2>1. 설정 컴포넌트 규격</h2>
+    <p>모든 값은 tokens.json에 있는 토큰이다. <b>(제안)</b>은 토큰이 없어서 추가를 제안하는 값이다(아래 3절).</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>요소</th><th>색</th><th>글자</th><th>치수</th></tr></thead>
+      <tbody>
+        <tr><td>화면 배경</td><td><code>background</code></td><td>—</td><td>좌우 <code>screenHorizontal</code> 16, 요소 사이 8 <b>(제안)</b></td></tr>
+        <tr><td>상단바</td><td>제목 <code>onSurface</code></td><td><code>characterName</code> 18sp / 600</td><td>뒤로 버튼 터치 <code>minTouchTarget</code> 48</td></tr>
+        <tr><td>섹션 라벨</td><td><code>onSurfaceVariant</code></td><td><code>dateDivider</code> 12sp / 500 (#504 카드 제목과 같음)</td><td>위 16 · 아래 8 <b>(제안)</b>, 좌 4</td></tr>
+        <tr><td>카드 묶음</td><td><code>surface</code> + <code>outline</code> 1dp</td><td>—</td><td>모서리 16 <b>(제안, #504 카드·코드 shapes.medium과 같음)</b></td></tr>
+        <tr><td>행</td><td>제목 <code>onSurface</code>, 보조 <code>onSurfaceVariant</code>, 구분선 <code>outline</code> 1dp</td><td>제목 <code>body</code> 16sp/23 (설정은 글자 크기 설정과 무관하게 고정), 보조 <code>status</code> 13sp</td><td>최소 높이 48, 안쪽 가로 14 · 세로 12 <b>(제안)</b>, 요소 사이 12</td></tr>
+        <tr><td>오른쪽 표시</td><td>› ⌄ 와 보조 글자 <code>onSurfaceVariant</code></td><td><code>status</code> 13sp</td><td>—</td></tr>
+        <tr><td>스위치</td><td>켬: 트랙 <code>primary</code>, 손잡이 <code>onPrimary</code> / 끔: 트랙 <code>surfaceVariant</code>, 테두리 <code>outline</code>, 손잡이 <code>onSurfaceVariant</code></td><td>—</td><td>Material3 Switch 기본 52×32, 터치 48</td></tr>
+        <tr><td>라디오</td><td>켬 <code>primary</code> / 끔 <code>onSurfaceVariant</code></td><td>—</td><td>20, 터치는 행 전체</td></tr>
+        <tr><td>입력칸</td><td><code>surfaceVariant</code>, 포커스 테두리 <code>primary</code>, 안내 글자 <code>onSurfaceVariant</code></td><td><code>body</code> 16sp</td><td><code>input</code> 모서리 24, <code>inputMinHeight</code> 48 (#503 알약과 같은 생김새)</td></tr>
+        <tr><td>주 버튼</td><td><code>primary</code> / <code>onPrimary</code>, 비활성 <code>surfaceVariant</code> / <code>onSurfaceVariant</code></td><td>15sp / 700 <b>(제안, #504 버튼과 같음)</b></td><td>높이 48, <code>chip</code> 999</td></tr>
+        <tr><td>글자 버튼 (샘플)</td><td><code>primary</code>, 비활성 <code>onSurfaceVariant</code></td><td><code>status</code> 13sp / 600</td><td>터치 48</td></tr>
+        <tr><td>안내문</td><td><code>onSurfaceVariant</code></td><td><code>status</code> 13sp, 줄 18</td><td>좌우 4</td></tr>
+        <tr><td>경고 · 위험</td><td><code>error</code> (글자, !, 위험 구역 테두리)</td><td>—</td><td>—</td></tr>
+        <tr><td><code>star</code></td><td colspan="3">설정에서는 쓰지 않는다 (foundation 2절 · 8절 규칙 4).</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>2. 지금 앱 코드와 다른 점</h2>
+    <p>main <code>d50391d</code> 기준. 배치·동작은 바꾸지 않고 아래 값만 맞춘다.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>위치 (feature-ui-settings / feature-ui-common)</th><th>현재</th><th>시안</th></tr></thead>
+      <tbody>
+        <tr><td><code>SettingsScaffold</code> 본문 여백</td><td><code>padding(20.dp)</code></td><td>좌우 16 (<code>SomeYouSpacing.ScreenHorizontal</code>)</td></tr>
+        <tr><td><code>LibraryTopBar</code> 제목</td><td><code>FontWeight.Bold</code> (700)</td><td><code>SomeYouTextStyles.CharacterName</code> 그대로 (600). 공통 컴포넌트라 Persona 라이브러리 상단바도 같이 바뀐다.</td></tr>
+        <tr><td><code>SettingsRow</code> · <code>SettingsNote</code> · <code>ConnectionStatusRow</code> 보조 글자</td><td><code>DateDivider.fontSize</code> 12sp, 줄 높이 하드코딩 18.sp</td><td><code>SomeYouTextStyles.Status</code> 13sp</td></tr>
+        <tr><td>AI 연결 · 내 서버 입력칸</td><td>Material <code>OutlinedTextField</code> (모서리 <code>shapes.extraSmall</code> 기본 4dp)</td><td><code>SomeYouShapes.Input</code> 24, <code>surfaceVariant</code> 채움, 최소 48</td></tr>
+        <tr><td>모델 선택 (<code>ModelPicker</code>)</td><td>드롭다운 입력칸</td><td>#446 05처럼 카드 행 + ⌄. 누르면 지금과 같은 메뉴가 열린다(동작 그대로).</td></tr>
+        <tr><td>key 저장 · 내 서버 저장 버튼</td><td>Material <code>Button</code> 기본 높이 40</td><td>높이 48, 글자 15sp/700</td></tr>
+        <tr><td>목소리 행 (<code>SettingsVoicePage</code>)</td><td>안쪽 6×4, 제목 SemiBold</td><td>다른 행과 같은 14×12, 제목 Regular, 최소 48</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>3. foundation 토큰 추가 제안</h2>
+    <p>foundation 8절 규칙 2("하드코딩이 필요하면 먼저 토큰을 추가하자고 제안")에 따른 제안이다. 승인되면 <code>tokens.json</code> → README 표 → <code>compose/*.kt</code>를 같은 커밋에서 맞춘다.</p>
+    <div class="tablewrap"><table>
+      <thead><tr><th>토큰 (제안)</th><th>값</th><th>근거</th></tr></thead>
+      <tbody>
+        <tr><td><code>shape.card</code></td><td>16</td><td>#504 프로필 카드, 앱 <code>SomeYouMaterialShapes.medium</code>이 이미 16. #446·#539의 14를 대체.</td></tr>
+        <tr><td><code>spacing.rowHorizontal</code> / <code>rowVertical</code></td><td>14 / 12</td><td>앱 <code>SettingsRow</code>가 이미 쓰는 값. 말풍선 가로 여백 14와 맞물림.</td></tr>
+        <tr><td><code>spacing.itemGap</code> / <code>sectionGap</code></td><td>8 / 16</td><td>앱 설정 화면이 이미 쓰는 값(요소 사이 8 + 라벨 위 8).</td></tr>
+        <tr><td><code>typography.button</code></td><td>15sp / 700</td><td>#504 버튼. #500 버튼은 14sp/700이라 둘 중 하나로 통일 필요.</td></tr>
+      </tbody>
+    </table></div>
+
+    <h2>4. 열어둔 질문</h2>
+    <ul class="legend">
+      <li>목소리(#446 04)는 라디오가 왼쪽, 화면(#539)은 오른쪽이다. 배치를 그대로 두라는 요청에 따라 둘 다 유지했다. 한쪽으로 맞출지는 별도로 정한다.</li>
+    </ul>
+  </section>
+
+  <footer style="margin-top:32px;font-size:13px;opacity:.7">기반: <code>foundation/tokens.json</code> v1.0.0 · 배치: #446 초안 v3, #539 초안</footer>
+</main>
+<script>
+  // 탭
+  const tabs = document.querySelectorAll('[role="tab"]');
+  const stages = document.querySelectorAll('.stage');
+  tabs.forEach(tab => tab.addEventListener('click', () => {
+    tabs.forEach(x => x.setAttribute('aria-selected', String(x === tab)));
+    stages.forEach(stage => stage.hidden = stage.id !== tab.dataset.target);
+  }));
+
+  const themeNames = { system: '기기 설정 따름', light: '라이트', dark: '다크' };
+  const state = { device: 'dark', theme: 'system', proactive: true, image: true, voice: false, video: false, voiceName: 'Ara' };
+
+  function render() {
+    const effective = state.theme === 'system' ? state.device : state.theme;
+    document.querySelectorAll('.phone.themed').forEach(p => {
+      p.classList.toggle('dark', effective === 'dark');
+      p.classList.toggle('light', effective === 'light');
+    });
+    document.getElementById('devDark').setAttribute('aria-selected', String(state.device === 'dark'));
+    document.getElementById('devLight').setAttribute('aria-selected', String(state.device === 'light'));
+
+    const onOff = v => v ? '켬' : '끔';
+    const conv = `선톡 ${onOff(state.proactive)} · 이미지 ${onOff(state.image)} · 음성 ${onOff(state.voice)} · 영상 ${onOff(state.video)}`;
+    document.querySelectorAll('[data-summary="conversation"]').forEach(el => el.textContent = conv);
+    document.querySelectorAll('[data-summary="theme"]').forEach(el => el.textContent = themeNames[state.theme]);
+    document.querySelectorAll('[data-summary="voiceName"]').forEach(el => el.textContent = state.voiceName);
+
+    document.querySelectorAll('.switch').forEach(sw => sw.setAttribute('aria-checked', String(state[sw.dataset.key])));
+    document.querySelectorAll('[data-mode]').forEach(r => {
+      const on = r.dataset.mode === state.theme;
+      r.setAttribute('aria-checked', String(on));
+      r.querySelector('.radio').classList.toggle('on', on);
+    });
+    document.querySelectorAll('[data-voice]').forEach(r => {
+      const on = r.dataset.voice === state.voiceName;
+      r.setAttribute('aria-checked', String(on));
+      r.querySelector('.radio').classList.toggle('on', on);
+    });
+  }
+
+  document.querySelectorAll('.switch').forEach(sw => sw.addEventListener('click', () => { state[sw.dataset.key] = !state[sw.dataset.key]; render(); }));
+  document.querySelectorAll('[data-mode]').forEach(r => r.addEventListener('click', () => { state.theme = r.dataset.mode; render(); }));
+  document.querySelectorAll('[data-voice]').forEach(r => r.addEventListener('click', e => {
+    if (e.target.closest('.textbtn')) return;
+    state.voiceName = r.dataset.voice; render();
+  }));
+  document.getElementById('devDark').addEventListener('click', () => { state.device = 'dark'; render(); });
+  document.getElementById('devLight').addEventListener('click', () => { state.device = 'light'; render(); });
+
+  const keyInput = document.getElementById('keyInput');
+  const keySave = document.getElementById('keySave');
+  keyInput.addEventListener('input', () => { keySave.disabled = keyInput.value.trim() === ''; });
+  keySave.addEventListener('click', () => { keyInput.value = ''; keySave.disabled = true; });
+
+  render();
+</script>
+</body>
+</html>
