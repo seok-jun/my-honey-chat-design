@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Issue #626 — 로어북 조회 안내·적용 내역 화면 초안</title>
+<title>Issue #626 — 로어북 조회 안내·적용 내역 확정 시안</title>
 <style>
 :root{color-scheme:dark;--bg:#0E0B1F;--surface:#1E1838;--variant:#262046;--outline:#3A3260;--text:#ECE8FF;--muted:#A9A2C9;--primary:#9C8FFF;--on-primary:#120E2A;--error:#FFB4AB;--on-error:#4A0F0C;--body:16px}
 :root[data-theme=light]{color-scheme:light;--bg:#F5F3FC;--surface:#FFFFFF;--variant:#ECE8F8;--outline:#DCD5F2;--text:#1C1733;--muted:#5F5880;--primary:#4F3FC4;--on-primary:#FFFFFF;--error:#A82018;--on-error:#FFFFFF}
@@ -32,8 +32,8 @@ details{border:1px solid var(--outline);border-radius:16px;margin:12px 0;backgro
 <header>
 <div class="meta">some:You · 앱 Issue #626 · D-06 / D-07</div>
 <h1>대화는 이어가고,<br>필요할 때 근거를 확인하기</h1>
-<p class="muted">로어북 조회 안내와 적용·제외 내역의 화면 초안. 배치·문구·상태 검토용이며 앱 설계 승인이나 구현 완료를 뜻하지 않습니다.</p>
-<span class="tag">제안 · 미확정</span>
+<p class="muted">로어북 조회 안내·적용 내역·작성자 관리 진입의 확정 시안. 전체 관리·편집·복원 화면은 후속 설계 대상이며 앱 구현은 아직 진행하지 않았습니다.</p>
+<span class="tag">D-06/D-07 · 확정</span>
 <div class="toolbar" aria-label="시안 표시 옵션">
 <button id="theme" type="button" aria-pressed="false">라이트로 보기</button>
 <button id="type" type="button" aria-pressed="false">큰 글자 20px</button>
@@ -42,7 +42,7 @@ details{border:1px solid var(--outline);border-radius:16px;margin:12px 0;backgro
 </select></label>
 </div>
 </header>
-<section class="frames" aria-label="제안 화면 세 가지">
+<section class="frames" aria-label="확정 화면 세 가지">
 <article>
 <p class="frame-label">01 · 채팅 / 필요한 경우에만 짧게 안내</p>
 <div class="phone">
@@ -111,7 +111,7 @@ details{border:1px solid var(--outline);border-radius:16px;margin:12px 0;backgro
 <div class="state"><h3>복구 안전성 미확인</h3><p>“대화 데이터를 복구하고 있어요.” 기존 복구 절차에 따라 전송 제한. 목록·진행 안내는 유지.</p><p class="result">“무시하고 계속” 없음 · 입력 초안 보존</p><button type="button" data-to="blocked">전송 제한 보기</button></div>
 <div class="state"><h3>정상적인 제외</h3><p>관련 없음·중복·문맥 한도·충돌로 제외된 경우는 적용 내역에만 표시. 핵심 근거가 부족할 때만 답변 보류로 전환.</p><p class="result">“제외됨”이 데이터 삭제를 뜻하지 않음</p></div>
 <div class="state"><h3>과거 적용 기록 없음</h3><p>“이 답변의 적용 기록이 없어요.” 현재 설정을 이용해 당시 적용/제외 이유를 추정하지 않음.</p><p class="result">정보 없음은 실패·비용 0과 구분</p><button type="button" data-to="unknown">기록 없음 보기</button></div>
-<div class="state"><h3>스냅샷 연결 예외</h3><p>다른 책·연결 미상은 교체 전 차단. 같은 책 소실은 기존 미리보기에 제한을 표시한 뒤 복원 선택.</p><p class="result">이 페이지는 안내/내역 초안이며 복원 화면 전체 배치는 별도 설계</p></div>
+<div class="state"><h3>스냅샷 연결 예외</h3><p>다른 책·연결 미상은 교체 전 차단. 같은 책 소실은 기존 미리보기에 제한을 표시한 뒤 복원 선택.</p><p class="result">안내·내역 범위 확정 · 복원 화면 전체 배치는 별도 설계</p></div>
 </div>
 </section>
 <section class="rules">
