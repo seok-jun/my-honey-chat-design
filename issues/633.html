@@ -29,13 +29,16 @@ details{border:1px solid var(--outline);border-radius:16px;margin:12px 0;backgro
 <style>
 .management{margin-bottom:24px}.flow-nav{display:flex;gap:12px;flex-wrap:wrap;margin:24px 0}.flow-nav button[aria-pressed=true]{background:var(--primary);color:var(--on-primary)}.flow-panel{scroll-margin-top:16px}.flow-title{display:flex;justify-content:space-between;align-items:start;gap:16px;flex-wrap:wrap;margin:24px 0 16px}.flow-title h2{font-size:24px;margin-bottom:4px}.flow-title p{color:var(--muted);max-width:800px}.management .frames{grid-template-columns:repeat(2,minmax(0,1fr));max-width:960px;margin:auto}.management .phone{min-height:700px}.management .phone h2{margin:0}.management .phone p{overflow-wrap:anywhere}.management .screen>.row{margin-bottom:16px}.field{display:block;margin:16px 0}.field>span{display:block;margin-bottom:4px}.field input,.field textarea,.field select{width:100%;max-width:100%;min-width:0;min-height:48px;padding:12px 14px;border:1px solid var(--outline);border-radius:16px;color:var(--text);background:var(--surface);font:inherit}.field textarea{min-height:120px;resize:vertical}.hint{font-size:13px;color:var(--muted);margin:4px 0 12px}.actions{display:flex;gap:12px;flex-wrap:wrap}.actions button{flex:1;min-width:96px}.screen .wide{margin:4px 0}.book-row{display:block;width:100%;text-align:left;margin:12px 0;padding:16px;background:var(--surface)}.book-row strong,.book-row span{display:block}.book-row span{color:var(--muted);font-size:13px;margin-top:4px}.stat{display:flex;justify-content:space-between;gap:16px;padding:12px 0;border-bottom:1px solid var(--outline)}.stat span{color:var(--muted)}.state-selector{margin:16px 0 24px;padding:16px;background:var(--surface);border:1px solid var(--outline);border-radius:16px}.state-selector label{display:block;margin-bottom:12px}.state-selector select{width:100%;max-width:100%}.design-note{border-left:2px solid var(--primary);padding:12px 16px;margin:24px 0;color:var(--muted)}.decision{border:1px solid var(--primary);border-radius:16px;padding:16px;background:var(--surface);margin:16px 0}.decision h3{color:var(--primary)}.danger-text{color:var(--error)}.management .choice{padding:16px;border:1px solid var(--outline);border-radius:16px;margin:12px 0;background:var(--surface)}.management .choice.selected{border-color:var(--primary)}.management .choice strong{display:block;margin-bottom:4px}.management .choice p{font-size:13px;color:var(--muted);margin:0}.management .badge{display:inline-block;margin-bottom:4px}.management .empty{border:1px dashed var(--outline);border-radius:16px;padding:24px 16px;text-align:center;margin:24px 0}.management .case-note{color:var(--muted);font-size:13px;margin-top:12px}.management .checkline{display:flex;align-items:start;gap:12px;padding:12px 0}.management .checkline input{min-width:24px;min-height:24px;margin:12px 0;accent-color:var(--primary)}.management .checkline span{padding:12px 0}.management button,.management select{overflow-wrap:anywhere;white-space:normal}.management .phone-top>div{min-width:0}.management .screen{min-width:0}.management [data-case-panel] h3{font-size:18px}.management .micro{font-size:13px;color:var(--muted)}#feedback{margin:24px 0;background:var(--bg)}#feedback>summary{font-size:18px}#feedback>.feedback-content{padding:16px}#feedback .toolbar{margin-bottom:24px}#feedback .frames{gap:16px}.management .compare{display:grid;grid-template-columns:1fr 1fr;gap:16px}.management .compare>div{border:1px solid var(--outline);border-radius:16px;padding:16px}a.jump{display:inline-flex;align-items:center;min-height:48px}.flow-panel h2:focus{outline:none}@media(max-width:1000px){.management .frames{grid-template-columns:1fr}.management .phone{max-width:480px;width:100%}.management .frame-label{max-width:480px}}@media(max-width:400px){.management .compare{grid-template-columns:1fr}.flow-title h2{font-size:20px}.actions button{min-width:0}}
 </style>
+<style>
+#fact-list .fact-row{border:1px solid var(--outline);border-radius:16px;padding:12px;margin:12px 0;background:var(--surface)}#fact-list .field{margin:0}#fact-list textarea{min-height:48px}#fact-list .row{justify-content:space-between;align-items:center}#fact-list .row span{font-size:13px;color:var(--muted)}#fact-list button{margin-top:4px}.management article{min-width:0}#fact-phone .actions button{min-width:0}#fact-phone .card ol{padding-left:24px}#fact-phone .card li{margin:12px 0}#fact-phone :disabled{cursor:not-allowed}
+</style>
 </head>
 <body>
 <main>
 <header>
 <div class="meta">some:You · 앱 Issue #633 · 로어북 관리 화면·적용 내역과 앱 통합 검증</div>
 <h1>설정은 함께 쓰고,<br>대화의 연결은 지키기</h1>
-<p class="muted">로어북 작성·편집·연결·보관/삭제·복원 흐름. 확정된 제품 정책을 화면으로 구체화한 관리 시안이며, 최초 설정 구분과 발설 방식 두 가지도 확정 반영했습니다.</p>
+<p class="muted">로어북 작성·편집·연결·보관/삭제·복원 흐름. 확정된 제품 정책을 화면으로 구체화한 관리 시안이며, 최초 설정 구분·발설 방식과 D-633-01/02 사실 초안 검토 결정을 반영했습니다.</p>
 <div class="row"><span class="tag">관리 화면 · 검토 시안</span><span class="tag">안내·적용 내역 · 확정 유지</span><a class="jump" href="#decisions">확정한 선택 2건</a><a class="jump" id="open-feedback" href="#feedback">확정 안내 화면</a></div>
 <div class="toolbar" aria-label="시안 표시 옵션">
 <button id="theme" type="button" aria-pressed="false">라이트로 보기</button>
@@ -64,22 +67,39 @@ details{border:1px solid var(--outline);border-radius:16px;margin:12px 0;backgro
 </section>
 
 <section class="flow-panel" id="flow-edit" hidden>
-<div class="flow-title"><div><h2 tabindex="-1">02 · 작성과 편집</h2><p>책을 먼저 만들고 항목을 추가합니다. 저장은 명시적으로 실행하며 공용 원본의 적용 범위를 편집 화면 안에서 확인합니다.</p></div><span class="tag">공용 편집 · 연결 교체 없음</span></div>
-<div class="state-selector"><label for="edit-case">저장·편집 상태 시안</label><select id="edit-case" data-case-group="edit"><option value="form">작성 중</option><option value="validation">필수 입력 없음</option><option value="saving">저장 중</option><option value="saved">저장 완료</option><option value="error">저장 실패 · 입력 유지</option><option value="conflict">다른 편집 내용과 충돌</option><option value="leave">저장하지 않고 나가기</option><option value="remove">항목 비활성화·삭제</option></select></div>
+<div class="flow-title"><div><h2 tabindex="-1">02 · 작성과 사실 검토</h2><p>본문을 쓰고 명시적으로 AI 분해를 요청하거나 사실을 직접 작성합니다. 펼쳐진 사실 목록을 고친 뒤 한 번에 확인하고 저장합니다.</p></div><span class="tag">D-633-01/02 · 작성자 전용</span></div>
+<div class="state-selector"><label for="edit-case">편집·초안·저장 상태 시안 · 실제 AI 호출 없음</label><select id="edit-case" data-case-group="edit"><option value="form">작성·수동 사실 편집</option><option value="analyzing">AI 분해 중 · 사실 편집 가능</option><option value="candidate">재분해 후보 도착 · 현재 편집 유지</option><option value="failed">AI 분해 실패 · 입력 유지</option><option value="cancelled">AI 분해 취소 · 입력 유지</option><option value="bodychanged">본문 변경 · 사실 재확인</option><option value="validation">필수 입력 없음</option><option value="saving">저장 중</option><option value="saved">저장 완료</option><option value="error">저장 실패 · 입력 유지</option><option value="conflict">CAS 충돌 · 최신본 재확인</option><option value="lookup">충돌 후 최신본 조회 실패</option><option value="leave">저장하지 않고 나가기</option><option value="remove">항목 비활성화·삭제</option></select><p class="case-note">사실 0개 상태는 현재 사실을 모두 삭제해 확인할 수 있습니다. 모든 입력은 합성 예시입니다. 상태 선택은 화면 검토용이며 provider·DB 동작을 재현하지 않습니다.</p></div>
 <div class="frames">
 <article><p class="frame-label">새 로어북 → 빈 책 상세 → 항목 추가</p><div class="phone"><div class="phone-top"><h2 id="book-form-title">새 로어북</h2></div><div class="screen"><label class="field"><span>책 이름 · 필수</span><input readonly value="로어북 A" aria-label="책 이름 예시"></label><label class="field"><span>설명 · 선택</span><textarea readonly placeholder="책의 용도를 정리해요. 시안에는 본문을 넣지 않았어요."></textarea></label><div class="notice"><h3 id="book-notice-title">책을 만들어도 바로 연결되지 않아요</h3><p id="book-notice-text">사용할 페르소나에서 대화 시작 전에 선택해 주세요.</p></div><div class="card"><h3>만든 다음</h3><p>빈 책 상세에서 항목 추가 → 필요한 설정 작성 → 연결 화면에서 공용 원본 또는 독립 복제본 선택.</p></div></div><div class="footer actions"><button data-flow="library">취소</button><button class="primary" data-flow="library" data-next-case="library:list" id="book-submit">책 만들기</button></div></div></article>
-<article><p class="frame-label">항목 편집 → 저장 결과와 예외</p><div class="phone"><div class="phone-top"><div><h2>항목 편집</h2><span class="sub">로어북 A · 연결 2명</span></div></div><div class="screen">
-<div class="notice"><h3>공유 중인 책을 수정해요</h3><p>저장한 내용은 모든 연결 대화의 다음 요청부터 반영돼요. 생성 중인 답변은 그대로 이어져요.</p></div>
-<div data-case-panel="edit:form"><label class="field"><span>항목 이름 · 필수</span><input readonly value="항목 A"></label><label class="field"><span>설정 내용 · 필수</span><textarea readonly placeholder="설정 본문 입력 영역 · 실제 내용은 시안에서 생략"></textarea></label><label class="field"><span>설정 구분 · 확정 Q1</span><select aria-label="설정 구분 예시"><option value="">처음 저장할 때 선택</option><option>일반 배경</option><option>제한 정보·비밀</option><option>작성자 전용</option></select></label><p class="hint">제한 정보는 인지 근거가 있는 페르소나에게만 제공해요. 본문에 공개 정보와 비밀이 섞이면 항목을 나누거나 전체를 제한해 주세요.</p><details><summary>검색과 분류 · 선택</summary><div class="inside"><label class="field"><span>키워드·별칭</span><input readonly placeholder="시안에서는 비워 둠"></label><label class="field"><span>분류</span><input readonly placeholder="선택적 분류 · 매 대화에 선택할 필요 없음"></label><p>검색 우선순위·상한 수치는 평가 후 정해요.</p></div></details><button class="wide" data-flow="knowledge">페르소나별 인지 확인</button></div>
-<div data-case-panel="edit:validation" hidden class="notice error"><h3>입력을 확인해 주세요</h3><p>이름·설정 내용은 비워 둘 수 없어요. 새 항목은 설정 구분도 선택해 주세요(Q1 확정).</p><button data-case-set="edit:form">입력으로 돌아가기</button></div>
-<div data-case-panel="edit:saving" hidden class="notice" role="status"><h3>저장하고 있어요</h3><p>입력은 유지하고 중복 저장을 막아요. 완료 전에는 반영됐다고 표시하지 않아요.</p><button disabled>저장 중</button></div>
-<div data-case-panel="edit:saved" hidden class="notice"><h3>저장했어요</h3><p>모든 연결 대화의 다음 요청부터 적용돼요. 기존 기억 원문은 바꾸지 않아요.</p><button data-flow="knowledge">인지 영향 확인</button><p>설정 변경의 인지 영향이 미확인이면 새 내용을 아는 것으로 확대하지 않아요.</p></div>
-<div data-case-panel="edit:error" hidden class="notice error"><h3>저장하지 못했어요</h3><p>입력 내용은 이 편집 화면에 남아 있어요. 재시도 전에 현재 저장 상태를 확인해 중복 반영을 막아요.</p><button data-case-set="edit:saving">다시 저장</button><button data-case-set="edit:form">계속 편집</button></div>
-<div data-case-panel="edit:conflict" hidden><div class="notice error"><h3>다른 곳에서 먼저 수정했어요</h3><p>최신 내용을 덮어쓰지 않았어요. 편집 중인 내용을 보며 최신 내용과 비교해 주세요.</p></div><div class="compare"><div><strong>현재 저장본</strong><p class="micro">최신 항목 · 본문 생략</p></div><div><strong>내 편집 내용</strong><p class="micro">입력 유지 · 본문 생략</p></div></div><p class="hint">최신 내용 기준으로 다시 편집합니다. 무조건 덮어쓰기 버튼은 두지 않습니다.</p><button class="wide" data-case-set="edit:form">비교하며 편집 이어가기</button></div>
+<article><p class="frame-label">항목 편집 → 사실 목록 검토 → 확인하고 저장</p><div class="phone" id="fact-phone"><div class="phone-top"><div><h2>항목 편집</h2><span class="sub">로어북 A · 연결 2명 · 작성자용</span></div></div><div class="screen">
+<div class="notice"><h3>공유 중인 책을 수정해요</h3><p>저장한 내용은 모든 연결 대화의 다음 요청부터 반영돼요. 생성 중인 답변과 기존 기억 원문은 그대로예요.</p></div>
+<div id="fact-editor">
+<label class="field"><span>항목 이름 · 필수</span><input id="entry-name" value="항목 A" required></label>
+<label class="field"><span>설정 구분 · 필수(Q1)</span><select id="entry-visibility" required aria-describedby="visibility-hint"><option value="">처음 저장할 때 선택</option><option value="background">일반 배경</option><option value="restricted">제한 정보·비밀</option><option value="author">작성자 전용</option></select></label>
+<p class="hint" id="visibility-hint">설정 구분은 항목 전체에 적용돼요. 공개 정보와 비밀이 섞이면 항목을 나누거나 전체를 제한해 주세요. AI가 공개 범위를 바꾸지 않아요.</p>
+<details open id="source-details"><summary>원문 · 설정 본문 작성/대조</summary><div class="inside"><label class="field"><span>설정 본문 · 필수</span><textarea id="entry-body" required aria-describedby="source-hint">합성 본문 A. 합성 본문 B.</textarea></label><p class="hint" id="source-hint">AI는 원문에 있는 사실만 나누도록 요청해요. 결과를 직접 검토해 주세요. 원문은 접어 두고 대조할 수 있어요.</p></div></details>
+<div class="actions"><button id="analyze-facts">AI로 사실 나누기</button><button id="manual-facts">직접 사실 작성</button></div><p class="hint">자동으로 호출하지 않아요. 직접 작성해서도 저장할 수 있어요.</p>
+<div id="source-changed" class="notice" role="status" hidden><h3>본문이 바뀌었어요</h3><p>사실 목록은 그대로예요. 본문과 맞는지 다시 확인하고 저장해 주세요. 필요하면 AI 분해를 다시 요청할 수 있어요.</p></div>
+<section aria-labelledby="facts-heading" id="current-facts"><div class="row"><h3 id="facts-heading">현재 편집 중인 사실</h3><span id="fact-count" class="count" aria-live="polite"></span></div><p class="hint">내용을 수정하거나 사실을 추가·삭제하세요. 사실마다 체크할 필요는 없어요.</p><div id="fact-list"></div><button id="add-fact" class="wide">사실 추가</button></section>
+<div id="zero-facts" class="notice" role="status" hidden><h3>대화에 제공할 사실이 없습니다</h3><p>사실 0개로도 저장할 수 있어요. 작성자 전용 항목은 작성자 참고용으로 보관해요.</p></div>
+<div data-case-panel="edit:analyzing" hidden class="notice" role="status"><h3>사실 초안을 만들고 있어요</h3><p>원문과 현재 사실은 유지돼요. 기다리는 동안 사실 목록을 고쳐도 새 결과는 별도 후보로 받아요.</p><button id="cancel-analysis">분해 취소</button></div>
+<section data-case-panel="edit:candidate" hidden class="card" aria-labelledby="candidate-title"><span class="badge">아직 저장되지 않은 새 후보</span><h3 id="candidate-title">새 초안을 사용할까요?</h3><p>현재 편집 내용을 덮어쓰지 않았어요. 아래 요약은 현재 편집 목록과 비교하며, 저장 영향 요약과는 달라요.</p><p id="candidate-summary" class="micro" aria-live="polite"></p><ol><li>합성 사실 A</li><li>합성 사실 C</li></ol><div class="actions"><button id="use-candidate" class="primary">새 초안 사용</button><button id="keep-facts">현재 편집 유지</button></div><p>새 초안 사용은 편집 목록만 바꿔요. 저장은 아래에서 따로 확인해요.</p></section>
+<div data-case-panel="edit:failed" hidden class="notice error" role="status"><h3>사실을 나누지 못했어요</h3><p>본문·사실 목록·기존 저장본은 그대로예요. 자동으로 다시 요청하지 않아요. 직접 사실을 작성해도 돼요.</p><button data-fact-action="retry">다시 분해 요청</button></div>
+<div data-case-panel="edit:cancelled" hidden class="notice" role="status"><h3>분해를 취소했어요</h3><p>본문과 편집 중인 사실은 유지돼요. 취소 뒤 늦게 도착한 결과는 적용하지 않아요.</p></div>
+<details><summary>검색과 분류 · 선택</summary><div class="inside"><label class="field"><span>키워드·별칭</span><input placeholder="선택 사항"></label><label class="field"><span>분류</span><input placeholder="선택 사항"></label><p>검색 우선순위·상한 수치는 평가 후 정해요.</p></div></details>
+<div class="card" id="save-summary"><h3>저장 영향 요약</h3><p id="save-impact" class="micro" aria-live="polite"></p><p>현재 저장본을 기준으로 본문·사실·공개 범위의 변경 영향을 함께 확인해요. 범위 변경 시 같은 내용도 기존 인지를 자동 승계하지 않아요. 변경한 사실이나 공개 범위에 기존 인지를 자동으로 이어 붙이지 않아요.</p><p><strong>저장·열람·초안 확인은 인지 획득이 아니에요.</strong> 페르소나의 인지는 별도로 조정해요.</p><button class="wide" data-flow="knowledge">페르소나별 인지 확인</button></div>
+</div>
+<div data-case-panel="edit:validation" hidden class="notice error" role="alert"><h3>입력을 확인해 주세요</h3><p>이름·설정 본문과 설정 구분을 확인해 주세요. 사실은 0개여도 저장할 수 있어요.</p><button data-case-set="edit:form">편집 이어가기</button></div>
+<div data-case-panel="edit:saving" hidden class="notice" role="status"><h3>저장하고 있어요</h3><p>본문과 확인한 사실 목록을 함께 저장해요. 중복 저장을 막고 완료 전에는 반영됐다고 표시하지 않아요.</p><button disabled>저장 중</button></div>
+<div data-case-panel="edit:saved" hidden class="notice" role="status"><h3>저장했어요</h3><p>모든 연결 대화의 다음 요청부터 적용돼요. 사실이 없으면 대화에 제공할 사실이 없습니다. 저장만으로 인지를 획득하지 않아요.</p><button data-flow="knowledge">인지 영향 확인</button></div>
+<div data-case-panel="edit:error" hidden class="notice error" role="alert"><h3>저장하지 못했어요</h3><p>본문과 편집 목록은 이 화면에 남아 있어요. 현재 저장 상태를 확인한 뒤 다시 확인하고 저장해 주세요.</p><button data-case-set="edit:form">편집 내용 확인</button></div>
+<div data-case-panel="edit:conflict" hidden><div class="notice error" role="alert"><h3>다른 곳에서 먼저 수정했어요</h3><p>최신 내용을 덮어쓰지 않았어요. 내 본문·사실 목록은 유지돼요. 자동 병합하거나 자동 재시도하지 않아요.</p></div><div class="compare"><div><strong>최신 저장본</strong><p class="micro">재조회한 snapshot 기준</p></div><div><strong>내 편집 내용</strong><p class="micro">본문·사실 목록 유지</p></div></div><p class="hint">최신 저장본을 기준으로 변경 영향 요약을 다시 계산하고, 다시 확인한 뒤 저장해요.</p><button id="reconfirm-facts" class="wide">최신본 기준으로 다시 확인</button></div>
+<div data-case-panel="edit:lookup" hidden class="notice error" role="alert"><h3>최신 저장본을 확인하지 못했어요</h3><p>빈 항목으로 취급하지 않아요. 내 편집 내용을 유지하고 확인될 때까지 저장을 기다려 주세요.</p><button data-case-set="edit:conflict">최신본 재조회 상태 시안</button></div>
 <div data-case-panel="edit:leave" hidden class="card"><h3>저장하지 않고 나갈까요?</h3><p>현재 입력은 저장되지 않아요. 원래 항목은 그대로 남아요.</p><div class="actions"><button data-case-set="edit:form">계속 편집</button><button data-flow="library">저장하지 않고 나가기</button></div></div>
 <div data-case-panel="edit:remove" hidden><div class="card"><h3>항목 사용 중지</h3><p>항목은 남기고 다음 요청부터 제공하지 않아요. 참조하던 기억은 미확인 설정 처리 기준을 따라요.</p><button class="wide" data-case-set="edit:saved">비활성화</button><p>이미 비활성화된 항목에는 같은 위치에 다시 사용을 제공해요.</p></div><div class="notice error"><h3>항목 A를 삭제할까요?</h3><p>공용 책의 항목만 삭제해요. 연결된 두 페르소나의 기억 원문은 지우지 않아요. 참조된 설정은 미확인으로 처리해요.</p><div class="actions"><button data-case-set="edit:form">취소</button><button data-flow="library">항목 삭제</button></div></div></div>
-</div><div class="footer actions"><button data-case-set="edit:leave">뒤로</button><button id="edit-save" class="primary" data-case-set="edit:saving">저장</button></div></div></article>
-</div><p class="design-note">항목 저장 때마다 확인 창을 띄우지 않습니다. 삭제와 저장하지 않고 나가기만 명시적으로 확인합니다. 저장 실패의 입력 보존은 현재 화면 기준이며 앱 종료 후 편집 초안 복구를 약속하지 않습니다.</p>
+<p class="hint" id="reconfirm-status" role="status" hidden>최신 저장본 기준으로 변경 영향 요약을 다시 확인해 주세요. 확인하고 저장하기 전에는 반영되지 않아요.</p>
+</div><div class="footer actions"><button data-case-set="edit:leave">뒤로</button><button id="edit-save" class="primary">확인하고 저장</button></div></div></article>
+</div><p class="design-note">D-633-01/02 반영 시안. 사실별 체크·원문 span·분할/병합 전용 버튼·행별 비교 편집기는 두지 않습니다. 본문 등 생성 입력/편집 대상/요청 세대가 달라지거나 화면을 벗어나면 늦은 후보를 적용하지 않습니다. 저장 영향은 실제 저장 snapshot과 사실 내용+공개 범위를 기준으로 다시 확인합니다. 실패·취소의 입력 보존은 현재 화면 기준이며 앱 종료 후 초안 복구를 약속하지 않습니다. 운영 모델·비용·호출 활성화는 이 시안의 결정 범위 밖입니다.</p>
 </section>
 
 <section class="flow-panel" id="flow-connect" hidden>
@@ -256,6 +276,47 @@ details{border:1px solid var(--outline);border-radius:16px;margin:12px 0;backgro
 </div></details>
 </main>
 <script>
+// 화면 검토용 상태 전환만 제공하며 네트워크·DB·provider를 호출하지 않는다.
+const factList=document.querySelector('#fact-list');
+const candidateFacts=['합성 사실 A','합성 사실 C'];
+let factSequence=0;
+function currentFacts(){return [...factList.querySelectorAll('textarea')].map(input=>input.value);}
+function updateFactCount(){
+  const facts=currentFacts();document.querySelector('#fact-count').textContent=facts.length+'개';
+  document.querySelector('#zero-facts').hidden=facts.length!==0||document.querySelector('#entry-visibility').value==='author';
+  const kept=candidateFacts.filter(fact=>facts.includes(fact)).length;
+  const visibility=document.querySelector('#entry-visibility');
+  const original=['합성 사실 A','합성 사실 B'];const unchanged=original.filter(fact=>facts.includes(fact)).length;
+  document.querySelector('#save-impact').textContent='저장본 대비 · 유지 '+unchanged+'개 · 현재에만 '+(facts.length-unchanged)+'개 · 저장본에만 '+(original.length-unchanged)+'개 · 본문 '+(document.querySelector('#entry-body').value==='합성 본문 A. 합성 본문 B.'?'동일':'변경')+' · 공개 범위 '+(visibility.value?visibility.selectedOptions[0].textContent:'선택 필요');
+  document.querySelector('#candidate-summary').textContent='현재 '+facts.length+'개 → 후보 '+candidateFacts.length+'개 · 같은 내용 '+kept+'개 · 후보에만 '+(candidateFacts.length-kept)+'개 · 현재에만 '+(facts.length-kept)+'개';
+}
+function addFact(value='',focus=false){
+  const row=document.createElement('div');row.className='fact-row';const id='fact-'+(++factSequence);
+  const label=document.createElement('label');label.className='field';const span=document.createElement('span');span.textContent='사실 '+factSequence;
+  const input=document.createElement('textarea');input.id=id;input.value=value;input.rows=2;input.addEventListener('input',updateFactCount);label.append(span,input);
+  const remove=document.createElement('button');remove.textContent='사실 삭제';remove.setAttribute('aria-label','사실 '+factSequence+' 삭제');remove.addEventListener('click',()=>{row.remove();updateFactCount();document.querySelector('#add-fact').focus();});row.append(label,remove);factList.append(row);updateFactCount();if(focus)input.focus();
+}
+function updateFactState(value){
+  const locked=['saving','conflict','lookup'].includes(value);
+  document.querySelector('#edit-save').disabled=locked||value==='analyzing';
+  document.querySelector('#fact-editor').hidden=['saved','leave','remove'].includes(value);
+  document.querySelectorAll('#fact-editor input,#fact-editor textarea,#fact-editor select,#fact-editor button').forEach(input=>input.disabled=value==='saving');
+  document.querySelector('#analyze-facts').disabled=value==='analyzing'||value==='saving';
+  document.querySelector('#source-changed').hidden=value!=='bodychanged';
+  updateFactCount();
+}
+addFact('합성 사실 A');addFact('합성 사실 B');
+document.querySelector('#add-fact').addEventListener('click',()=>addFact('',true));
+document.querySelector('#manual-facts').addEventListener('click',()=>{showCase('edit','form');document.querySelector('#facts-heading').scrollIntoView({block:'start'});document.querySelector('#add-fact').focus();});
+document.querySelector('#entry-body').addEventListener('input',()=>{showCase('edit','bodychanged');updateFactCount();});
+document.querySelector('#entry-visibility').addEventListener('change',updateFactCount);
+document.querySelector('#analyze-facts').addEventListener('click',()=>showCase('edit','analyzing'));
+document.querySelector('[data-fact-action="retry"]').addEventListener('click',()=>showCase('edit','analyzing'));
+document.querySelector('#cancel-analysis').addEventListener('click',()=>showCase('edit','cancelled'));
+document.querySelector('#keep-facts').addEventListener('click',()=>showCase('edit','form'));
+document.querySelector('#use-candidate').addEventListener('click',()=>{factList.replaceChildren();candidateFacts.forEach(fact=>addFact(fact));showCase('edit','form');document.querySelector('#facts-heading').scrollIntoView({block:'start'});});
+document.querySelector('#reconfirm-facts').addEventListener('click',()=>{showCase('edit','form');document.querySelector('#reconfirm-status').hidden=false;document.querySelector('#save-summary').scrollIntoView({block:'center'});document.querySelector('#edit-save').focus();});
+document.querySelector('#edit-save').addEventListener('click',()=>{const valid=['entry-name','entry-body','entry-visibility'].every(id=>document.querySelector('#'+id).value.trim());showCase('edit',valid?'saving':'validation');const target=document.querySelector('[data-case-panel="edit:'+(valid?'saving':'validation')+'"]');target.scrollIntoView({block:'center'});});
 const state=document.querySelector('#state');
 const flowButtons=[...document.querySelectorAll('.flow-nav [data-flow]')];
 function showFlow(name,focus=true){
@@ -268,7 +329,7 @@ function showCase(group,value){
   const select=document.querySelector('[data-case-group="'+group+'"]');
   if(select)select.value=value;
   document.querySelectorAll('[data-case-panel^="'+group+':"]').forEach(panel=>panel.hidden=panel.dataset.casePanel!==group+':'+value);
-  if(group==='edit')document.querySelector('#edit-save').disabled=value==='saving';
+  if(group==='edit')updateFactState(value);
   if(group==='knowledge')document.querySelector('#knowledge-save').disabled=['saving','changed'].includes(value);
   if(group==='connect'){document.querySelector('#connect-save').hidden=value!=='before';document.querySelector('#connect-result').hidden=true;const locked=['locked','changed','none'].includes(value);document.querySelector('#connect-persona-state').textContent=locked?'대화 시작됨 · 연결 고정':'아직 시작 전 · 선택됨';const action=document.querySelector('#connect-persona-action');action.dataset.caseSet='connect:'+(locked?value==='none'?'none':'locked':'before');action.textContent=locked?'연결 보기':'선택 변경·해제';}
   if(group==='archive'){const empty=['delete','deleted'].includes(value);document.querySelector('#archive-book-title').textContent=(empty?'로어북 B':'로어북 A')+' · 책 관리';document.querySelector('#archive-book-count').textContent=empty?'연결된 페르소나 없음':'연결된 페르소나 2명';}
