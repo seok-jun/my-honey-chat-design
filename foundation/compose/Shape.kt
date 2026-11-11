@@ -34,6 +34,8 @@ object SomeYouSize {
     val AvatarList = 52.dp
     val AvatarProfile = 96.dp
     val OnlineDot = 10.dp
+    val ConversationStar = 15.dp
+    val ConversationStarContainer = 23.dp
     val MinTouchTarget = 48.dp
     val InputMinHeight = 48.dp
     val SendButton = 48.dp

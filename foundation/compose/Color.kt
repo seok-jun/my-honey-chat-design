@@ -106,6 +106,9 @@ data class SomeYouColors(
     /** 별빛 포인트: 온라인 점, 안 읽은 배지, 선톡 칩에만 쓴다. */
     val star: Color,
     val onStar: Color,
+    val conversationStarGold: Color,
+    val conversationStarPink: Color,
+    val conversationStarLavender: Color,
 )
 
 internal val DarkSomeYouColors = SomeYouColors(
@@ -115,6 +118,9 @@ internal val DarkSomeYouColors = SomeYouColors(
     onUserBubble = OnUserBubble,
     star = DarkStar,
     onStar = OnStar,
+    conversationStarGold = Color(0xFFFFD27A),
+    conversationStarPink = Color(0xFFFFB5D6),
+    conversationStarLavender = Color(0xFFC7B5FF),
 )
 
 internal val LightSomeYouColors = SomeYouColors(
@@ -124,6 +130,9 @@ internal val LightSomeYouColors = SomeYouColors(
     onUserBubble = OnUserBubble,
     star = LightStar,
     onStar = OnStar,
+    conversationStarGold = Color(0xFFAD730E),
+    conversationStarPink = Color(0xFFBD477E),
+    conversationStarLavender = Color(0xFF7753C8),
 )
 
 internal val LocalSomeYouColors = staticCompositionLocalOf { DarkSomeYouColors }
