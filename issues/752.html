@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>#752 · 역할 설정에서 전송 범위 확인</title>
+  <style>
+    :root { color-scheme: light dark; font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif; }
+    body { margin: 0; padding: 32px 20px 72px; }
+    main { max-width: 1100px; margin: 0 auto; }
+    header { margin-bottom: 28px; }
+    .meta { opacity: .65; }
+    .tabs { display: flex; gap: 8px; margin: 20px 0; }
+    button { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); background: Canvas; color: CanvasText; border-radius: 10px; padding: 9px 14px; cursor: pointer; }
+    button[aria-selected="true"] { font-weight: 700; border-color: CanvasText; }
+    .stage { border: 1px solid color-mix(in srgb, CanvasText 18%, Canvas); border-radius: 18px; padding: 24px; min-height: 520px; }
+    .phone { width: min(390px, 100%); min-height: 700px; margin: 0 auto; border: 1px solid color-mix(in srgb, CanvasText 25%, Canvas); border-radius: 28px; padding: 18px; box-sizing: border-box; }
+    [hidden] { display: none !important; }
+  nav,.actions {display:flex;align-items:center;gap:12px;flex-wrap:wrap} nav{margin-bottom:18px} select{font:inherit;padding:6px} .phone{display:flex;align-items:flex-end;background:color-mix(in srgb,CanvasText 8%,Canvas);padding:8px;min-height:550px} .sheet{box-sizing:border-box;width:100%;background:Canvas;border-radius:20px;padding:18px}.handle{width:35px;height:4px;border-radius:3px;margin:auto;background:GrayText}.notice{margin:16px 0;padding:12px;border:1px solid GrayText;border-radius:12px}.notice h3,.sheet h2{margin:8px 0}.actions{justify-content:flex-end}#save:not(:disabled){background:#304e97;color:white}body{font-family:Roboto,system-ui,sans-serif} .stage{min-height:auto} @media(max-width:520px){body,.stage{padding:8px}}
+</style>
+</head>
+<body>
+<main>
+<header><p class="meta">역할 설정 · 설계 초안</p><h1>#752 회사 선택과 전송 범주 확인</h1>
+<p>역할을 저장할 때 적용 대상과 회사별 전송 범주를 함께 확인합니다.</p></header>
+<nav aria-label="화면 상태"><label>화면 상태 <select id="state"></select></label><label>적용 대상 <select id="scope"><option>앱 기본</option><option>이 대화의 역할</option></select></label></nav>
+<section class="stage"><article class="phone"><div class="sheet"><div class="handle"></div>
+<p class="meta" id="target"></p><h2>이미지 · 선택 변경</h2>
+<label>이미지 모델의 회사 <select id="provider"><option>xAI</option><option>OpenAI</option></select></label>
+<p class="meta">이미지 생성 요청에 사용할 모델을 선택하세요.</p>
+<section class="notice"><h3 id="company"></h3><p id="audience"></p><ul id="categories"></ul></section>
+<p id="result" role="status"></p><div class="actions"><button id="cancel">취소</button><button id="save">확인하고 저장</button></div>
+</div></article></section>
+</main>
+<script>
+const states = {
+  initial: ['기존 선택', '회사와 전송 범주를 확인한 뒤 직접 선택해 주세요.'],
+  selected: ['회사 선택', '선택한 회사와 전송 범주를 확인해 주세요.'],
+  expanded: ['범주 확대', '이미지 역할을 추가하면 생성 프롬프트도 이 회사에 전송됩니다.'],
+  saving: ['저장 중', '저장 중입니다.'],
+  saved: ['저장 완료', '선택한 회사와 전송 범주를 저장했어요.'],
+  cancelled: ['취소', '기존 설정을 유지했어요.'],
+  failed: ['저장 실패', '저장하지 못했어요. 기존 설정이 적용됩니다.'],
+  stale: ['고지 변경', '설정이 바뀌었어요. 최신 회사와 범주를 다시 확인해 주세요.']
+};
+const el = id => document.getElementById(id);
+for (const [id, value] of Object.entries(states)) el('state').add(new Option(value[0], id));
+function draw() {
+  const state = el('state').value, scope = el('scope').value;
+  el('target').textContent = scope;
+  el('company').textContent = el('provider').value + '에 보낼 수 있는 데이터';
+  el('audience').textContent = scope === '앱 기본' ? '이 기본값을 따르는 기존 대화와 새 대화에 적용됩니다.' : '이 대화에 적용됩니다.';
+  const categories = state === 'expanded' ? ['페르소나, 대화, 기억, 로어', '첨부 자료, 도구 결과', '생성 프롬프트 · 추가'] : ['생성 프롬프트', '첨부 자료'];
+  el('categories').replaceChildren(...categories.map(value => { const li = document.createElement('li'); li.textContent = value; return li; }));
+  el('result').textContent = states[state][1];
+  el('save').disabled = !['selected','expanded','failed'].includes(state);
+  el('save').textContent = state === 'saving' ? '저장 중' : '확인하고 저장';
+  el('scope').disabled = el('provider').disabled = el('cancel').disabled = state === 'saving';
+}
+function show(state) { el('state').value = state; draw(); }
+el('scope').onchange = () => show('initial');
+el('provider').onchange = () => show('selected');
+el('state').onchange = draw;
+el('cancel').onclick = () => show('cancelled');
+el('save').onclick = () => { show('saving'); setTimeout(() => { if (el('state').value === 'saving') show('saved'); }, 700); };
+draw();
+</script></body></html>
